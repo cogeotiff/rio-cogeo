@@ -53,8 +53,8 @@ class CogeoProfiles(object):
             'tiled': True,
             'blockxsize': 512,
             'blockysize': 512,
-            'compress': 'LZW',
-            'photometric': 'DEFLATE'}
+            'compress': 'DEFLATE',
+            'photometric': 'RGB'}
 
     cog_deflate = COG_DEFLATE()
 
