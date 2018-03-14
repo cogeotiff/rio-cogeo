@@ -1,62 +1,45 @@
 
-from rasterio.profiles import Profile
 
-
-class CogeoProfiles(object):
-    """Rasterio profiles
+class COG(dict):
+    """CloudOptimized GeoTiff profiles
     """
 
-    def get(self, name):
-        if name == 'ycbcr':
-            return self.cog_ycbcr
-        elif name == 'lzw':
-            return self.cog_lzw
-        elif name == 'deflate':
-            return self.cog_deflate
-        else:
-            raise Exception('Invalid Profile name')
-
-    class COG_YCbCr(Profile):
+    def __init__(self):
         """Tiled, pixel-interleaved, JPEG-compressed, 8-bit GTiff."""
-
-        defaults = {
+        self.update({'ycbcr': {
             'driver': 'GTiff',
             'interleave': 'pixel',
             'tiled': True,
             'blockxsize': 512,
             'blockysize': 512,
             'compress': 'JPEG',
-            'photometric': 'YCbCr'}
+            'photometric': 'YCbCr'}})
 
-    cog_ycbcr = COG_YCbCr()
-
-    class COG_LZW(Profile):
         """Tiled, pixel-interleaved, LZW-compressed, 8-bit GTiff."""
-
-        defaults = {
+        self.update({'lzw': {
             'driver': 'GTiff',
             'interleave': 'pixel',
             'tiled': True,
             'blockxsize': 512,
             'blockysize': 512,
             'compress': 'LZW',
-            'photometric': 'RGB'}
+            'photometric': 'RGB'}})
 
-    cog_lzw = COG_LZW()
-
-    class COG_DEFLATE(Profile):
         """Tiled, pixel-interleaved, DEFLATE-compressed, 8-bit GTiff."""
-
-        defaults = {
+        self.update({'deflate': {
             'driver': 'GTiff',
             'interleave': 'pixel',
             'tiled': True,
             'blockxsize': 512,
             'blockysize': 512,
             'compress': 'DEFLATE',
-            'photometric': 'RGB'}
+            'photometric': 'RGB'}})
 
-    cog_deflate = COG_DEFLATE()
+    def get(self, key):
+        """Like normal item access but error."""
+        if key not in (self.keys()):
+            raise KeyError('{} is not a valid COG profile name'.format(key))
+        return self[key]
 
 
-CogeoProfiles = CogeoProfiles()
+cog_profiles = COG()

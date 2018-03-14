@@ -9,26 +9,47 @@ import numpy
 
 import rasterio
 from rasterio.enums import Resampling
-from rio_cogeo.profiles import CogeoProfiles
+from rio_cogeo.profiles import cog_profiles
+
+
+class CustomType():
+
+    class BdxParamType(click.ParamType):
+        """Band Index Type
+        """
+        name = 'str'
+
+        def convert(self, value, param, ctx):
+            try:
+                bands = [int(x) for x in value.split(',')]
+                assert len(bands) in [1, 3]
+                assert all(b > 0 for b in bands)
+                return value
+            except (AttributeError, AssertionError):
+                raise click.ClickException('bidx must be a string with 1 or 3 ints (> 0) comma-separated, '
+                                           'representing the band indexes for R,G,B')
+
+    bidx = BdxParamType()
 
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
 @click.option('--output', '-o', required=True, type=click.Path())
-@click.option('--bidx', '-b', type=str, default='1,2,3')
-@click.option('--profile', '-p', type=str, default='ycbcr')
-@click.option('--nodata', type=int)
-@click.option('--alpha', type=int)
-@click.option('--level', type=int, default=6, help='Overview level (default: 6)')
-def cogeo(path, output, bidx, profile, nodata, alpha, level):
+@click.option('--bidx', '-b', type=CustomType.bidx, default='1,2,3', help='Band index to copy')
+@click.option('--profile', '-p', type=str, default='ycbcr', help='COGEO profile (default: ycbcr)')
+@click.option('--nodata', type=int, help='Force mask creation from a given nodata value')
+@click.option('--alpha', type=int, help='Force mask creation from a given alpha band number')
+@click.option('--overview-level', type=int, default=6, help='Overview level (default: 6)')
+def cogeo(path, output, bidx, profile, nodata, alpha, overview_level):
     """Create Cloud Optimized Geotiff
     """
 
-    bands = [int(b) for b in bidx.split(',')]
-    if len(bands) != 3:
-        click.Exception('invalid bdix format')
+    if nodata is not None and alpha:
+        raise click.ClickException('Incompatible  option "alpha" and "nodata"')
 
-    meta_update = CogeoProfiles.get(profile)
+    bands = [int(b) for b in bidx.split(',')]
+
+    meta_update = cog_profiles.get(profile)
 
     output = os.path.join(os.getcwd(), output)
     if os.path.exists(output):
@@ -43,8 +64,11 @@ def cogeo(path, output, bidx, profile, nodata, alpha, level):
             meta['count'] = len(bands)
 
             with rasterio.open(output, 'w', **meta) as dst:
+
                 mask = numpy.zeros((meta['height'], meta['width']), dtype=numpy.uint8)
+
                 wind = list(dst.block_windows(1))
+
                 with click.progressbar(wind, length=len(wind), file=sys.stderr, show_percent=True) as windows:
                     for ij, w in windows:
                         matrix = src.read(window=w, indexes=bands, resampling=Resampling.bilinear)
@@ -63,6 +87,6 @@ def cogeo(path, output, bidx, profile, nodata, alpha, level):
 
                 dst.write_mask(mask)
 
-                overviews = [2**j for j in range(1, level + 1)]
+                overviews = [2**j for j in range(1, overview_level + 1)]
                 dst.build_overviews(overviews, Resampling.nearest)
                 dst.update_tags(ns='rio_overview', resampling=Resampling.nearest.value)
