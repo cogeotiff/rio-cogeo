@@ -1,4 +1,4 @@
-"""rio_cogeo.cogeo"""
+"""rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
 import sys
 
@@ -12,7 +12,6 @@ from rasterio.enums import Resampling
 
 def cog_translate(input_file, output_file, profile, bands, nodata, alpha, overview_level):
     """Create Cloud Optimized Geotiff."""
-
     with rasterio.open(input_file) as src:
 
         nodata = src.nodata if src.nodata else nodata
