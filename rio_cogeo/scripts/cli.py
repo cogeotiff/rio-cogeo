@@ -1,9 +1,9 @@
 """rio_cogeo.scripts.cli"""
 
-import os
 import click
 
 import rasterio
+
 from rio_cogeo.cogeo import create
 from rio_cogeo.profiles import cog_profiles
 
@@ -47,18 +47,10 @@ def cogeo(path, output, bidx, profile, nodata, alpha, overview_level, threads):
     bands = [int(b) for b in bidx.split(',')]
     output_profile = cog_profiles.get(profile)
 
-    output = os.path.join(os.getcwd(), output)
-    if os.path.exists(output):
-        os.remove(output)
-
     gda_env = dict(
         GDAL_TIFF_INTERNAL_MASK=True,
         GDAL_TIFF_OVR_BLOCKSIZE=512,
         NUM_THREADS=threads)
 
     with rasterio.Env(**gda_env):
-        with rasterio.open(path) as src:
-            cogeo = create(src, bands, output_profile,  nodata, alpha, overview_level)
-
-            with open(output, 'wb') as f:
-                f.write(cogeo.read())
+        create(path, output, output_profile, bands, nodata, alpha, overview_level)
