@@ -10,7 +10,7 @@ import rasterio
 from rasterio.enums import Resampling
 
 
-def create(input_file, output_file, profile, bands, nodata, alpha, overview_level):
+def cog_translate(input_file, output_file, profile, bands, nodata, alpha, overview_level):
     """Create Cloud Optimized Geotiff."""
 
     with rasterio.open(input_file) as src:

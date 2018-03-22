@@ -4,7 +4,7 @@ import click
 
 import rasterio
 
-from rio_cogeo.cogeo import create
+from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
 
@@ -53,4 +53,4 @@ def cogeo(path, output, bidx, profile, nodata, alpha, overview_level, threads):
         NUM_THREADS=threads)
 
     with rasterio.Env(**gda_env):
-        create(path, output, output_profile, bands, nodata, alpha, overview_level)
+        cog_translate(path, output, output_profile, bands, nodata, alpha, overview_level)
