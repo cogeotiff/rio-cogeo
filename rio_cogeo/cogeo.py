@@ -10,15 +10,16 @@ import rasterio
 from rasterio.enums import Resampling
 
 
-def cog_translate(input_file, output_file, profile, bands, nodata, alpha, overview_level):
+def cog_translate(input_file, output_file, profile, indexes, nodata, alpha, overview_level):
     """Create Cloud Optimized Geotiff."""
     with rasterio.open(input_file) as src:
 
+        indexes = indexes if indexes else src.indexes
         nodata = src.nodata if src.nodata else nodata
 
         meta = src.meta
         meta.update(**profile)
-        meta['count'] = len(bands)
+        meta['count'] = len(indexes)
 
         with rasterio.open(output_file, 'w', **meta) as dst:
 
@@ -27,8 +28,8 @@ def cog_translate(input_file, output_file, profile, bands, nodata, alpha, overvi
 
             with click.progressbar(wind, length=len(wind), file=sys.stderr, show_percent=True) as windows:
                 for ij, w in windows:
-                    matrix = src.read(window=w, indexes=bands, resampling=Resampling.bilinear)
-                    dst.write(matrix, window=w, indexes=bands)
+                    matrix = src.read(window=w, indexes=indexes, resampling=Resampling.bilinear)
+                    dst.write(matrix, window=w)
 
                     if nodata is not None:
                         mask_value = numpy.all(matrix != nodata, axis=0).astype(numpy.uint8) * 255
