@@ -1,3 +1,4 @@
+"""rio_cogeo.profiles"""
 
 
 class COG(dict):
