@@ -32,7 +32,8 @@ class CustomType():
 @click.argument('path', type=click.Path(exists=True))
 @click.option('--output', '-o', required=True, type=click.Path())
 @click.option('--bidx', '-b', type=CustomType.bidx, default='1,2,3', help='Band index to copy')
-@click.option('--profile', '-p', type=str, default='ycbcr', help='COGEO profile (default: ycbcr)')
+@click.option('--profile', '-p', type=click.Choice(cog_profiles.keys()), default='ycbcr',
+              help='COGEO profile (default: ycbcr)')
 @click.option('--nodata', type=int, help='Force mask creation from a given nodata value')
 @click.option('--alpha', type=int, help='Force mask creation from a given alpha band number')
 @click.option('--overview-level', type=int, default=6, help='Overview level (default: 6)')
