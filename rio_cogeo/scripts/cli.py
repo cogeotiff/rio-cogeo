@@ -20,7 +20,7 @@ class CustomType():
                 bands = [int(x) for x in value.split(',')]
                 assert len(bands) in [1, 3]
                 assert all(b > 0 for b in bands)
-                return value
+                return bands
             except (AttributeError, AssertionError):
                 raise click.ClickException('bidx must be a string with 1 or 3 ints (> 0) comma-separated, '
                                            'representing the band indexes for R,G,B')
@@ -44,7 +44,6 @@ def cogeo(path, output, bidx, profile, nodata, alpha, overview_level, threads):
     if nodata is not None and alpha:
         raise click.ClickException('Incompatible  option "alpha" and "nodata"')
 
-    bands = [int(b) for b in bidx.split(',')]
     output_profile = cog_profiles.get(profile)
 
     gda_env = dict(
@@ -53,4 +52,4 @@ def cogeo(path, output, bidx, profile, nodata, alpha, overview_level, threads):
         NUM_THREADS=threads)
 
     with rasterio.Env(**gda_env):
-        cog_translate(path, output, output_profile, bands, nodata, alpha, overview_level)
+        cog_translate(path, output, output_profile, bidx, nodata, alpha, overview_level)
