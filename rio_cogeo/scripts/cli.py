@@ -1,4 +1,4 @@
-"""rio_cogeo.scripts.cli"""
+"""rio_cogeo.scripts.cli."""
 
 import click
 
@@ -9,13 +9,15 @@ from rio_cogeo.profiles import cog_profiles
 
 
 class CustomType():
+    """Click CustomType."""
 
     class BdxParamType(click.ParamType):
-        """Band Index Type
-        """
-        name = 'str'
+        """Band inddex type."""
+
+        name = 'bidx'
 
         def convert(self, value, param, ctx):
+            """Validate and parse band index."""
             try:
                 bands = [int(x) for x in value.split(',')]
                 assert len(bands) in [1, 3]
@@ -33,15 +35,13 @@ class CustomType():
 @click.option('--output', '-o', required=True, type=click.Path())
 @click.option('--bidx', '-b', type=CustomType.bidx, default='1,2,3', help='Band index to copy')
 @click.option('--profile', '-p', type=click.Choice(cog_profiles.keys()), default='ycbcr',
-              help='COGEO profile (default: ycbcr)')
+              help='CloudOptimized GeoTIFF profile (default: ycbcr)')
 @click.option('--nodata', type=int, help='Force mask creation from a given nodata value')
 @click.option('--alpha', type=int, help='Force mask creation from a given alpha band number')
 @click.option('--overview-level', type=int, default=6, help='Overview level (default: 6)')
 @click.option('--threads', type=int, default=8)
 def cogeo(path, output, bidx, profile, nodata, alpha, overview_level, threads):
-    """Create Cloud Optimized Geotiff
-    """
-
+    """Create Cloud Optimized Geotiff."""
     if nodata is not None and alpha:
         raise click.ClickException('Incompatible  option "alpha" and "nodata"')
 
