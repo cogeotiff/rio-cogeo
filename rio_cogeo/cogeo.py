@@ -47,5 +47,3 @@ def create(input_file, output_file, profile, bands, nodata, alpha, overview_leve
             overviews = [2**j for j in range(1, overview_level + 1)]
             dst.build_overviews(overviews, Resampling.nearest)
             dst.update_tags(ns='rio_overview', resampling=Resampling.nearest.value)
-
-    return True
