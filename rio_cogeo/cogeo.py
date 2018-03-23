@@ -21,6 +21,9 @@ def cog_translate(input_file, output_file, profile,
         meta.update(**profile)
         meta['count'] = len(indexes)
 
+        meta.pop('nodata', None)
+        meta.pop('alpha', None)
+
         with rasterio.open(output_file, 'w', **meta) as dst:
 
             mask = numpy.zeros((dst.height, dst.width), dtype=numpy.uint8)
@@ -28,17 +31,16 @@ def cog_translate(input_file, output_file, profile,
 
             with click.progressbar(wind, length=len(wind), file=sys.stderr, show_percent=True) as windows:
                 for ij, w in windows:
-                    matrix = src.read(window=w, indexes=indexes, resampling=Resampling.bilinear)
+                    matrix = src.read(window=w, indexes=indexes, boundless=True)
                     dst.write(matrix, window=w)
 
                     if nodata is not None:
                         mask_value = numpy.all(matrix != nodata, axis=0).astype(numpy.uint8) * 255
                     elif alpha is not None:
-                        mask_value = src.read(alpha, window=w, boundless=True,
-                                              resampling=Resampling.bilinear)
+                        mask_value = src.read(alpha, window=w, boundless=True)
                     else:
-                        mask_value = src.read_masks(1, window=w, boundless=True,
-                                                    resampling=Resampling.bilinear)
+                        mask_value = src.read_masks(window=w, indexes=indexes, boundless=True)
+                        mask_value = numpy.all(mask_value, axis=0).astype(numpy.uint8) * 255
 
                     mask[w.row_off:w.row_off + w.height, w.col_off:w.col_off + w.width] = mask_value
 
