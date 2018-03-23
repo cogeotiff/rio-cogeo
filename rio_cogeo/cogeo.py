@@ -16,7 +16,6 @@ def cog_translate(input_file, output_file, profile,
     with rasterio.open(input_file) as src:
 
         indexes = indexes if indexes else src.indexes
-        nodata = src.nodata if src.nodata else nodata
 
         meta = src.meta
         meta.update(**profile)
