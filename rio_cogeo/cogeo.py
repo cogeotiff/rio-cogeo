@@ -39,8 +39,7 @@ def cog_translate(input_file, output_file, profile,
                     elif alpha is not None:
                         mask_value = src.read(alpha, window=w, boundless=True)
                     else:
-                        mask_value = src.read_masks(window=w, indexes=indexes, boundless=True)
-                        mask_value = numpy.all(mask_value, axis=0).astype(numpy.uint8) * 255
+                        mask_value = src.dataset_mask(window=w, boundless=True)
 
                     mask[w.row_off:w.row_off + w.height, w.col_off:w.col_off + w.width] = mask_value
 
