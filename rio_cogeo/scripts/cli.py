@@ -22,7 +22,7 @@ class CustomType():
                 bands = [int(x) for x in value.split(',')]
                 assert all(b > 0 for b in bands)
                 return bands
-            except (AttributeError, AssertionError):
+            except (ValueError, AttributeError, AssertionError):
                 raise click.ClickException('bidx must be a string of comma-separated integers (> 0), '
                                            'representing the band indexes.')
 
