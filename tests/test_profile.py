@@ -61,7 +61,7 @@ def test_profiles_raw():
 
 
 def test_profiles_copy():
-    """get should perform a dict copy."""
+    """'get' should perform a dict copy."""
     profile = cog_profiles.get('raw')
     profile.update({'interleave': 'bands'})
     profile2 = cog_profiles.get('raw')
