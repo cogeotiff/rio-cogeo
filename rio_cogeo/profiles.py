@@ -58,7 +58,7 @@ class COG(dict):
         """Like normal item access but error."""
         if key not in (self.keys()):
             raise KeyError('{} is not a valid COG profile name'.format(key))
-        return self[key]
+        return self[key].copy()
 
 
 cog_profiles = COG()
