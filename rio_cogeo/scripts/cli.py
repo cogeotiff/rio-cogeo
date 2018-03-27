@@ -2,7 +2,6 @@
 
 import click
 
-import rasterio
 from rasterio.rio import options
 
 from rio_cogeo.cogeo import cog_translate
@@ -21,12 +20,11 @@ class CustomType():
             """Validate and parse band index."""
             try:
                 bands = [int(x) for x in value.split(',')]
-                assert len(bands) in [1, 3]
                 assert all(b > 0 for b in bands)
                 return bands
             except (AttributeError, AssertionError):
-                raise click.ClickException('bidx must be a string with 1 or 3 ints (> 0) comma-separated, '
-                                           'representing the band indexes for R,G,B')
+                raise click.ClickException('bidx must be a string of comma-separated integers (> 0), '
+                                           'representing the band indexes.')
 
     bidx = BdxParamType()
 
@@ -44,17 +42,20 @@ class CustomType():
 @options.creation_options
 def cogeo(input, output, bidx, cogeo_profile, nodata, alpha, overview_level, threads, creation_options):
     """Create Cloud Optimized Geotiff."""
-    if nodata is not None and alpha:
-        raise click.ClickException('Incompatible  option "alpha" and "nodata"')
+    if nodata is not None and alpha is not None:
+        raise click.ClickException('Incompatible options "alpha" and "nodata"')
 
     output_profile = cog_profiles.get(cogeo_profile)
     if creation_options:
         output_profile.update(creation_options)
 
-    gda_env = dict(
-        GDAL_TIFF_INTERNAL_MASK=True,
-        GDAL_TIFF_OVR_BLOCKSIZE=512,
-        NUM_THREADS=threads)
+    block_size = min(
+        output_profile['blockxsize'],
+        output_profile['blockysize'])
 
-    with rasterio.Env(**gda_env):
-        cog_translate(input, output, output_profile, bidx, nodata, alpha, overview_level)
+    config = dict(
+        NUM_THREADS=threads,
+        GDAL_TIFF_INTERNAL_MASK=True,
+        GDAL_TIFF_OVR_BLOCKSIZE=block_size)
+
+    cog_translate(input, output, output_profile, bidx, nodata, alpha, overview_level, config)
