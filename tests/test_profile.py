@@ -23,7 +23,6 @@ def test_profiles_lzw():
     assert profile['compress'] == 'LZW'
     assert profile['blockxsize'] == 512
     assert profile['blockysize'] == 512
-    assert profile['photometric'] == 'RGB'
     assert profile['interleave'] == 'pixel'
 
 
@@ -34,7 +33,6 @@ def test_profiles_deflate():
     assert profile['compress'] == 'DEFLATE'
     assert profile['blockxsize'] == 512
     assert profile['blockysize'] == 512
-    assert profile['photometric'] == 'RGB'
     assert profile['interleave'] == 'pixel'
 
 
@@ -45,7 +43,6 @@ def test_profiles_packbits():
     assert profile['compress'] == 'PACKBITS'
     assert profile['blockxsize'] == 512
     assert profile['blockysize'] == 512
-    assert profile['photometric'] == 'RGB'
     assert profile['interleave'] == 'pixel'
 
 
@@ -56,7 +53,6 @@ def test_profiles_raw():
     assert not profile.get('compress')
     assert profile['blockxsize'] == 512
     assert profile['blockysize'] == 512
-    assert profile['photometric'] == 'RGB'
     assert profile['interleave'] == 'pixel'
 
 
