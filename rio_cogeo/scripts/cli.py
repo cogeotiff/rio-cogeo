@@ -4,7 +4,7 @@ import click
 
 from rasterio.rio import options
 
-from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
 
@@ -29,7 +29,13 @@ class CustomType():
     bidx = BdxParamType()
 
 
-@click.command()
+@click.group(short_help="Create and Validate COGEO")
+def cogeo():
+    """Rasterio cogeo subcommands."""
+    pass
+
+
+@cogeo.command(short_help="Create a COGEO")
 @options.file_in_arg
 @options.file_out_arg
 @click.option('--bidx', '-b', type=CustomType.bidx, default='1,2,3', help='Band index to copy (default: 1,2,3)')
@@ -40,7 +46,7 @@ class CustomType():
 @click.option('--overview-level', type=int, default=6, help='Overview level (default: 6)')
 @click.option('--threads', type=int, default=8)
 @options.creation_options
-def cogeo(input, output, bidx, cogeo_profile, nodata, alpha, overview_level, threads, creation_options):
+def create(input, output, bidx, cogeo_profile, nodata, alpha, overview_level, threads, creation_options):
     """Create Cloud Optimized Geotiff."""
     if nodata is not None and alpha is not None:
         raise click.ClickException('Incompatible options "alpha" and "nodata"')
@@ -59,3 +65,13 @@ def cogeo(input, output, bidx, cogeo_profile, nodata, alpha, overview_level, thr
         GDAL_TIFF_OVR_BLOCKSIZE=block_size)
 
     cog_translate(input, output, output_profile, bidx, nodata, alpha, overview_level, config)
+
+
+@cogeo.command(short_help="Validate COGEO")
+@options.file_in_arg
+def validate(input):
+    """Validate Cloud Optimized Geotiff."""
+    if cog_validate(input):
+        click.echo('{} is a valid cloud optimized GeoTIFF'.format(input))
+    else:
+        click.echo('{} is NOT a valid cloud optimized GeoTIFF'.format(input))
