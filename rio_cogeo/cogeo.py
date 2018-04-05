@@ -42,9 +42,9 @@ def cog_translate(src, dst, dst_opts,
 
             indexes = indexes if indexes else src.indexes
             meta = src.meta
+            meta['count'] = len(indexes)
             meta.pop('nodata', None)
             meta.pop('alpha', None)
-            meta['count'] = len(indexes)
             meta.pop('compress', None)
             meta.update(**dst_opts)
 
