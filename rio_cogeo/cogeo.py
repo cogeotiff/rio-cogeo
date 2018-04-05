@@ -38,10 +38,10 @@ def cog_translate(src, dst, dst_opts,
     config = config or {}
 
     with rasterio.Env(**config):
-        with rasterio.open(src) as src:
+        with rasterio.open(src) as dsrc:
 
-            indexes = indexes if indexes else src.indexes
-            meta = src.meta
+            indexes = indexes if indexes else dsrc.indexes
+            meta = dsrc.meta
             meta['count'] = len(indexes)
             meta.pop('nodata', None)
             meta.pop('alpha', None)
@@ -55,15 +55,15 @@ def cog_translate(src, dst, dst_opts,
 
                     with click.progressbar(wind, length=len(wind), file=sys.stderr, show_percent=True) as windows:
                         for ij, w in windows:
-                            matrix = src.read(window=w, indexes=indexes, boundless=True)
+                            matrix = dsrc.read(window=w, indexes=indexes, boundless=True)
                             mem.write(matrix, window=w)
 
                             if nodata is not None:
                                 mask_value = numpy.all(matrix != nodata, axis=0).astype(numpy.uint8) * 255
                             elif alpha is not None:
-                                mask_value = src.read(alpha, window=w, boundless=True)
+                                mask_value = dsrc.read(alpha, window=w, boundless=True)
                             else:
-                                mask_value = src.dataset_mask(window=w, boundless=True)
+                                mask_value = dsrc.dataset_mask(window=w, boundless=True)
 
                             mask[w.row_off:w.row_off + w.height, w.col_off:w.col_off + w.width] = mask_value
 
