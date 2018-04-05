@@ -105,12 +105,12 @@ def cog_validate(src):
                 errors.append(
                     'The file is greater than 512xH or 512xW, but has no overviews')
 
-        ifd_offset = int(ds.get_metadata_item(1, 'IFD_OFFSET', 'TIFF'))
+        ifd_offset = int(ds.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1))
         ifd_offsets = [ifd_offset]
         if ifd_offset not in (8, 16):
             errors.append(
                 'The offset of the main IFD should be 8 for ClassicTIFF '
-                'or 16 for BigTIFF. It is %d instead'.format(ifd_offset))
+                'or 16 for BigTIFF. It is {} instead'.format(ifd_offset))
 
         details['ifd_offsets'] = {}
         details['ifd_offsets']['main'] = ifd_offset
@@ -119,22 +119,15 @@ def cog_validate(src):
             errors.append('Overviews should be sorted')
 
         for ix, dec in enumerate(overviews):
-            # TODO:
-            # Check that overviews are by descending sizes
-            # ovr_band = ds.GetRasterBand(1).GetOverview(i)
-            # if i == 0:
-            #     if (ovr_band.XSize > main_band.XSize or
-            #         ovr_band.YSize > main_band.YSize):
-            #             errors += [
-            #                 'First overview has larger dimension than main band']
-            # else:
-            #     prev_ovr_band = ds.GetRasterBand(1).GetOverview(i-1)
-            #     if (ovr_band.XSize > prev_ovr_band.XSize or
-            #         ovr_band.YSize > prev_ovr_band.YSize):
-            #             errors += [
-            #                 'Overview of index %d has larger dimension than '
-            #                 'overview of index %d' % (i, i-1)]
-            #
+
+            # NOTE: Size check is handled in rasterio `src.overviews` methods
+            # https://github.com/mapbox/rasterio/blob/4ebdaa08cdcc65b141ed3fe95cf8bbdd9117bc0b/rasterio/_base.pyx
+            # Basically we just need to make sure the decimation level is > 1
+            if not dec > 1:
+                errors.append('Invalid Decimation {} for overview level {}'.format(dec, ix))
+
+            # TODO: Check if the overviews are tiled
+            # NOTE: There is currently no way to do that with rasterio
             # if check_tiled:
             #     block_size = ovr_band.GetBlockSize()
             #     if block_size[0] == ovr_band.XSize and block_size[0] > 1024:
@@ -143,7 +136,7 @@ def cog_validate(src):
 
             # Check that the IFD of descending overviews are sorted by increasing
             # offsets
-            ifd_offset = int(ds.get_metadata_item(1, 'IFD_OFFSET', 'TIFF', ovr=ix))
+            ifd_offset = int(ds.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1, ovr=ix))
             ifd_offsets.append(ifd_offset)
 
             details['ifd_offsets']['overview_{}'.format(ix)] = ifd_offset
@@ -159,7 +152,7 @@ def cog_validate(src):
                         'whereas it should be greater than the one of index {}, '
                         'which is at byte {}'.format(ix, ifd_offsets[-1], ix-1, ifd_offsets[-2]))
 
-        block_offset = int(ds.get_metadata_item(1, 'BLOCK_OFFSET_0_0', 'TIFF'))
+        block_offset = int(ds.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1))
         if not block_offset:
             errors.append('Missing BLOCK_OFFSET_0_0')
 
@@ -169,7 +162,7 @@ def cog_validate(src):
         details['data_offsets']['main'] = data_offset
 
         for ix, dec in enumerate(overviews):
-            data_offset = int(ds.get_metadata_item(1, 'BLOCK_OFFSET_0_0', 'TIFF', ovr=ix))
+            data_offset = int(ds.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1, ovr=ix))
             data_offsets.append(data_offset)
             details['data_offsets']['overview_{}'.format(ix)] = data_offset
 
