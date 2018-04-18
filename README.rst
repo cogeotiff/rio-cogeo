@@ -2,7 +2,7 @@
 rio-cogeo
 =========
 
-CloudOptimized GeoTIFF creation plugin for rasterio
+CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio
 
 
 Install
