@@ -1,7 +1,6 @@
 """rio_cogeo.profiles: CloudOptimized profiles."""
 
 from rasterio.profiles import Profile
-from rasterio.dtypes import uint8
 
 
 class YCbCrProfile(Profile):
@@ -14,8 +13,7 @@ class YCbCrProfile(Profile):
         'blockxsize': 512,
         'blockysize': 512,
         'compress': 'JPEG',
-        'photometric': 'YCbCr',
-        'dtype': uint8}
+        'photometric': 'YCbCr'}
 
 
 class LZWProfile(Profile):
