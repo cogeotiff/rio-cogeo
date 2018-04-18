@@ -12,8 +12,9 @@ from rasterio.enums import Resampling
 from rasterio.shutil import copy
 
 
-def cog_translate(src_path, dst_path, dst_opts,
-                  indexes=None, nodata=None, alpha=None, overview_level=6, config=None):
+def cog_translate(src_path, dst_path, dst_kwargs,
+                  indexes=None, nodata=None, alpha=None, overview_level=6,
+                  config=None):
     """
     Create Cloud Optimized Geotiff.
 
@@ -24,7 +25,7 @@ def cog_translate(src_path, dst_path, dst_opts,
     dst_path : str or Path-like object
         An output dataset path or or PathLike object.
         Will be opened in "w" mode.
-    dst_opts: dict
+    dst_kwargs: dict
         output dataset creation options.
     indexes : tuple, int, optional
         Raster band indexes to copy.
@@ -34,7 +35,7 @@ def cog_translate(src_path, dst_path, dst_opts,
         alpha band index for mask creation.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
-    config : mapping
+    config : dict
         Rasterio Env options.
 
     """
@@ -49,7 +50,7 @@ def cog_translate(src_path, dst_path, dst_opts,
             meta.pop('nodata', None)
             meta.pop('alpha', None)
             meta.pop('compress', None)
-            meta.update(**dst_opts)
+            meta.update(**dst_kwargs)
 
             with MemoryFile() as memfile:
                 with memfile.open(**meta) as mem:
@@ -76,4 +77,4 @@ def cog_translate(src_path, dst_path, dst_opts,
                     mem.build_overviews(overviews, Resampling.nearest)
                     mem.update_tags(ns='rio_overview', resampling=Resampling.nearest.value)
 
-                    copy(mem, dst_path, copy_src_overviews=True, **dst_opts)
+                    copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
