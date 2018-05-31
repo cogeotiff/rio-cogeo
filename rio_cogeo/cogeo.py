@@ -50,6 +50,7 @@ def cog_translate(src_path, dst_path, dst_kwargs,
             meta.pop('nodata', None)
             meta.pop('alpha', None)
             meta.pop('compress', None)
+            meta.pop('photometric', None)
             meta.update(**dst_kwargs)
 
             with MemoryFile() as memfile:
