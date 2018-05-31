@@ -17,7 +17,7 @@ def test_cogeo_valid():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif'])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif'])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open('output.tif') as src:
@@ -35,7 +35,7 @@ def test_cogeo_validbidx():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif', '-b', '1', '-p', 'raw'])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif', '-b', '1', '-p', 'raw'])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open('output.tif') as src:
@@ -46,7 +46,7 @@ def test_cogeo_validInvalidbidx():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif', '-b', '0'])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif', '-b', '0'])
         assert result.exception
         assert result.exit_code == 1
 
@@ -55,7 +55,7 @@ def test_cogeo_validInvalidbidxString():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif', '-b', 'a'])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif', '-b', 'a'])
         assert result.exception
         assert result.exit_code == 1
 
@@ -64,7 +64,7 @@ def test_cogeo_validAlpha():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgba, 'output.tif', '-b', '1,2,3', '--alpha', 4])
+        result = runner.invoke(cogeo, ['create', raster_path_rgba, 'output.tif', '-b', '1,2,3', '--alpha', 4])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open('output.tif') as src:
@@ -75,7 +75,7 @@ def test_cogeo_validnodata():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif', '--nodata', 0])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif', '--nodata', 0])
         assert not result.exception
         assert result.exit_code == 0
 
@@ -84,7 +84,7 @@ def test_cogeo_validalpahnodata():
     """Should exit with incompatible option."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgba, 'output.tif', '--nodata', 0, '--alpha', 4])
+        result = runner.invoke(cogeo, ['create', raster_path_rgba, 'output.tif', '--nodata', 0, '--alpha', 4])
         assert result.exception
         assert result.exit_code == 1
 
@@ -93,7 +93,7 @@ def test_cogeo_validGdalOptions():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, 'output.tif', '-p', 'raw', '--co', 'COMPRESS=DEFLATE'])
+        result = runner.invoke(cogeo, ['create', raster_path_rgb, 'output.tif', '-p', 'raw', '--co', 'COMPRESS=DEFLATE'])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open('output.tif') as src:
