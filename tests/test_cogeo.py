@@ -23,11 +23,9 @@ def test_cog_translate_valid():
             assert src.width == 512
             assert src.meta['dtype'] == 'uint8'
             assert not src.is_tiled  # Because blocksize is 512 and the file is 512, the output is not tiled
-            assert src.compression.name == 'jpeg'
-            assert not src.profile.get('blockxsize')
-            assert not src.profile.get('blockysize')
-            assert src.profile['photometric'] == 'ycbcr'
-            assert src.profile['interleave'] == 'pixel'
+            assert src.compression.value == 'JPEG'
+            assert src.photometric.value == 'YCbCr'
+            assert src.interleaving.value == 'PIXEL'
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
 
 
@@ -43,9 +41,7 @@ def test_cog_translate_validRaw():
             assert src.meta['dtype'] == 'uint8'
             assert not src.is_tiled  # Because blocksize is 512 and the file is 512, the output is not tiled
             assert not src.compression
-            assert not src.profile.get('blockxsize')
-            assert not src.profile.get('blockysize')
-            assert src.profile['interleave'] == 'pixel'
+            assert src.interleaving.value == 'PIXEL'
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
 
 
@@ -99,9 +95,8 @@ def test_cog_translate_validCustom():
             assert src.width == 512
             assert src.meta['dtype'] == 'uint8'
             assert src.is_tiled
-            assert src.compression.name == 'jpeg'
-            assert src.profile['blockxsize'] == 256
-            assert src.profile['blockysize'] == 256
-            assert src.profile['photometric'] == 'ycbcr'
-            assert src.profile['interleave'] == 'pixel'
+            assert src.compression.value == 'JPEG'
+            assert (256, 256) == src.block_shapes[0]
+            assert src.photometric.value == 'YCbCr'
+            assert src.interleaving.value == 'PIXEL'
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]

@@ -25,11 +25,9 @@ def test_cogeo_valid():
             assert src.width == 512
             assert src.meta['dtype'] == 'uint8'
             assert not src.is_tiled  # Because blocksize is 512 and the file is 512, the output is not tiled
-            assert src.compression.name == 'jpeg'
-            assert not src.profile.get('blockxsize')
-            assert not src.profile.get('blockysize')
-            assert src.profile['photometric'] == 'ycbcr'
-            assert src.profile['interleave'] == 'pixel'
+            assert src.compression.value == 'JPEG'
+            assert src.photometric.value == 'YCbCr'
+            assert src.interleaving.value == 'PIXEL'
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
 
 
@@ -99,6 +97,5 @@ def test_cogeo_validGdalOptions():
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open('output.tif') as src:
-            assert src.compression.name == 'deflate'
-            assert not src.profile.get('blockxsize')
-            assert not src.profile.get('blockysize')
+            assert src.compression.value == 'DEFLATE'
+            assert not src.is_tiled  # Because blocksize is 512 and the file is 512, the output is not tiled
