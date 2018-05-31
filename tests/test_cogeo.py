@@ -96,7 +96,8 @@ def test_cog_translate_validCustom():
             assert src.meta['dtype'] == 'uint8'
             assert src.is_tiled
             assert src.compression.value == 'JPEG'
-            assert (256, 256) == src.block_shapes[0]
+            assert src.profile['blockxsize'] == 256
+            assert src.profile['blockysize'] == 256
             assert src.photometric.value == 'YCbCr'
             assert src.interleaving.value == 'PIXEL'
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
