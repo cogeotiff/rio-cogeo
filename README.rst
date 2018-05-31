@@ -60,8 +60,6 @@ Examples
 Defaults COGEO profiles
 =======================
 
-Disclaimer: The defaults profiles provided by `rio-cogeo` stands for example and are might not fit your use case.
-
 **YCbCr**
 
 - JPEG compression
@@ -91,3 +89,5 @@ Disclaimer: The defaults profiles provided by `rio-cogeo` stands for example and
 - PIXEL interleave
 
 Defaults profiles are tiled with 512x512 blocksizes
+
+You can update default profile by providing `--co` options in the cli.
