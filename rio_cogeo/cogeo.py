@@ -1,5 +1,6 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
+import os
 import sys
 
 import click
@@ -8,23 +9,26 @@ import numpy
 
 import rasterio
 from rasterio.io import MemoryFile
+from rasterio.env import GDALVersion
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
 
 
-def cog_translate(src, dst, dst_opts,
-                  indexes=None, nodata=None, alpha=None, overview_level=6, config=None):
+def cog_translate(src_path, dst_path, dst_kwargs,
+                  indexes=None, nodata=None, alpha=None, overview_level=6,
+                  config=None):
     """
     Create Cloud Optimized Geotiff.
 
     Parameters
     ----------
-    src : str
-        input dataset path.
-    dst : str
-        output dataset path.
-    dst_opts: dict
-        cloudoptimized geotiff raster profile.
+    src_path : str or PathLike object
+        A dataset path or URL. Will be opened in "r" mode.
+    dst_path : str or Path-like object
+        An output dataset path or or PathLike object.
+        Will be opened in "w" mode.
+    dst_kwargs: dict
+        output dataset creation options.
     indexes : tuple, int, optional
         Raster band indexes to copy.
     nodata, int, optional
@@ -33,20 +37,23 @@ def cog_translate(src, dst, dst_opts,
         alpha band index for mask creation.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
+    config : dict
+        Rasterio Env options.
 
     """
     config = config or {}
 
     with rasterio.Env(**config):
-        with rasterio.open(src) as dsrc:
+        with rasterio.open(src_path) as src:
 
-            indexes = indexes if indexes else dsrc.indexes
-            meta = dsrc.meta
+            indexes = indexes if indexes else src.indexes
+            meta = src.meta
             meta['count'] = len(indexes)
             meta.pop('nodata', None)
             meta.pop('alpha', None)
             meta.pop('compress', None)
-            meta.update(**dst_opts)
+            meta.pop('photometric', None)
+            meta.update(**dst_kwargs)
 
             with MemoryFile() as memfile:
                 with memfile.open(**meta) as mem:
@@ -55,15 +62,15 @@ def cog_translate(src, dst, dst_opts,
 
                     with click.progressbar(wind, length=len(wind), file=sys.stderr, show_percent=True) as windows:
                         for ij, w in windows:
-                            matrix = dsrc.read(window=w, indexes=indexes, boundless=True)
+                            matrix = src.read(window=w, indexes=indexes, boundless=True)
                             mem.write(matrix, window=w)
 
                             if nodata is not None:
                                 mask_value = numpy.all(matrix != nodata, axis=0).astype(numpy.uint8) * 255
                             elif alpha is not None:
-                                mask_value = dsrc.read(alpha, window=w, boundless=True)
+                                mask_value = src.read(alpha, window=w, boundless=True)
                             else:
-                                mask_value = dsrc.dataset_mask(window=w, boundless=True)
+                                mask_value = src.dataset_mask(window=w, boundless=True)
 
                             mask[w.row_off:w.row_off + w.height, w.col_off:w.col_off + w.width] = mask_value
 
@@ -73,39 +80,49 @@ def cog_translate(src, dst, dst_opts,
                     mem.build_overviews(overviews, Resampling.nearest)
                     mem.update_tags(ns='rio_overview', resampling=Resampling.nearest.value)
 
-                    copy(mem, dst, copy_src_overviews=True, **dst_opts)
+                    copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(src):
+def cog_validate(src_path):
     """
     Create Cloud Optimized Geotiff.
 
     Parameters
     ----------
-    src : str
-        input dataset path.
+    src_path : str or PathLike object
+        A dataset path or URL. Will be opened in "r" mode.
+
+    This script is the rasterio equivalent of
+    https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
 
     """
     errors = []
     details = {}
-    with rasterio.open(src) as ds:
-        if not ds.driver == 'GTiff':
+
+    if not GDALVersion.runtime().at_least('2.2'):
+        raise Exception('GDAL 2.2 or above required')
+
+    with rasterio.open(src_path) as src:
+        if not src.driver == 'GTiff':
             raise Exception('The file is not a GeoTIFF')
 
-        # TODO: Overviews must be internal
-        # GDAL: ds.GetFileList()
+        filelist = [os.path.basename(f) for f in src.files]
+        src_bname = os.path.basename(src_path)
+        if len(filelist) > 1 and src_bname + '.ovr' in filelist:
+                errors.append(
+                    'Overviews found in external .ovr file. They should be internal')
 
-        if ds.width >= 512 or ds.height >= 512:
-            if not ds.is_tiled:
+        if src.width >= 512 or src.height >= 512:
+            if not src.is_tiled:
                 errors.append(
                     'The file is greater than 512xH or 512xW, but is not tiled')
 
-            overviews = ds.overviews(1)
+            overviews = src.overviews(1)
             if not overviews:
                 errors.append(
                     'The file is greater than 512xH or 512xW, but has no overviews')
 
-        ifd_offset = int(ds.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1))
+        ifd_offset = int(src.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1))
         ifd_offsets = [ifd_offset]
         if ifd_offset not in (8, 16):
             errors.append(
@@ -122,7 +139,7 @@ def cog_validate(src):
 
             # NOTE: Size check is handled in rasterio `src.overviews` methods
             # https://github.com/mapbox/rasterio/blob/4ebdaa08cdcc65b141ed3fe95cf8bbdd9117bc0b/rasterio/_base.pyx
-            # Basically we just need to make sure the decimation level is > 1
+            # We just need to make sure the decimation level is > 1
             if not dec > 1:
                 errors.append('Invalid Decimation {} for overview level {}'.format(dec, ix))
 
@@ -136,7 +153,7 @@ def cog_validate(src):
 
             # Check that the IFD of descending overviews are sorted by increasing
             # offsets
-            ifd_offset = int(ds.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1, ovr=ix))
+            ifd_offset = int(src.get_tag_item('IFD_OFFSET', 'TIFF', bidx=1, ovr=ix))
             ifd_offsets.append(ifd_offset)
 
             details['ifd_offsets']['overview_{}'.format(ix)] = ifd_offset
@@ -152,7 +169,7 @@ def cog_validate(src):
                         'whereas it should be greater than the one of index {}, '
                         'which is at byte {}'.format(ix, ifd_offsets[-1], ix-1, ifd_offsets[-2]))
 
-        block_offset = int(ds.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1))
+        block_offset = int(src.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1))
         if not block_offset:
             errors.append('Missing BLOCK_OFFSET_0_0')
 
@@ -162,7 +179,7 @@ def cog_validate(src):
         details['data_offsets']['main'] = data_offset
 
         for ix, dec in enumerate(overviews):
-            data_offset = int(ds.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1, ovr=ix))
+            data_offset = int(src.get_tag_item('BLOCK_OFFSET_0_0', 'TIFF', bidx=1, ovr=ix))
             data_offsets.append(data_offset)
             details['data_offsets']['overview_{}'.format(ix)] = data_offset
 
