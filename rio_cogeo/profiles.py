@@ -73,11 +73,15 @@ class COGProfiles(dict):
 
     def __init__(self):
         """Initialize COGProfiles dict."""
-        self.update({"ycbcr": YCbCrProfile()})
-        self.update({"lzw": LZWProfile()})
-        self.update({"deflate": DEFLATEProfile()})
-        self.update({"packbits": PACKBITSProfile()})
-        self.update({"raw": RAWProfile()})
+        self.update(
+            {
+                "ycbcr": YCbCrProfile(),
+                "lzw": LZWProfile(),
+                "deflate": DEFLATEProfile(),
+                "packbits": PACKBITSProfile(),
+                "raw": RAWProfile(),
+            }
+        )
 
     def get(self, key):
         """Like normal item access but error."""
