@@ -106,4 +106,11 @@ Issues and pull requests are more than welcome.
   $ git clone https://github.com/mapbox/rio-cogeo.git
   $ cd rio-cogeo
   $ pip install -e .[dev]
+
+**Python3.6 only**
+
+This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* ("uncompromising Python code formatter") when commiting new code.
+
+.. code-block:: console
+
   $ pre-commit install

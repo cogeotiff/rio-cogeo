@@ -11,7 +11,10 @@ common: &common
         command: ~/.local/bin/tox
     - run:
         name: run pre-commit
-        command: ~/.local/bin/pre-commit run --all-files
+        command: |
+          if $(python -V 2>&1 | grep -q 'Python 3.6'); then
+            ~/.local/bin/pre-commit run --all-files
+          fi
     # - run:
     #     name: upload coverage report
     #     command: |
