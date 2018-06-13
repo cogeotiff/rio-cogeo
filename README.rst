@@ -57,10 +57,10 @@ Examples
   # Create a COGEO without compression and wiht 1024x1024 block size
   $ rio cogeo mydataset.tif mydataset_raw.tif -co BLOCKXSIZE=1024 -co BLOCKXSIZE=1024 --cog-profile raw
 
-Defaults COGEO profiles
+Default COGEO profiles
 =======================
 
-Profiles can be extended by providing `--co` option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
+Profiles can be extended by providing '--co' option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
 
 **YCbCr**
 
@@ -90,9 +90,7 @@ Profiles can be extended by providing `--co` option in command line (e.g: rio co
 - NO compression
 - PIXEL interleave
 
-Defaults profiles are tiled with 512x512 blocksizes
-
-You can update default profile by providing `--co` options in the cli.
+Default profiles are tiled with 512x512 blocksizes.
 
 Contribution & Devellopement
 ============================
