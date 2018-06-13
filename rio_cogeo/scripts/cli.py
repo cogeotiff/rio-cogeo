@@ -55,6 +55,7 @@ def cogeo(input, output, bidx, cogeo_profile, nodata, alpha, overview_level, thr
 
     config = dict(
         NUM_THREADS=threads,
+        BIGTIFF="IF_SAFER",
         GDAL_TIFF_INTERNAL_MASK=True,
         GDAL_TIFF_OVR_BLOCKSIZE=block_size)
 
