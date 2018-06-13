@@ -60,6 +60,8 @@ Examples
 Defaults COGEO profiles
 =======================
 
+Profiles can be extended by providing `--co` option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
+
 **YCbCr**
 
 - JPEG compression
@@ -91,3 +93,24 @@ Defaults COGEO profiles
 Defaults profiles are tiled with 512x512 blocksizes
 
 You can update default profile by providing `--co` options in the cli.
+
+Contribution & Devellopement
+============================
+
+Issues and pull requests are more than welcome.
+
+**dev install**
+
+.. code-block:: console
+
+  $ git clone https://github.com/mapbox/rio-cogeo.git
+  $ cd rio-cogeo
+  $ pip install -e .[dev]
+
+**Python3.6 only**
+
+This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* ("uncompromising Python code formatter") when commiting new code.
+
+.. code-block:: console
+
+  $ pre-commit install

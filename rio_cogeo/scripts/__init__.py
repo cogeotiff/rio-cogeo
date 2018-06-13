@@ -1,1 +1,1 @@
-""".scripts"""
+"""Rio-cogeo cli."""
