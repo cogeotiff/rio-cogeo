@@ -1,6 +1,6 @@
 version: 2
 common: &common
-  working_directory: ~/fio-area
+  working_directory: ~/rio-cogeo
   steps:
     - checkout
     - run:
