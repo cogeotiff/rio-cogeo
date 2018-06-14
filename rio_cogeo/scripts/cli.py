@@ -1,5 +1,6 @@
 """Rio_cogeo.scripts.cli."""
 
+import os
 import click
 
 from rasterio.rio import options
@@ -84,9 +85,9 @@ def cogeo(
 
     config = dict(
         NUM_THREADS=threads,
-        BIGTIFF="IF_SAFER",
-        GDAL_TIFF_INTERNAL_MASK=True,
-        GDAL_TIFF_OVR_BLOCKSIZE=block_size,
+        BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER"),
+        GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
+        GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
     )
 
     cog_translate(
