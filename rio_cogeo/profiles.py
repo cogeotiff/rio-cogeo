@@ -17,6 +17,19 @@ class YCbCrProfile(Profile):
     }
 
 
+class ZSTDProfile(Profile):
+    """Tiled, pixel-interleaved, ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "ZSTD",
+    }
+
+
 class LZWProfile(Profile):
     """Tiled, pixel-interleaved, LZW-compressed GTiff."""
 
@@ -76,6 +89,7 @@ class COGProfiles(dict):
         self.update(
             {
                 "ycbcr": YCbCrProfile(),
+                "zstd": ZSTDProfile(),
                 "lzw": LZWProfile(),
                 "deflate": DEFLATEProfile(),
                 "packbits": PACKBITSProfile(),
