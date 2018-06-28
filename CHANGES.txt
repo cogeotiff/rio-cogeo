@@ -1,0 +1,10 @@
+
+1.0a1 (?)
+------------------
+- Add ZSTD compressed COG profile
+- Fix warnings for useless boundless=True option (#13)
+- add BIGTIFF=IF_SAFER to COG profile (if BIGTIFF not set otherwise in the env)
+
+1.0dev1(2018-16-13)
+------------------
+- Initial release. Requires Rasterio >= 1.0b1.
