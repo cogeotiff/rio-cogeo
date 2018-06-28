@@ -64,7 +64,7 @@ class PACKBITSProfile(Profile):
 
     defaults = {
         "driver": "GTiff",
-        "interleave": "band",
+        "interleave": "pixel",
         "tiled": True,
         "blockxsize": 512,
         "blockysize": 512,
