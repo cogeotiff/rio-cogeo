@@ -69,7 +69,7 @@ def cog_translate(
                         wind, length=len(wind), file=sys.stderr, show_percent=True
                     ) as windows:
                         for ij, w in windows:
-                            matrix = src.read(window=w, indexes=indexes, boundless=True)
+                            matrix = src.read(window=w, indexes=indexes)
                             mem.write(matrix, window=w)
 
                             if nodata is not None:
@@ -80,9 +80,9 @@ def cog_translate(
                                     * 255
                                 )
                             elif alpha is not None:
-                                mask_value = src.read(alpha, window=w, boundless=True)
+                                mask_value = src.read(alpha, window=w)
                             else:
-                                mask_value = src.dataset_mask(window=w, boundless=True)
+                                mask_value = src.dataset_mask(window=w)
 
                             mask[
                                 w.row_off : w.row_off + w.height,
