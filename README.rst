@@ -34,7 +34,7 @@ Usage
 
   Options:
     -b, --bidx BIDX                 Band index to copy (default: 1,2,3)
-    -p, --cog-profile [ycbcr|lzw|deflate|packbits|raw]
+    -p, --cog-profile [ycbcr|zstd|lzw|deflate|packbits|raw]
                                     CloudOptimized GeoTIFF profile (default: ycbcr)
     --nodata INTEGER                Force mask creation from a given nodata value
     --alpha INTEGER                 Force mask creation from a given alpha band number
@@ -69,6 +69,12 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 - YCbCr colorspace
 - limited to uint8 datatype and 3 bands data
 
+**ZSTD**
+
+- ZSTD compression
+- PIXEL interleave
+- Available for GDAL>=2.3.0
+
 **LZW**
 
 - LZW compression
@@ -83,7 +89,6 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 
 - PACKBITS compression
 - BAND interleave
-
 
 **RAW**
 
