@@ -58,7 +58,7 @@ Examples
   $ rio cogeo mydataset.tif mydataset_raw.tif -co BLOCKXSIZE=1024 -co BLOCKXSIZE=1024 --cog-profile raw
 
 Default COGEO profiles
-=======================
+======================
 
 Profiles can be extended by providing '--co' option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
 
@@ -117,3 +117,8 @@ This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* 
 .. code-block:: console
 
   $ pre-commit install
+
+Extras
+======
+
+Checkout **rio-glui** (https://github.com/mapbox/rio-glui/) rasterio plugin to explore COG locally in your web browser.

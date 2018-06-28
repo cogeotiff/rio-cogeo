@@ -1,9 +1,12 @@
 
-1.0a1 (?)
+1.0dev2 (2018-06-28)
 ------------------
-- Add ZSTD compressed COG profile
+- Add ZSTD compressed COG profile (#14)
 - Fix warnings for useless boundless=True option (#13)
 - add BIGTIFF=IF_SAFER to COG profile (if BIGTIFF not set otherwise in the env)
+
+:Breacking Changes:
+- replace "BAND" by "PIXEL" interleave in PACKBITS profile (#16)
 
 1.0dev1(2018-16-13)
 ------------------
