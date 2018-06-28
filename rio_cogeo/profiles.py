@@ -18,7 +18,10 @@ class YCbCrProfile(Profile):
 
 
 class ZSTDProfile(Profile):
-    """Tiled, pixel-interleaved, ZSTD-compressed GTiff."""
+    """Tiled, pixel-interleaved, ZSTD-compressed GTiff.
+
+    Note: ZSTD compression is available since gdal 2.3
+    """
 
     defaults = {
         "driver": "GTiff",
