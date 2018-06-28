@@ -31,6 +31,22 @@ def test_cogeo_valid():
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
 
 
+def test_cogeo_valid_external_mask(monkeypatch):
+    """Should work as expected."""
+    monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "FALSE")
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, [raster_path_rgba, "output.tif", "-b", "1,2,3", "--alpha", 4]
+        )
+
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert "output.tif.msk" in src.files
+
+
 def test_cogeo_validbidx():
     """Should work as expected."""
     runner = CliRunner()
