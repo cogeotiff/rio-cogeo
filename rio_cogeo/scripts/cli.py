@@ -78,6 +78,7 @@ def cogeo(
         raise click.ClickException('Incompatible options "alpha" and "nodata"')
 
     output_profile = cog_profiles.get(cogeo_profile)
+    output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
         output_profile.update(creation_options)
 
@@ -85,7 +86,6 @@ def cogeo(
 
     config = dict(
         NUM_THREADS=threads,
-        BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER"),
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
         GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
     )
