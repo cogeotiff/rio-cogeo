@@ -88,7 +88,7 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 **PACKBITS**
 
 - PACKBITS compression
-- BAND interleave
+- PIXEL interleave
 
 **RAW**
 
