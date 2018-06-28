@@ -4,6 +4,15 @@ rio-cogeo
 
 CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio
 
+.. image:: https://badge.fury.io/py/rio-cogeo.svg
+    :target: https://badge.fury.io/py/rio-cogeo
+
+.. image:: https://circleci.com/gh/mapbox/rio-cogeo.svg?style=svg
+   :target: https://circleci.com/gh/mapbox/rio-cogeo
+
+.. image:: https://codecov.io/gh/mapbox/rio-cogeo/branch/master/graph/badge.svg?token=zuHupC20cG
+   :target: https://codecov.io/gh/mapbox/rio-cogeo
+
 
 Install
 =======
