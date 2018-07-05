@@ -36,13 +36,7 @@ class CustomType:
 @click.command()
 @options.file_in_arg
 @options.file_out_arg
-@click.option(
-    "--bidx",
-    "-b",
-    type=CustomType.bidx,
-    default="1,2,3",
-    help="Band index to copy (default: 1,2,3)",
-)
+@click.option("--bidx", "-b", type=CustomType.bidx, help="Band index to copy")
 @click.option(
     "--cog-profile",
     "-p",

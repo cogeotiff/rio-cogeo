@@ -42,7 +42,7 @@ Usage
     Create Cloud Optimized Geotiff.
 
   Options:
-    -b, --bidx BIDX                 Band index to copy (default: 1,2,3)
+    -b, --bidx BIDX                 Band index to copy
     -p, --cog-profile [ycbcr|zstd|lzw|deflate|packbits|raw]
                                     CloudOptimized GeoTIFF profile (default: ycbcr)
     --nodata INTEGER                Force mask creation from a given nodata value
