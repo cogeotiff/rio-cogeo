@@ -1,8 +1,11 @@
+1.0dev4 (2018-07-16)
+------------------
+- rasterio 1.0
+
 1.0dev3 (2018-07-05)
 ------------------
 - remove default bidx in cli (#17)
 
-:Breac
 1.0dev2 (2018-06-28)
 ------------------
 - Add ZSTD compressed COG profile (#14)
