@@ -1,2 +1,5 @@
 click
 rasterio~=1.0
+mercantile
+numpy
+supermercado

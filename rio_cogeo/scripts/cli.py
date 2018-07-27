@@ -54,6 +54,9 @@ class CustomType:
 @click.option(
     "--overview-level", type=int, default=6, help="Overview level (default: 6)"
 )
+@click.option(
+    "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 def cogeo(
@@ -64,6 +67,7 @@ def cogeo(
     nodata,
     alpha,
     overview_level,
+    web_optimized,
     threads,
     creation_options,
 ):
@@ -85,5 +89,13 @@ def cogeo(
     )
 
     cog_translate(
-        input, output, output_profile, bidx, nodata, alpha, overview_level, config
+        input,
+        output,
+        output_profile,
+        bidx,
+        nodata,
+        alpha,
+        overview_level,
+        config,
+        web_optimized,
     )
