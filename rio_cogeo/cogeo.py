@@ -1,7 +1,6 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
 import sys
-import math
 
 import click
 import numpy
@@ -83,7 +82,7 @@ def cog_translate(
                 max_zoom = utils.get_max_zoom(src)
                 bounds = list(
                     transform_bounds(
-                        *[src.crs, "epsg:4326"] + list(src.bounds), densify_pts=0
+                        *[src.crs, "epsg:4326"] + list(src.bounds), densify_pts=21
                     )
                 )
 
@@ -95,10 +94,8 @@ def cog_translate(
                     *mercantile.ul(extrema["x"]["max"], extrema["y"]["max"], max_zoom)
                 )
 
-                dst_res = 40075000 / 2 ** (max_zoom + 8)
-                vrt_width = math.ceil((e - w) / dst_res)
-                vrt_height = math.ceil((s - n) / -dst_res)
-
+                vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
+                vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
                 vrt_transform = from_bounds(w, s, e, n, vrt_width, vrt_height)
 
                 vrt_params.update(
