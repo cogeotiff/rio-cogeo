@@ -1,6 +1,7 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
 import sys
+import math
 
 import click
 import numpy
@@ -13,7 +14,7 @@ from rasterio.vrt import WarpedVRT
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
 from rasterio.warp import transform_bounds
-from rasterio.transform import from_bounds
+from rasterio.transform import Affine
 
 from supermercado.burntiles import tile_extrema
 
@@ -90,13 +91,13 @@ def cog_translate(
                 w, n = mercantile.xy(
                     *mercantile.ul(extrema["x"]["min"], extrema["y"]["min"], max_zoom)
                 )
-                e, s = mercantile.xy(
-                    *mercantile.ul(extrema["x"]["max"], extrema["y"]["max"], max_zoom)
-                )
+
+                size_power = math.log(256, 2)
+                vrt_res = 40075016.686 / 2 ** (max_zoom + size_power)
+                vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)
 
                 vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
                 vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
-                vrt_transform = from_bounds(w, s, e, n, vrt_width, vrt_height)
 
                 vrt_params.update(
                     dict(
