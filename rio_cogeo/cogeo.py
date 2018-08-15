@@ -62,9 +62,7 @@ def cog_translate(
 
             with MemoryFile() as memfile:
                 with memfile.open(**meta) as mem:
-                    mask = numpy.zeros((mem.height, mem.width), dtype=numpy.uint8)
                     wind = list(mem.block_windows(1))
-
                     with click.progressbar(
                         wind, length=len(wind), file=sys.stderr, show_percent=True
                     ) as windows:
@@ -83,13 +81,7 @@ def cog_translate(
                                 mask_value = src.read(alpha, window=w)
                             else:
                                 mask_value = src.dataset_mask(window=w)
-
-                            mask[
-                                w.row_off : w.row_off + w.height,
-                                w.col_off : w.col_off + w.width,
-                            ] = mask_value
-
-                    mem.write_mask(mask)
+                            mem.write_mask(mask_value, window=w)
 
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
                     mem.build_overviews(overviews, Resampling.nearest)
