@@ -1,3 +1,7 @@
+1.0dev6 (2018-08-23)
+------------------
+- Remove unnecessary compression for in-memory step (reduce runtime and memory usage)  (#25)
+
 1.0dev4 (2018-07-16)
 ------------------
 - rasterio 1.0
