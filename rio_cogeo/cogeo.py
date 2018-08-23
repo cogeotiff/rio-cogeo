@@ -56,9 +56,10 @@ def cog_translate(
             meta["count"] = len(indexes)
             meta.pop("nodata", None)
             meta.pop("alpha", None)
+
+            meta.update(**dst_kwargs)
             meta.pop("compress", None)
             meta.pop("photometric", None)
-            meta.update(**dst_kwargs)
 
             with MemoryFile() as memfile:
                 with memfile.open(**meta) as mem:
