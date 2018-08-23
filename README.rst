@@ -64,7 +64,7 @@ Examples
   $ rio cogeo mydataset.tif mydataset_ycbcr.tif -b 1,2,3
 
   # Create a COGEO without compression and wiht 1024x1024 block size
-  $ rio cogeo mydataset.tif mydataset_raw.tif -co BLOCKXSIZE=1024 -co BLOCKXSIZE=1024 --cog-profile raw
+  $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
 
 Default COGEO profiles
 ======================
