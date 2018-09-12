@@ -4,6 +4,7 @@ import os
 import click
 
 from rasterio.rio import options
+from rasterio.enums import Resampling
 
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
@@ -54,6 +55,12 @@ class CustomType:
 @click.option(
     "--overview-level", type=int, default=6, help="Overview level (default: 6)"
 )
+@click.option(
+    "--overview-resampling",
+    help="Resampling algorithm.",
+    type=click.Choice([it.name for it in Resampling if it.value in [0, 2, 5, 6, 7]]),
+    default="nearest",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 def cogeo(
@@ -64,6 +71,7 @@ def cogeo(
     nodata,
     alpha,
     overview_level,
+    overview_resampling,
     threads,
     creation_options,
 ):
@@ -85,5 +93,13 @@ def cogeo(
     )
 
     cog_translate(
-        input, output, output_profile, bidx, nodata, alpha, overview_level, config
+        input,
+        output,
+        output_profile,
+        bidx,
+        nodata,
+        alpha,
+        overview_level,
+        overview_resampling,
+        config,
     )
