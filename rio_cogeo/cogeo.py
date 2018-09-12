@@ -20,6 +20,7 @@ def cog_translate(
     nodata=None,
     alpha=None,
     overview_level=6,
+    overview_resampling="nearest",
     config=None,
 ):
     """
@@ -85,9 +86,11 @@ def cog_translate(
                             mem.write_mask(mask_value, window=w)
 
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
-                    mem.build_overviews(overviews, Resampling.nearest)
+
+                    mem.build_overviews(overviews, Resampling[overview_resampling])
                     mem.update_tags(
-                        ns="rio_overview", resampling=Resampling.nearest.value
+                        ns="rio_overview",
+                        resampling=Resampling[overview_resampling].value,
                     )
 
                     copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)

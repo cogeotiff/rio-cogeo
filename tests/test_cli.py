@@ -126,3 +126,33 @@ def test_cogeo_validGdalOptions():
             assert (
                 not src.is_tiled
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
+
+
+def test_cogeo_validOvrOption():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--overview-level",
+                2,
+                "--overview-resampling",
+                "cubic",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.height == 512
+            assert src.width == 512
+            assert src.meta["dtype"] == "uint8"
+            assert (
+                not src.is_tiled
+            )  # Because blocksize is 512 and the file is 512, the output is not tiled
+            assert src.compression.value == "JPEG"
+            assert src.photometric.value == "YCbCr"
+            assert src.interleaving.value == "PIXEL"
+            assert src.overviews(1) == [2, 4]
