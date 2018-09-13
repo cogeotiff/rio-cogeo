@@ -140,7 +140,7 @@ def test_cogeo_validOvrOption():
                 "--overview-level",
                 2,
                 "--overview-resampling",
-                "cubic",
+                "bilinear",
             ],
         )
         assert not result.exception
