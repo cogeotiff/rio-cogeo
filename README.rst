@@ -48,12 +48,12 @@ Usage
     --nodata INTEGER                Force mask creation from a given nodata value
     --alpha INTEGER                 Force mask creation from a given alpha band number
     --overview-level INTEGER        Overview level (default: 6)
+    --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the
                                     documentation for the selected output driver
                                     for more information.
     --help                          Show this message and exit.
-
 
 Examples
 ========

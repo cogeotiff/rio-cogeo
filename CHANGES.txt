@@ -1,6 +1,7 @@
 Next release
 ------------
 - write tags in output file (#31)
+- add bilinear, cubic spline, lanczos resampling modes for overviews
 
 1.0dev7 (2018-09-12)
 ------------------

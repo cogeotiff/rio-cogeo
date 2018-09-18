@@ -58,7 +58,9 @@ class CustomType:
 @click.option(
     "--overview-resampling",
     help="Resampling algorithm.",
-    type=click.Choice([it.name for it in Resampling if it.value in [0, 2, 5, 6, 7]]),
+    type=click.Choice(
+        [it.name for it in Resampling if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+    ),
     default="nearest",
 )
 @click.option("--threads", type=int, default=8)
