@@ -1,3 +1,7 @@
+Next release
+------------
+- write tags in output file (#31)
+
 1.0dev7 (2018-09-12)
 ------------------
 - add resampling option for overviews (#28)
