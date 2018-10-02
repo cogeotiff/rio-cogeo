@@ -89,7 +89,7 @@ def cog_translate(
 
                     mem.build_overviews(overviews, Resampling[overview_resampling])
                     mem.update_tags(
-                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].value
+                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].name.upper()
                     )
 
                     copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
