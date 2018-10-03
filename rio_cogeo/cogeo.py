@@ -88,10 +88,8 @@ def cog_translate(
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
 
                     mem.build_overviews(overviews, Resampling[overview_resampling])
+                    mem.update_tags(
+                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].name.upper()
+                    )
 
                     copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
-
-    with rasterio.open(dst_path, "r+") as dst:
-        dst.update_tags(
-            ns="rio_overview", resampling=Resampling[overview_resampling].value
-        )

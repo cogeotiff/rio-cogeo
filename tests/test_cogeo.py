@@ -29,7 +29,7 @@ def test_cog_translate_valid():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
-            assert src.tags(ns="rio_overview") == {"resampling": "0"}
+            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
 
 
 def test_cog_translate_validRaw():
