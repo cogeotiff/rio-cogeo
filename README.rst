@@ -4,6 +4,15 @@ rio-cogeo
 
 CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio
 
+.. image:: https://badge.fury.io/py/rio-cogeo.svg
+    :target: https://badge.fury.io/py/rio-cogeo
+
+.. image:: https://circleci.com/gh/mapbox/rio-cogeo.svg?style=svg
+   :target: https://circleci.com/gh/mapbox/rio-cogeo
+
+.. image:: https://codecov.io/gh/mapbox/rio-cogeo/branch/master/graph/badge.svg?token=zuHupC20cG
+   :target: https://codecov.io/gh/mapbox/rio-cogeo
+
 
 Install
 =======
@@ -49,12 +58,13 @@ Usage
     Create Cloud Optimized Geotiff.
 
   Options:
-    -b, --bidx BIDX                 Band index to copy (default: 1,2,3)
-    -p, --cog-profile [ycbcr|lzw|deflate|packbits|raw]
+    -b, --bidx BIDX                 Band index to copy
+    -p, --cog-profile [ycbcr|zstd|lzw|deflate|packbits|raw]
                                     CloudOptimized GeoTIFF profile (default: ycbcr)
     --nodata INTEGER                Force mask creation from a given nodata value
     --alpha INTEGER                 Force mask creation from a given alpha band number
     --overview-level INTEGER        Overview level (default: 6)
+    --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the
                                     documentation for the selected output driver
@@ -90,7 +100,7 @@ Examples
 
 
 Default COGEO profiles
-=======================
+======================
 
 Profiles can be extended by providing '--co' option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
 
@@ -100,6 +110,12 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 - PIXEL interleave
 - YCbCr colorspace
 - limited to uint8 datatype and 3 bands data
+
+**ZSTD**
+
+- ZSTD compression
+- PIXEL interleave
+- Available for GDAL>=2.3.0
 
 **LZW**
 
@@ -114,8 +130,7 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 **PACKBITS**
 
 - PACKBITS compression
-- BAND interleave
-
+- PIXEL interleave
 
 **RAW**
 
@@ -144,3 +159,8 @@ This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* 
 .. code-block:: console
 
   $ pre-commit install
+
+Extras
+======
+
+Checkout **rio-glui** (https://github.com/mapbox/rio-glui/) rasterio plugin to explore COG locally in your web browser.

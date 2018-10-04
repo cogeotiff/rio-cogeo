@@ -22,6 +22,7 @@ def cog_translate(
     nodata=None,
     alpha=None,
     overview_level=6,
+    overview_resampling="nearest",
     config=None,
 ):
     """
@@ -58,20 +59,19 @@ def cog_translate(
             meta["count"] = len(indexes)
             meta.pop("nodata", None)
             meta.pop("alpha", None)
+
+            meta.update(**dst_kwargs)
             meta.pop("compress", None)
             meta.pop("photometric", None)
-            meta.update(**dst_kwargs)
 
             with MemoryFile() as memfile:
                 with memfile.open(**meta) as mem:
-                    mask = numpy.zeros((mem.height, mem.width), dtype=numpy.uint8)
                     wind = list(mem.block_windows(1))
-
                     with click.progressbar(
                         wind, length=len(wind), file=sys.stderr, show_percent=True
                     ) as windows:
                         for ij, w in windows:
-                            matrix = src.read(window=w, indexes=indexes, boundless=True)
+                            matrix = src.read(window=w, indexes=indexes)
                             mem.write(matrix, window=w)
 
                             if nodata is not None:
@@ -82,21 +82,16 @@ def cog_translate(
                                     * 255
                                 )
                             elif alpha is not None:
-                                mask_value = src.read(alpha, window=w, boundless=True)
+                                mask_value = src.read(alpha, window=w)
                             else:
-                                mask_value = src.dataset_mask(window=w, boundless=True)
-
-                            mask[
-                                w.row_off : w.row_off + w.height,
-                                w.col_off : w.col_off + w.width,
-                            ] = mask_value
-
-                    mem.write_mask(mask)
+                                mask_value = src.dataset_mask(window=w)
+                            mem.write_mask(mask_value, window=w)
 
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
-                    mem.build_overviews(overviews, Resampling.nearest)
+
+                    mem.build_overviews(overviews, Resampling[overview_resampling])
                     mem.update_tags(
-                        ns="rio_overview", resampling=Resampling.nearest.value
+                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].name.upper()
                     )
 
                     copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)

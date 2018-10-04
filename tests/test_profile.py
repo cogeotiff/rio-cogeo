@@ -43,7 +43,7 @@ def test_profiles_packbits():
     assert profile["compress"] == "PACKBITS"
     assert profile["blockxsize"] == 512
     assert profile["blockysize"] == 512
-    assert profile["interleave"] == "band"
+    assert profile["interleave"] == "pixel"
 
 
 def test_profiles_raw():

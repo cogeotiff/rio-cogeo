@@ -1,0 +1,34 @@
+1.0dev8 (2018-10-02)
+--------------------
+- write tags in output file (#31)
+- add bilinear, cubic spline, lanczos resampling modes for overviews
+
+1.0dev7 (2018-09-12)
+--------------------
+- add resampling option for overviews (#28)
+
+1.0dev6 (2018-08-23)
+--------------------
+- Remove unnecessary compression for in-memory step (reduce runtime and memory usage) (#25)
+
+1.0dev4 (2018-07-16)
+--------------------
+- rasterio 1.0
+
+1.0dev3 (2018-07-05)
+--------------------
+- remove default bidx in cli (#17)
+
+1.0dev2 (2018-06-28)
+--------------------
+- Add ZSTD compressed COG profile (#14)
+- Fix warnings for useless boundless=True option (#13)
+- add BIGTIFF=IF_SAFER to COG profile (if BIGTIFF not set otherwise in the env)
+
+**Breacking Changes**
+
+- replace "BAND" by "PIXEL" interleave in PACKBITS profile (#16)
+
+1.0dev1(2018-16-13)
+-------------------
+- Initial release. Requires Rasterio >= 1.0b1.

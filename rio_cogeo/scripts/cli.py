@@ -1,8 +1,10 @@
 """Rio_cogeo.scripts.cli."""
 
+import os
 import click
 
 from rasterio.rio import options
+from rasterio.enums import Resampling
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -41,13 +43,7 @@ def cogeo():
 @cogeo.command(short_help="Create a COGEO")
 @options.file_in_arg
 @options.file_out_arg
-@click.option(
-    "--bidx",
-    "-b",
-    type=CustomType.bidx,
-    default="1,2,3",
-    help="Band index to copy (default: 1,2,3)",
-)
+@click.option("--bidx", "-b", type=CustomType.bidx, help="Band index to copy")
 @click.option(
     "--cog-profile",
     "-p",
@@ -65,6 +61,14 @@ def cogeo():
 @click.option(
     "--overview-level", type=int, default=6, help="Overview level (default: 6)"
 )
+@click.option(
+    "--overview-resampling",
+    help="Resampling algorithm.",
+    type=click.Choice(
+        [it.name for it in Resampling if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+    ),
+    default="nearest",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 def create(
@@ -75,6 +79,7 @@ def create(
     nodata,
     alpha,
     overview_level,
+    overview_resampling,
     threads,
     creation_options,
 ):
@@ -83,6 +88,7 @@ def create(
         raise click.ClickException('Incompatible options "alpha" and "nodata"')
 
     output_profile = cog_profiles.get(cogeo_profile)
+    output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
         output_profile.update(creation_options)
 
@@ -90,13 +96,20 @@ def create(
 
     config = dict(
         NUM_THREADS=threads,
-        BIGTIFF="IF_SAFER",
-        GDAL_TIFF_INTERNAL_MASK=True,
-        GDAL_TIFF_OVR_BLOCKSIZE=block_size,
+        GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
+        GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
     )
 
     cog_translate(
-        input, output, output_profile, bidx, nodata, alpha, overview_level, config
+        input,
+        output,
+        output_profile,
+        bidx,
+        nodata,
+        alpha,
+        overview_level,
+        overview_resampling,
+        config,
     )
 
 
