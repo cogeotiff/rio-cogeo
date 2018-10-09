@@ -2,7 +2,7 @@
 rio-cogeo
 =========
 
-CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio
+Cloud Optimized GeoTIFF (COG) creation plugin for rasterio
 
 .. image:: https://badge.fury.io/py/rio-cogeo.svg
     :target: https://badge.fury.io/py/rio-cogeo
