@@ -16,6 +16,16 @@ def test_profiles_ycbcr():
     assert profile["interleave"] == "pixel"
 
 
+def test_profiles_webp():
+    """Should work as expected (return webp profile)."""
+    profile = cog_profiles.get("webp")
+    assert profile["tiled"]
+    assert profile["compress"] == "WEBP"
+    assert profile["blockxsize"] == 512
+    assert profile["blockysize"] == 512
+    assert profile["interleave"] == "pixel"
+
+
 def test_profiles_lzw():
     """Should work as expected (return lzw profile)."""
     profile = cog_profiles.get("lzw")
