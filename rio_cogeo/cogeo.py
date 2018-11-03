@@ -19,6 +19,7 @@ def cog_translate(
     indexes=None,
     nodata=None,
     alpha=None,
+    addmask=True,
     overview_level=6,
     overview_resampling="nearest",
     config=None,
@@ -55,8 +56,9 @@ def cog_translate(
             indexes = indexes if indexes else src.indexes
             meta = src.meta
             meta["count"] = len(indexes)
-            meta.pop("nodata", None)
-            meta.pop("alpha", None)
+            if addmask:
+                meta.pop("nodata", None)
+                meta.pop("alpha", None)
 
             meta.update(**dst_kwargs)
             meta.pop("compress", None)
@@ -72,18 +74,19 @@ def cog_translate(
                             matrix = src.read(window=w, indexes=indexes)
                             mem.write(matrix, window=w)
 
-                            if nodata is not None:
-                                mask_value = (
-                                    numpy.all(matrix != nodata, axis=0).astype(
-                                        numpy.uint8
+                            if addmask:
+                                if nodata is not None:
+                                    mask_value = (
+                                        numpy.all(matrix != nodata, axis=0).astype(
+                                            numpy.uint8
+                                        )
+                                        * 255
                                     )
-                                    * 255
-                                )
-                            elif alpha is not None:
-                                mask_value = src.read(alpha, window=w)
-                            else:
-                                mask_value = src.dataset_mask(window=w)
-                            mem.write_mask(mask_value, window=w)
+                                elif alpha is not None:
+                                    mask_value = src.read(alpha, window=w)
+                                else:
+                                    mask_value = src.dataset_mask(window=w)
+                                mem.write_mask(mask_value, window=w)
 
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
 

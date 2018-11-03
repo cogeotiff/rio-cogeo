@@ -53,6 +53,9 @@ class CustomType:
     "--alpha", type=int, help="Force mask creation from a given alpha band number"
 )
 @click.option(
+    "--addmask", type=bool, default=True, help="Add internal/external bitmask"
+)
+@click.option(
     "--overview-level", type=int, default=6, help="Overview level (default: 6)"
 )
 @click.option(
@@ -72,6 +75,7 @@ def cogeo(
     cogeo_profile,
     nodata,
     alpha,
+    addmask,
     overview_level,
     overview_resampling,
     threads,
@@ -101,6 +105,7 @@ def cogeo(
         bidx,
         nodata,
         alpha,
+        addmask,
         overview_level,
         overview_resampling,
         config,
