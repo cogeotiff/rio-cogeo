@@ -53,7 +53,9 @@ class CustomType:
     "--alpha", type=int, help="Force mask creation from a given alpha band number"
 )
 @click.option(
-    "--overview-level", type=int, help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size)"
+    "--overview-level",
+    type=int,
+    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size)",
 )
 @click.option(
     "--overview-resampling",

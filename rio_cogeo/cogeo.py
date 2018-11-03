@@ -53,8 +53,7 @@ def cog_translate(
 
     if overview_level is None:
         overview_level = get_overview_level(
-            src_path,
-            min(dst_kwargs["blockxsize"], dst_kwargs["blockysize"])
+            src_path, min(dst_kwargs["blockxsize"], dst_kwargs["blockysize"])
         )
 
     with rasterio.Env(**config):
