@@ -28,7 +28,7 @@ def test_cogeo_valid():
             assert src.compression.value == "JPEG"
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
+            assert not src.overviews(1)
 
 
 def test_cogeo_valid_external_mask(monkeypatch):

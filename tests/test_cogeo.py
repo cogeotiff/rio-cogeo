@@ -28,7 +28,7 @@ def test_cog_translate_valid():
             assert src.compression.value == "JPEG"
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
+            assert not src.overviews(1)
             assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
 
 
@@ -47,7 +47,7 @@ def test_cog_translate_validRaw():
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
             assert not src.compression
             assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
+            assert not src.overviews(1)
 
 
 def test_cog_translate_validAlpha():
@@ -123,4 +123,4 @@ def test_cog_translate_validCustom():
             assert src.profile["blockysize"] == 256
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
+            assert src.overviews(1) == [2]
