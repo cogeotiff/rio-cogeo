@@ -94,9 +94,14 @@ def cogeo(
 
     config = dict(
         NUM_THREADS=threads,
-        GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
         GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
     )
+    if addmask:
+        config.update(
+            dict(
+                GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True)
+            )
+        )
 
     cog_translate(
         input,

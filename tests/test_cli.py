@@ -5,10 +5,27 @@ import os
 from click.testing import CliRunner
 
 import rasterio
+from rasterio.enums import MaskFlags
 from rio_cogeo.scripts.cli import cogeo
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
+
+
+def _has_mask(src):
+    """Check for mask in source."""
+    if any(
+        [MaskFlags.per_dataset in flags for flags in src.mask_flag_enums]
+    ) and not any([MaskFlags.alpha in flags for flags in src.mask_flag_enums]):
+        return True
+    return False
+
+
+def _has_alpha(src):
+    """Check for mask in source."""
+    if any([MaskFlags.alpha in flags for flags in src.mask_flag_enums]):
+        return True
+    return False
 
 
 def test_cogeo_valid():
@@ -29,6 +46,7 @@ def test_cogeo_valid():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
+            assert _has_mask(src)
 
 
 def test_cogeo_valid_external_mask(monkeypatch):
@@ -89,6 +107,13 @@ def test_cogeo_validAlpha():
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
             assert src.count == 3
+
+        result = runner.invoke(cogeo, [raster_path_rgba, "output.tif", "-p", "raw"])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.count == 4
+            assert _has_mask(src)
 
 
 def test_cogeo_validnodata():
@@ -156,3 +181,25 @@ def test_cogeo_validOvrOption():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4]
+
+
+def test_cogeo_nomask_valid():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, [raster_path_rgb, "output.tif", "--addmask", False]
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert not _has_mask(src)
+
+        result = runner.invoke(
+            cogeo, [raster_path_rgba, "output.tif", "-p", "raw", "--addmask", False]
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert not _has_mask(src)
+            assert _has_alpha(src)
