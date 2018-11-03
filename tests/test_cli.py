@@ -22,7 +22,7 @@ def _has_mask(src):
 
 
 def _has_alpha(src):
-    """Check for mask in source."""
+    """Check for alpha band in source."""
     if any([MaskFlags.alpha in flags for flags in src.mask_flag_enums]):
         return True
     return False
