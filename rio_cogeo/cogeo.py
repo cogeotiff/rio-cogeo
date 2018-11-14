@@ -11,7 +11,7 @@ from rasterio.io import MemoryFile
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
 
-from rio_cogeo.utils import get_overview_level
+from rio_cogeo.utils import get_maximum_overview_level
 
 
 def cog_translate(
@@ -52,7 +52,7 @@ def cog_translate(
     config = config or {}
 
     if overview_level is None:
-        overview_level = get_overview_level(
+        overview_level = get_maximum_overview_level(
             src_path, min(dst_kwargs["blockxsize"], dst_kwargs["blockysize"])
         )
 
