@@ -9,6 +9,9 @@ from rio_cogeo.scripts.cli import cogeo
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
+raster_path_noweb = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_noweb.tif"
+)
 
 
 def test_cogeo_valid():
@@ -31,9 +34,22 @@ def test_cogeo_valid():
             assert src.overviews(1) == [2, 4, 8, 16, 32, 64]
 
 
+def test_cogeo_valid_web():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(cogeo, [raster_path_noweb, "output.tif", "-w"])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.height == 768
+            assert src.width == 512
+
+
 def test_cogeo_valid_external_mask(monkeypatch):
     """Should work as expected."""
     monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "FALSE")
+    monkeypatch.setenv("GDAL_DISABLE_READDIR_ON_OPEN", "FALSE")
 
     runner = CliRunner()
     with runner.isolated_filesystem():
