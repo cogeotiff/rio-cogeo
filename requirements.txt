@@ -1,2 +1,4 @@
 click
 rasterio>=1.0.9
+mercantile
+supermercado
