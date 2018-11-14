@@ -63,6 +63,9 @@ class CustomType:
     ),
     default="nearest",
 )
+@click.option(
+    "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 def cogeo(
@@ -74,6 +77,7 @@ def cogeo(
     alpha,
     overview_level,
     overview_resampling,
+    web_optimized,
     threads,
     creation_options,
 ):
@@ -103,5 +107,6 @@ def cogeo(
         alpha,
         overview_level,
         overview_resampling,
+        web_optimized,
         config,
     )
