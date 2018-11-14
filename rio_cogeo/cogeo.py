@@ -7,9 +7,14 @@ import click
 import numpy
 
 import rasterio
+
 from rasterio.io import MemoryFile
+from rasterio.vrt import WarpedVRT
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
+
+
+from rio_cogeo import utils
 
 
 def cog_translate(
@@ -21,6 +26,7 @@ def cog_translate(
     alpha=None,
     overview_level=6,
     overview_resampling="nearest",
+    web_optimized=False,
     config=None,
 ):
     """
@@ -43,6 +49,8 @@ def cog_translate(
         alpha band index for mask creation.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
+    web_optimized: bool
+         Create web-optimized cogeo.
     config : dict
         Rasterio Env options.
 
@@ -51,45 +59,66 @@ def cog_translate(
 
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src:
+            vrt_params = dict(add_alpha=True, resampling=Resampling.bilinear)
 
             indexes = indexes if indexes else src.indexes
-            meta = src.meta
-            meta["count"] = len(indexes)
-            meta.pop("nodata", None)
-            meta.pop("alpha", None)
 
-            meta.update(**dst_kwargs)
-            meta.pop("compress", None)
-            meta.pop("photometric", None)
-
-            with MemoryFile() as memfile:
-                with memfile.open(**meta) as mem:
-                    wind = list(mem.block_windows(1))
-                    with click.progressbar(
-                        wind, length=len(wind), file=sys.stderr, show_percent=True
-                    ) as windows:
-                        for ij, w in windows:
-                            matrix = src.read(window=w, indexes=indexes)
-                            mem.write(matrix, window=w)
-
-                            if nodata is not None:
-                                mask_value = (
-                                    numpy.all(matrix != nodata, axis=0).astype(
-                                        numpy.uint8
-                                    )
-                                    * 255
-                                )
-                            elif alpha is not None:
-                                mask_value = src.read(alpha, window=w)
-                            else:
-                                mask_value = src.dataset_mask(window=w)
-                            mem.write_mask(mask_value, window=w)
-
-                    overviews = [2 ** j for j in range(1, overview_level + 1)]
-
-                    mem.build_overviews(overviews, Resampling[overview_resampling])
-                    mem.update_tags(
-                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].name.upper()
+            # TODO: What if a raster has a nodata value and an alpha band ?
+            nodata = nodata if nodata is not None else src.nodata
+            if nodata is not None:
+                vrt_params.update(
+                    dict(
+                        nodata=nodata,
+                        add_alpha=False,
+                        src_nodata=nodata,
+                        init_dest_nodata=False,
                     )
+                )
 
-                    copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
+            # TODO: What does this means when alpha is passed ?
+            if utils.has_alpha_band(src):
+                vrt_params.update(dict(add_alpha=False))
+
+            with WarpedVRT(src, **vrt_params) as vrt:
+                meta = vrt.meta
+                meta["count"] = len(indexes)
+                meta.pop("nodata", None)
+                meta.pop("alpha", None)
+
+                meta.update(**dst_kwargs)
+                meta.pop("compress", None)
+                meta.pop("photometric", None)
+
+                with MemoryFile() as memfile:
+                    with memfile.open(**meta) as mem:
+                        wind = list(mem.block_windows(1))
+                        with click.progressbar(
+                            wind, length=len(wind), file=sys.stderr, show_percent=True
+                        ) as windows:
+                            for ij, w in windows:
+                                matrix = vrt.read(window=w, indexes=indexes)
+                                mem.write(matrix, window=w)
+
+                                if nodata is not None:
+                                    mask_value = (
+                                        numpy.all(matrix != nodata, axis=0).astype(
+                                            numpy.uint8
+                                        )
+                                        * 255
+                                    )
+                                elif alpha is not None:
+                                    mask_value = vrt.read(alpha, window=w)
+                                else:
+                                    mask_value = vrt.dataset_mask(window=w)
+                                mem.write_mask(mask_value, window=w)
+
+                        overviews = [2 ** j for j in range(1, overview_level + 1)]
+
+                        mem.build_overviews(overviews, Resampling[overview_resampling])
+                        mem.update_tags(
+                            OVR_RESAMPLING_ALG=Resampling[
+                                overview_resampling
+                            ].name.upper()
+                        )
+
+                        copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
