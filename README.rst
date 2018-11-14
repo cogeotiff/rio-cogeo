@@ -78,6 +78,13 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 - YCbCr colorspace
 - limited to uint8 datatype and 3 bands data
 
+**WEBP**
+
+- WEBP compression
+- PIXEL interleave
+- limited to uint8 datatype and 3 or 4 bands data
+- Available for GDAL>2.3.2
+
 **ZSTD**
 
 - ZSTD compression

@@ -43,6 +43,8 @@ def cog_translate(
         alpha band index for mask creation.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
+    overview_resampling : str, optional (default: "nearest")
+         Resampling algorithm for overviews
     config : dict
         Rasterio Env options.
 
