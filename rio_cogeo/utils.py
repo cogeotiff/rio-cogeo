@@ -3,6 +3,7 @@
 import math
 
 from rasterio.warp import calculate_default_transform
+from rasterio.enums import MaskFlags, ColorInterp
 
 
 def _meters_per_pixel(zoom, lat):
@@ -30,3 +31,13 @@ def get_max_zoom(src, snap=0.5, max_z=23):
             break
 
     return tgt_z
+
+
+def has_alpha_band(src):
+    """Check for alpha band or mask in source."""
+    if (
+        any([MaskFlags.alpha in flags for flags in src.mask_flag_enums])
+        or ColorInterp.alpha in src.colorinterp
+    ):
+        return True
+    return False
