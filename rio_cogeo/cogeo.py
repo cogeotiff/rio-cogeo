@@ -1,18 +1,23 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
 import sys
+import math
 
 import click
 
 import numpy
 
 import rasterio
+import mercantile
 
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
+from rasterio.warp import transform_bounds
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
+from rasterio.transform import Affine
 
+from supermercado.burntiles import tile_extrema
 
 from rio_cogeo import utils
 
@@ -78,6 +83,36 @@ def cog_translate(
             # TODO: What does this means when alpha is passed ?
             if utils.has_alpha_band(src):
                 vrt_params.update(dict(add_alpha=False))
+
+            if web_optimized:
+                # TODO: add max_zoom option
+                max_zoom = utils.get_max_zoom(src)
+                bounds = list(
+                    transform_bounds(
+                        *[src.crs, "epsg:4326"] + list(src.bounds), densify_pts=21
+                    )
+                )
+
+                extrema = tile_extrema(bounds, max_zoom)
+                w, n = mercantile.xy(
+                    *mercantile.ul(extrema["x"]["min"], extrema["y"]["min"], max_zoom)
+                )
+
+                size_power = math.log(256, 2)
+                vrt_res = 40075016.686 / 2 ** (max_zoom + size_power)
+                vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)
+
+                vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
+                vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
+
+                vrt_params.update(
+                    dict(
+                        crs="epsg:3857",
+                        transform=vrt_transform,
+                        width=vrt_width,
+                        height=vrt_height,
+                    )
+                )
 
             with WarpedVRT(src, **vrt_params) as vrt:
                 meta = vrt.meta
