@@ -14,7 +14,7 @@ with open("README.rst") as f:
     readme = f.read()
 
 # Runtime requirements.
-inst_reqs = ["click", "rasterio[s3]>=1.0.9", "numpy"]
+inst_reqs = ["click", "rasterio[s3]>=1.0.9", "numpy~=1.15"]
 
 extra_reqs = {
     "test": ["pytest", "pytest-cov"],
