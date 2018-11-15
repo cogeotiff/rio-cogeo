@@ -21,6 +21,8 @@ from supermercado.burntiles import tile_extrema
 
 from rio_cogeo import utils
 
+from rio_cogeo.utils import get_maximum_overview_level
+
 
 def cog_translate(
     src_path,
@@ -29,7 +31,7 @@ def cog_translate(
     indexes=None,
     nodata=None,
     alpha=None,
-    overview_level=6,
+    overview_level=None,
     overview_resampling="nearest",
     web_optimized=False,
     config=None,
@@ -54,6 +56,8 @@ def cog_translate(
         alpha band index for mask creation.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
+    overview_resampling : str, optional (default: "nearest")
+         Resampling algorithm for overviews
     web_optimized: bool
          Create web-optimized cogeo.
     config : dict
@@ -61,6 +65,11 @@ def cog_translate(
 
     """
     config = config or {}
+
+    if overview_level is None:
+        overview_level = get_maximum_overview_level(
+            src_path, min(dst_kwargs["blockxsize"], dst_kwargs["blockysize"])
+        )
 
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src:
