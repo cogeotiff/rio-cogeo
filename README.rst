@@ -83,13 +83,15 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 - WEBP compression
 - PIXEL interleave
 - limited to uint8 datatype and 3 or 4 bands data
-- Available for GDAL>2.3.2
+- Available for GDAL>=2.4.0
 
 **ZSTD**
 
 - ZSTD compression
 - PIXEL interleave
 - Available for GDAL>=2.3.0
+
+*Note* in Nov 2018, there was a change in libtiff's ZSTD tags which create incompatibility for old ZSTD compressed GeoTIFF `link <https://lists.osgeo.org/pipermail/gdal-dev/2018-November/049289.html>`__
 
 **LZW**
 
