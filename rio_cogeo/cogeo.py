@@ -21,8 +21,6 @@ from supermercado.burntiles import tile_extrema
 
 from rio_cogeo import utils
 
-from rio_cogeo.utils import get_maximum_overview_level
-
 
 def cog_translate(
     src_path,
@@ -67,7 +65,7 @@ def cog_translate(
     config = config or {}
 
     if overview_level is None:
-        overview_level = get_maximum_overview_level(
+        overview_level = utils.get_maximum_overview_level(
             src_path, min(dst_kwargs["blockxsize"], dst_kwargs["blockysize"])
         )
 
