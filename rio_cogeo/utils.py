@@ -35,9 +35,9 @@ def get_max_zoom(src, snap=0.5, max_z=23):
     src: rasterio.io.DatasetReader
         Rasterio io.DatasetReader object
     snap: float or None
-        1   = snap to next lower mercator zoom level resolution
+        0   = snap to the next higher mercator zoom level resolution
         0.5 = snap to the closest mercator resolution
-        1   = snap to the next higher mercator zoom level resolution
+        1   = snap to next lower mercator zoom level resolution
     max_z: int
         max mercator zoom level allowed
         [DEFAULT = 23]
@@ -59,7 +59,6 @@ def get_max_zoom(src, snap=0.5, max_z=23):
     # loop through the pyramid to file the closest z level
     for z in range(1, max_z):
         mpp = _meters_per_pixel(z, 0)
-
         if (mpp - ((mpp / 2) * snap)) < res_max:
             tgt_z = z
             break
