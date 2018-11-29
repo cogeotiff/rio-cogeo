@@ -43,8 +43,8 @@ class CustomType:
     "-p",
     "cogeo_profile",
     type=click.Choice(cog_profiles.keys()),
-    default="ycbcr",
-    help="CloudOptimized GeoTIFF profile (default: ycbcr)",
+    default="jpeg",
+    help="CloudOptimized GeoTIFF profile (default: jpeg)",
 )
 @click.option(
     "--nodata", type=int, help="Force mask creation from a given nodata value"
