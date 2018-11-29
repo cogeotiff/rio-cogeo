@@ -1,0 +1,33 @@
+language: python
+sudo: false
+cache:
+  directories:
+    - ~/.cache/pip
+
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.6
+      env: TOXENV=py36
+
+python:
+  - "2.7"
+  - "3.6"
+before_install:
+  - python -m pip install -U pip
+install:
+  - pip install --user codecov pre-commit tox
+script:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then ~/.local/bin/pre-commit run --all-files; fi
+  - ~/.local/bin/tox
+after_success:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then ~/.local/bin/coverage xml; ~/.local/bin/codecov; fi
+deploy:
+  on:
+    repo: mapbox/rio-cogeo
+    python: 3.6
+    tags: true
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: mapboxci
