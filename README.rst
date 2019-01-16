@@ -115,8 +115,10 @@ Profiles can be extended by providing '--co' option in command line (e.g: rio co
 
 Default profiles are tiled with 512x512 blocksizes.
 
-Contribution & Devellopement
-============================
+Contribution & Development
+==========================
+
+The rio-cogeo project was begun at Mapbox and has been transferred in January 2019.
 
 Issues and pull requests are more than welcome.
 
