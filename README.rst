@@ -43,11 +43,13 @@ Usage
 
   Options:
     -b, --bidx BIDX                 Band index to copy
-    -p, --cog-profile [ycbcr|zstd|lzw|deflate|packbits|raw]
-                                    CloudOptimized GeoTIFF profile (default: ycbcr)
+    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw]
+                                    CloudOptimized GeoTIFF profile (default: jpeg)
     --nodata INTEGER                Force mask creation from a given nodata value
     --alpha INTEGER                 Force mask creation from a given alpha band number
-    --overview-level INTEGER        Overview level (default: 6)
+    --overview-level INTEGER        Overview level
+                                    (if not provided, appropriate overview level will be selected until the
+                                    smallest overview is smaller than the internal block size)
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the
@@ -60,8 +62,8 @@ Examples
 
 .. code-block:: console
 
-  # Create a COGEO with YCbCR profile and the first 3 bands of the data
-  $ rio cogeo mydataset.tif mydataset_ycbcr.tif -b 1,2,3
+  # Create a COGEO with JPEG profile and the first 3 bands of the data
+  $ rio cogeo mydataset.tif mydataset_jpeg.tif -b 1,2,3
 
   # Create a COGEO without compression and with 1024x1024 block size
   $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
@@ -71,7 +73,14 @@ Default COGEO profiles
 
 Profiles can be extended by providing '--co' option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
 
-**YCbCr**
+**YCbCr** *DEPRECATED in 1.0*
+
+- JPEG compression
+- PIXEL interleave
+- YCbCr colorspace
+- limited to uint8 datatype and 3 bands data
+
+**JPEG**
 
 - JPEG compression
 - PIXEL interleave

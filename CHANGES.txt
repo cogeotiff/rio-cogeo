@@ -1,3 +1,12 @@
+Next release
+------------
+- Renamed "ycbcr" profile's name to "jpeg" to reflect the compression name.
+  "ycbcr" profile will raise a "DeprecationWarning" (#44)
+- "webp" profile has been added to COG profiles. Exploitation of this new
+  compression mode will require GDAL 2.4 (#27)
+- Rio-cogeo can calculate the overview level based on the internal tile size
+  and the dataset width/height (#37)
+
 1.0dev8 (2018-10-02)
 --------------------
 - write tags in output file (#31)
