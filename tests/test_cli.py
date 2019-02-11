@@ -156,3 +156,31 @@ def test_cogeo_validOvrOption():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4]
+
+
+def test_cogeo_validgdalBlockOption():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--co",
+                "BLOCKXSIZE=128",
+                "--co",
+                "BLOCKYSIZE=128",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.height == 512
+            assert src.width == 512
+            assert src.meta["dtype"] == "uint8"
+            assert src.is_tiled
+            assert src.compression.value == "JPEG"
+            assert src.photometric.value == "YCbCr"
+            assert src.interleaving.value == "PIXEL"
+            assert src.overviews(1) == [2, 4]
