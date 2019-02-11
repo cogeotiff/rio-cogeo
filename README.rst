@@ -7,11 +7,11 @@ Cloud Optimized GeoTIFF (COG) creation plugin for rasterio
 .. image:: https://badge.fury.io/py/rio-cogeo.svg
     :target: https://badge.fury.io/py/rio-cogeo
 
-.. image:: https://circleci.com/gh/mapbox/rio-cogeo.svg?style=svg
-   :target: https://circleci.com/gh/mapbox/rio-cogeo
+.. image:: https://circleci.com/gh/cogeotiff/rio-cogeo.svg?style=svg
+   :target: https://circleci.com/gh/cogeotiff/rio-cogeo
 
-.. image:: https://codecov.io/gh/mapbox/rio-cogeo/branch/master/graph/badge.svg?token=zuHupC20cG
-   :target: https://codecov.io/gh/mapbox/rio-cogeo
+.. image:: https://codecov.io/gh/cogeotiff/rio-cogeo/branch/master/graph/badge.svg?token=zuHupC20cG
+   :target: https://codecov.io/gh/cogeotiff/rio-cogeo
 
 
 Install
@@ -26,7 +26,7 @@ Or install from source:
 
 .. code-block:: console
 
-   $ git clone https://github.com/mapbox/rio-cogeo.git
+   $ git clone https://github.com/cogeotiff/rio-cogeo.git
    $ cd rio-cogeo
    $ pip install -U pip
    $ pip install -e .
@@ -47,13 +47,11 @@ Usage
                                     CloudOptimized GeoTIFF profile (default: jpeg)
     --nodata INTEGER                Force mask creation from a given nodata value
     --alpha INTEGER                 Force mask creation from a given alpha band number
-    --overview-level INTEGER        Overview level
-                                    (if not provided, appropriate overview level will be selected until the
+    --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
                                     smallest overview is smaller than the internal block size)
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
-    --co, --profile NAME=VALUE      Driver specific creation options.See the
-                                    documentation for the selected output driver
+    --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver
                                     for more information.
     --help                          Show this message and exit.
 
@@ -135,7 +133,7 @@ Issues and pull requests are more than welcome.
 
 .. code-block:: console
 
-  $ git clone https://github.com/mapbox/rio-cogeo.git
+  $ git clone https://github.com/cogeotiff/rio-cogeo.git
   $ cd rio-cogeo
   $ pip install -e .[dev]
 
