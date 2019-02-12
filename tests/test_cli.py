@@ -9,6 +9,7 @@ from rio_cogeo.scripts.cli import cogeo
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
+raster_path_nan = os.path.join(os.path.dirname(__file__), "fixtures", "image_nan.tif")
 
 
 def test_cogeo_valid():
@@ -95,7 +96,7 @@ def test_cogeo_validnodata():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--nodata", 0])
+        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--nodata", "0"])
         assert not result.exception
         assert result.exit_code == 0
 
@@ -105,7 +106,7 @@ def test_cogeo_validalpahnodata():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
-            cogeo, [raster_path_rgba, "output.tif", "--nodata", 0, "--alpha", 4]
+            cogeo, [raster_path_rgba, "output.tif", "--nodata", "0", "--alpha", 4]
         )
         assert result.exception
         assert result.exit_code == 1
@@ -156,3 +157,127 @@ def test_cogeo_validOvrOption():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4]
+
+
+def test_cogeo_validgdalBlockOption():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--co",
+                "BLOCKXSIZE=128",
+                "--co",
+                "BLOCKYSIZE=128",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.height == 512
+            assert src.width == 512
+            assert src.meta["dtype"] == "uint8"
+            assert src.is_tiled
+            assert src.compression.value == "JPEG"
+            assert src.photometric.value == "YCbCr"
+            assert src.interleaving.value == "PIXEL"
+            assert src.overviews(1) == [2, 4]
+
+
+def test_cogeo_validNodataCustom():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_nan,
+                "output.tif",
+                "--cog-profile",
+                "deflate",
+                "--nodata",
+                "nan",
+                "--co",
+                "BLOCKXSIZE=64",
+                "--co",
+                "BLOCKYSIZE=64",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.meta["dtype"] == "float64"
+            assert src.is_tiled
+            assert src.compression.value == "DEFLATE"
+            assert src.overviews(1) == [2, 4, 8]
+            assert not src.dataset_mask().all()
+            assert src.dataset_mask()[0][0] == 0
+
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_nan,
+                "output.tif",
+                "--cog-profile",
+                "deflate",
+                "--nodata",
+                "0.5",
+                "--co",
+                "BLOCKXSIZE=64",
+                "--co",
+                "BLOCKYSIZE=64",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.meta["dtype"] == "float64"
+            assert src.is_tiled
+            assert src.compression.value == "DEFLATE"
+            assert src.overviews(1) == [2, 4, 8]
+            assert src.dataset_mask()[0][0] == 255
+
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_nan,
+                "output.tif",
+                "--cog-profile",
+                "deflate",
+                "--nodata",
+                "none",
+                "--co",
+                "BLOCKXSIZE=64",
+                "--co",
+                "BLOCKYSIZE=64",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.meta["dtype"] == "float64"
+            assert src.is_tiled
+            assert src.compression.value == "DEFLATE"
+            assert src.overviews(1) == [2, 4, 8]
+            assert src.dataset_mask().all()
+
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_nan,
+                "output.tif",
+                "--cog-profile",
+                "deflate",
+                "--nodata",
+                "non",
+                "--co",
+                "BLOCKXSIZE=64",
+                "--co",
+                "BLOCKYSIZE=64",
+            ],
+        )
+        assert result.exception
+        assert result.exit_code == 1

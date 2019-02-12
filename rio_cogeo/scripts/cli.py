@@ -2,6 +2,7 @@
 
 import os
 import click
+import numpy
 
 from rasterio.rio import options
 from rasterio.enums import Resampling
@@ -10,34 +11,47 @@ from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
 
-class CustomType:
-    """Click CustomType."""
+class BdxParamType(click.ParamType):
+    """Band inddex type."""
 
-    class BdxParamType(click.ParamType):
-        """Band inddex type."""
+    name = "bidx"
 
-        name = "bidx"
+    def convert(self, value, param, ctx):
+        """Validate and parse band index."""
+        try:
+            bands = [int(x) for x in value.split(",")]
+            assert all(b > 0 for b in bands)
+            return bands
 
-        def convert(self, value, param, ctx):
-            """Validate and parse band index."""
-            try:
-                bands = [int(x) for x in value.split(",")]
-                assert all(b > 0 for b in bands)
-                return bands
+        except (ValueError, AttributeError, AssertionError):
+            raise click.ClickException(
+                "bidx must be a string of comma-separated integers (> 0), "
+                "representing the band indexes."
+            )
 
-            except (ValueError, AttributeError, AssertionError):
-                raise click.ClickException(
-                    "bidx must be a string of comma-separated integers (> 0), "
-                    "representing the band indexes."
-                )
 
-    bidx = BdxParamType()
+class NodataParamType(click.ParamType):
+    """Nodata inddex type."""
+
+    name = "nodata"
+
+    def convert(self, value, param, ctx):
+        """Validate and parse band index."""
+        try:
+            if value.lower() == "nan":
+                return numpy.nan
+            elif value.lower() in ["nil", "none", "nada"]:
+                return None
+            else:
+                return float(value)
+        except (TypeError, ValueError):
+            raise click.ClickException("{} is not a valid nodata value ".format(value))
 
 
 @click.command()
 @options.file_in_arg
 @options.file_out_arg
-@click.option("--bidx", "-b", type=CustomType.bidx, help="Band index to copy")
+@click.option("--bidx", "-b", type=BdxParamType(), help="Band index to copy")
 @click.option(
     "--cog-profile",
     "-p",
@@ -47,7 +61,9 @@ class CustomType:
     help="CloudOptimized GeoTIFF profile (default: jpeg)",
 )
 @click.option(
-    "--nodata", type=int, help="Force mask creation from a given nodata value"
+    "--nodata",
+    type=NodataParamType(),
+    help="Force mask creation from a given nodata value.",
 )
 @click.option(
     "--alpha", type=int, help="Force mask creation from a given alpha band number"
@@ -88,7 +104,9 @@ def cogeo(
     if creation_options:
         output_profile.update(creation_options)
 
-    block_size = min(output_profile["blockxsize"], output_profile["blockysize"])
+    block_size = min(
+        int(output_profile["blockxsize"]), int(output_profile["blockysize"])
+    )
 
     config = dict(
         NUM_THREADS=threads,
