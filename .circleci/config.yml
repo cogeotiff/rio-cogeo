@@ -39,6 +39,7 @@ jobs:
         environment:
           - TOXENV=py36
           - UPLOAD_COVERAGE=1
+
   "python-3.7":
     <<: *common
     docker:
@@ -48,7 +49,7 @@ jobs:
 
   deploy:
       docker:
-        - image: circleci/python:3.6.5
+        - image: circleci/python:3.7.2
           environment:
             - TOXENV=release
       working_directory: ~/rio-cogeo
@@ -78,10 +79,13 @@ workflows:
     jobs:
       - "python-2.7"
       - "python-3.6"
-      - "python-3.7"
+      - "python-3.7":
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - deploy:
           requires:
-            - "python-3.6"
+            - "python-3.7"
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)*/
