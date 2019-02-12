@@ -88,7 +88,9 @@ def cogeo(
     if creation_options:
         output_profile.update(creation_options)
 
-    block_size = min(output_profile["blockxsize"], output_profile["blockysize"])
+    block_size = min(
+        int(output_profile["blockxsize"]), int(output_profile["blockysize"])
+    )
 
     config = dict(
         NUM_THREADS=threads,
