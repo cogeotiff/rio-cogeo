@@ -13,14 +13,14 @@ from rio_cogeo.profiles import cog_profiles
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_nan = os.path.join(os.path.dirname(__file__), "fixtures", "image_nan.tif")
-ycbcr_profile = cog_profiles.get("ycbcr")
+jpeg_profile = cog_profiles.get("jpeg")
 
 
 def test_cog_translate_valid():
     """Should work as expected (create cogeo file)."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        cog_translate(raster_path_rgb, "cogeo.tif", ycbcr_profile)
+        cog_translate(raster_path_rgb, "cogeo.tif", jpeg_profile)
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
             assert src.width == 512
@@ -60,7 +60,7 @@ def test_cog_translate_validAlpha():
         cog_translate(
             raster_path_rgba,
             "cogeo_alpha.tif",
-            ycbcr_profile,
+            jpeg_profile,
             indexes=[1, 2, 3],
             alpha=4,
         )
@@ -73,7 +73,7 @@ def test_cog_translate_valiNodata():
         cog_translate(
             raster_path_rgba,
             "cogeo_nodata.tif",
-            ycbcr_profile,
+            jpeg_profile,
             indexes=[1, 2, 3],
             nodata=0,
         )
@@ -100,7 +100,7 @@ def test_cog_translate_validOverviews():
     """Should work as expected (create cogeo file)."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        cog_translate(raster_path_rgb, "cogeo.tif", ycbcr_profile, overview_level=2)
+        cog_translate(raster_path_rgb, "cogeo.tif", jpeg_profile, overview_level=2)
         with rasterio.open("cogeo.tif") as src:
             assert src.overviews(1) == [2, 4]
 
@@ -113,7 +113,7 @@ def test_cog_translate_valiEnv():
         cog_translate(
             raster_path_rgba,
             "cogeo_env.tif",
-            ycbcr_profile,
+            jpeg_profile,
             indexes=[1, 2, 3],
             config=config,
         )
@@ -124,11 +124,11 @@ def test_cog_translate_validCustom():
     runner = CliRunner()
     with runner.isolated_filesystem():
         config = dict(GDAL_TIFF_OVR_BLOCKSIZE=256)
-        ycbcr_profile.update({"blockxsize": 256, "blockysize": 256})
+        jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
         cog_translate(
             raster_path_rgba,
             "cogeo_env.tif",
-            ycbcr_profile,
+            jpeg_profile,
             indexes=[1, 2, 3],
             config=config,
         )
