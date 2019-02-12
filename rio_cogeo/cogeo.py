@@ -81,7 +81,14 @@ def cog_translate(
                             matrix = src.read(window=w, indexes=indexes)
                             mem.write(matrix, window=w)
 
-                            if nodata is not None:
+                            if nodata is not None and not numpy.isfinite(nodata):
+                                mask_value = (
+                                    numpy.all(numpy.isfinite(matrix), axis=0).astype(
+                                        numpy.uint8
+                                    )
+                                    * 255
+                                )
+                            elif nodata is not None:
                                 mask_value = (
                                     numpy.all(matrix != nodata, axis=0).astype(
                                         numpy.uint8

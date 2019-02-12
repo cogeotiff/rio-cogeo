@@ -2,6 +2,8 @@
 
 import os
 
+import numpy
+
 from click.testing import CliRunner
 
 import rasterio
@@ -10,6 +12,7 @@ from rio_cogeo.profiles import cog_profiles
 
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
+raster_path_nan = os.path.join(os.path.dirname(__file__), "fixtures", "image_nan.tif")
 ycbcr_profile = cog_profiles.get("ycbcr")
 
 
@@ -74,6 +77,23 @@ def test_cog_translate_valiNodata():
             indexes=[1, 2, 3],
             nodata=0,
         )
+
+
+def test_cog_translate_valiNodataNan():
+    """Should work as expected and create mask from NaN."""
+    runner = CliRunner()
+    profile = cog_profiles.get("deflate")
+    profile.update({"blockxsize": 64, "blockysize": 64})
+    with runner.isolated_filesystem():
+        cog_translate(raster_path_nan, "cogeo_nan.tif", profile, nodata=numpy.nan)
+        with rasterio.open("cogeo_nan.tif") as src:
+            assert src.meta["dtype"] == "float64"
+            assert src.is_tiled
+            assert src.compression.value == "DEFLATE"
+            assert src.profile["blockxsize"] == 64
+            assert src.profile["blockysize"] == 64
+            assert src.overviews(1) == [2, 4, 8]
+            assert not src.dataset_mask().all()
 
 
 def test_cog_translate_validOverviews():
