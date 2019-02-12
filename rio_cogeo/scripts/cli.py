@@ -45,24 +45,25 @@ class NodataParamType(click.ParamType):
             else:
                 return float(value)
         except (TypeError, ValueError):
-            raise click.ClickException("{} is not a valid nodata value ".format(value))
+            raise click.ClickException("{} is not a valid nodata value.".format(value))
 
 
 @click.command()
 @options.file_in_arg
 @options.file_out_arg
-@click.option("--bidx", "-b", type=BdxParamType(), help="Band index to copy")
+@click.option("--bidx", "-b", type=BdxParamType(), help="Band indexes to copy.")
 @click.option(
     "--cog-profile",
     "-p",
     "cogeo_profile",
     type=click.Choice(cog_profiles.keys()),
     default="jpeg",
-    help="CloudOptimized GeoTIFF profile (default: jpeg)",
+    help="CloudOptimized GeoTIFF profile (default: jpeg).",
 )
 @click.option(
     "--nodata",
     type=NodataParamType(),
+    metavar="NUMBER|nan",
     help="Force mask creation from a given nodata value.",
 )
 @click.option(
@@ -71,7 +72,7 @@ class NodataParamType(click.ParamType):
 @click.option(
     "--overview-level",
     type=int,
-    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size)",
+    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size).",
 )
 @click.option(
     "--overview-resampling",

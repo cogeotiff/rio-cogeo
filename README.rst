@@ -42,13 +42,13 @@ Usage
     Create Cloud Optimized Geotiff.
 
   Options:
-    -b, --bidx BIDX                 Band index to copy
+    -b, --bidx BIDX                 Band indexes to copy.
     -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw]
-                                    CloudOptimized GeoTIFF profile (default: jpeg)
-    --nodata INTEGER                Force mask creation from a given nodata value
-    --alpha INTEGER                 Force mask creation from a given alpha band number
+                                    CloudOptimized GeoTIFF profile (default: jpeg).
+    --nodata NUMBER|nan             Force mask creation from a given nodata value.
+    --alpha INTEGER                 Force mask creation from a given alpha band number.
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
-                                    smallest overview is smaller than the internal block size)
+                                    smallest overview is smaller than the internal block size).
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver
