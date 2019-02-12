@@ -1,5 +1,5 @@
-Next (TBD)
-----------
+1.0dev10 (2019-02-12)
+---------------------
 - allow non integer nodata value (#51)
 - fix GDAL blocksize options casting for overview calculation (#50)
 
