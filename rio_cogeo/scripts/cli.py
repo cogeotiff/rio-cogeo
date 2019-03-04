@@ -1,6 +1,7 @@
 """Rio_cogeo.scripts.cli."""
 
 import os
+
 import click
 import numpy
 
@@ -64,10 +65,12 @@ class NodataParamType(click.ParamType):
     "--nodata",
     type=NodataParamType(),
     metavar="NUMBER|nan",
-    help="Force mask creation from a given nodata value.",
+    help="Set nodata masking values for input dataset.",
 )
 @click.option(
-    "--alpha", type=int, help="Force mask creation from a given alpha band number"
+    "--add-mask",
+    is_flag=True,
+    help="Force output dataset creation with an internal mask (convert alpha band or nodata to mask).",
 )
 @click.option(
     "--overview-level",
@@ -90,16 +93,13 @@ def cogeo(
     bidx,
     cogeo_profile,
     nodata,
-    alpha,
+    add_mask,
     overview_level,
     overview_resampling,
     threads,
     creation_options,
 ):
     """Create Cloud Optimized Geotiff."""
-    if nodata is not None and alpha is not None:
-        raise click.ClickException('Incompatible options "alpha" and "nodata"')
-
     output_profile = cog_profiles.get(cogeo_profile)
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
@@ -121,7 +121,7 @@ def cogeo(
         output_profile,
         bidx,
         nodata,
-        alpha,
+        add_mask,
         overview_level,
         overview_resampling,
         config,
