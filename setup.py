@@ -17,10 +17,9 @@ with open("README.rst") as f:
 inst_reqs = ["click", "rasterio[s3]>=1.0.9", "numpy~=1.15"]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-cov"],
-    "dev": ["pytest", "pytest-cov", "pre-commit"],
+    "test": ["mock", "pytest", "pytest-cov"],
+    "dev": ["mock", "pytest", "pytest-cov", "pre-commit"],
 }
-
 
 setup(
     name="rio-cogeo",
