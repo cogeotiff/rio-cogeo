@@ -87,6 +87,12 @@ class NodataParamType(click.ParamType):
 )
 @click.option("--threads", type=int, default=8)
 @options.creation_options
+@click.option(
+    "--quiet",
+    "-q",
+    help="Suppress progress bar and other non-error output.",
+    is_flag=True,
+)
 def cogeo(
     input,
     output,
@@ -98,6 +104,7 @@ def cogeo(
     overview_resampling,
     threads,
     creation_options,
+    quiet,
 ):
     """Create Cloud Optimized Geotiff."""
     output_profile = cog_profiles.get(cogeo_profile)
@@ -125,4 +132,5 @@ def cogeo(
         overview_level,
         overview_resampling,
         config,
+        quiet,
     )

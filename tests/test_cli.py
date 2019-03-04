@@ -26,7 +26,9 @@ def test_cogeo_valid():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--add-mask"])
+        result = runner.invoke(
+            cogeo, [raster_path_rgb, "output.tif", "--add-mask", "--quiet"]
+        )
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:

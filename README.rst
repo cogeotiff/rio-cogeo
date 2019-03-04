@@ -43,8 +43,7 @@ Usage
 
   Options:
     -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw]
-                                    CloudOptimized GeoTIFF profile (default: jpeg).
+    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: jpeg).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
@@ -52,6 +51,7 @@ Usage
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
+    -q, --quiet                     Suppress progress bar and other non-error output.
     --help                          Show this message and exit.
 
 Examples

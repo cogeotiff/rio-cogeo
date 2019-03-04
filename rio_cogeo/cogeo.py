@@ -1,5 +1,6 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
+import os
 import sys
 import warnings
 
@@ -25,6 +26,7 @@ def cog_translate(
     overview_level=None,
     overview_resampling="nearest",
     config=None,
+    quiet=False,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -47,9 +49,11 @@ def cog_translate(
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
     overview_resampling : str, optional (default: "nearest")
-         Resampling algorithm for overviews
+        Resampling algorithm for overviews
     config : dict
         Rasterio Env options.
+    quiet: bool, optional (default: False)
+        Mask processing steps.
 
     """
     config = config or {}
@@ -102,8 +106,11 @@ def cog_translate(
                     with memfile.open(**meta) as mem:
                         wind = list(mem.block_windows(1))
 
+                        if not quiet:
+                            click.echo("Reading input: {}".format(src_path), err=True)
+                        fout = os.devnull if quiet else sys.stderr
                         with click.progressbar(
-                            wind, length=len(wind), file=sys.stderr, show_percent=True
+                            wind, length=len(wind), file=fout, show_percent=True
                         ) as windows:
                             for ij, w in windows:
                                 matrix = vrt_dst.read(window=w, indexes=indexes)
@@ -113,13 +120,21 @@ def cog_translate(
                                     mask_value = vrt_dst.dataset_mask(window=w)
                                     mem.write_mask(mask_value, window=w)
 
+                        if not quiet:
+                            click.echo("Adding overviews...", err=True)
                         overviews = [2 ** j for j in range(1, overview_level + 1)]
                         mem.build_overviews(overviews, Resampling[overview_resampling])
 
+                        if not quiet:
+                            click.echo("Updating dataset tags...", err=True)
                         mem.update_tags(
                             OVR_RESAMPLING_ALG=Resampling[
                                 overview_resampling
                             ].name.upper()
                         )
 
+                        if not quiet:
+                            click.echo(
+                                "Writing output to: {}".format(dst_path), err=True
+                            )
                         copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
