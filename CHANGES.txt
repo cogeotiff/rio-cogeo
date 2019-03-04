@@ -1,5 +1,6 @@
 Next (TBD)
 ----------
+- add more logging and `--quiet` option (#46)
 
 Breacking Changes:
 
