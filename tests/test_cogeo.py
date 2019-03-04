@@ -29,6 +29,9 @@ raster_path_missingnodata = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
 )
 raster_path_tags = os.path.join(os.path.dirname(__file__), "fixtures", "image_tags.tif")
+raster_path_mask = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_rgb_mask.tif"
+)
 
 
 jpeg_profile = cog_profiles.get("jpeg")
@@ -216,6 +219,15 @@ def test_cog_translate_validCustom():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2]
+
+
+def test_cog_translate_mask():
+    """Should work as expected (copy mask from input)."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        cog_translate(raster_path_mask, "cogeo.tif", jpeg_profile, quiet=True)
+        with rasterio.open("cogeo.tif") as src:
+            assert has_mask_band(src)
 
 
 def test_cog_translate_tags():
