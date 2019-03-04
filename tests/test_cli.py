@@ -2,21 +2,31 @@
 
 import os
 
+import pytest
 from click.testing import CliRunner
 
 import rasterio
 from rio_cogeo.scripts.cli import cogeo
+from rio_cogeo.utils import has_mask_band
+from rio_cogeo.errors import LossyCompression
+
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
 raster_path_nan = os.path.join(os.path.dirname(__file__), "fixtures", "image_nan.tif")
+raster_path_nodata = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_nodata.tif"
+)
+raster_path_missingnodata = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
+)
 
 
 def test_cogeo_valid():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif"])
+        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--add-mask"])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
@@ -30,21 +40,21 @@ def test_cogeo_valid():
             assert src.photometric.value == "YCbCr"
             assert src.interleaving.value == "PIXEL"
             assert not src.overviews(1)
+            assert has_mask_band(src)
 
 
 def test_cogeo_valid_external_mask(monkeypatch):
     """Should work as expected."""
     monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "FALSE")
+    monkeypatch.setenv("GDAL_DISABLE_READDIR_ON_OPEN", "TRUE")
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(
-            cogeo, [raster_path_rgba, "output.tif", "-b", "1,2,3", "--alpha", 4]
-        )
-
+        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--add-mask"])
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
+            assert has_mask_band(src)
             assert "output.tif.msk" in src.files
 
 
@@ -53,15 +63,16 @@ def test_cogeo_validbidx():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
-            cogeo, [raster_path_rgb, "output.tif", "-b", "1", "-p", "raw"]
+            cogeo, [raster_path_rgb, "output.tif", "-b", "1", "-p", "raw", "--add-mask"]
         )
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
+            assert has_mask_band(src)
             assert src.count == 1
 
 
-def test_cogeo_validInvalidbidx():
+def test_cogeo_invalidbidx():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -70,7 +81,7 @@ def test_cogeo_validInvalidbidx():
         assert result.exit_code == 1
 
 
-def test_cogeo_validInvalidbidxString():
+def test_cogeo_invalidbidxString():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -79,37 +90,38 @@ def test_cogeo_validInvalidbidxString():
         assert result.exit_code == 1
 
 
-def test_cogeo_validAlpha():
-    """Should work as expected."""
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        result = runner.invoke(
-            cogeo, [raster_path_rgba, "output.tif", "-b", "1,2,3", "--alpha", 4]
-        )
-        assert not result.exception
-        assert result.exit_code == 0
-        with rasterio.open("output.tif") as src:
-            assert src.count == 3
-
-
 def test_cogeo_validnodata():
     """Should work as expected."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--nodata", "0"])
+        with pytest.warns(LossyCompression):
+            result = runner.invoke(
+                cogeo, [raster_path_rgb, "output.tif", "--nodata", "0"]
+            )
+            assert not result.exception
+            assert result.exit_code == 0
+            with rasterio.open("output.tif") as src:
+                assert src.nodata == 0
+                assert not has_mask_band(src)
+
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_nodata,
+                "output.tif",
+                "--co",
+                "BLOCKXSIZE=64",
+                "--co",
+                "BLOCKYSIZE=64",
+                "--cog-profile",
+                "deflate",
+            ],
+        )
         assert not result.exception
         assert result.exit_code == 0
-
-
-def test_cogeo_validalpahnodata():
-    """Should exit with incompatible option."""
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        result = runner.invoke(
-            cogeo, [raster_path_rgba, "output.tif", "--nodata", "0", "--alpha", 4]
-        )
-        assert result.exception
-        assert result.exit_code == 1
+        with rasterio.open("output.tif") as src:
+            assert src.nodata == -9999
+            assert not has_mask_band(src)
 
 
 def test_cogeo_validGdalOptions():
@@ -124,9 +136,6 @@ def test_cogeo_validGdalOptions():
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
             assert src.compression.value == "DEFLATE"
-            assert (
-                not src.is_tiled
-            )  # Because blocksize is 512 and the file is 512, the output is not tiled
 
 
 def test_cogeo_validOvrOption():
@@ -147,15 +156,9 @@ def test_cogeo_validOvrOption():
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert src.height == 512
-            assert src.width == 512
-            assert src.meta["dtype"] == "uint8"
             assert (
                 not src.is_tiled
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
-            assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4]
 
 
@@ -177,13 +180,7 @@ def test_cogeo_validgdalBlockOption():
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert src.height == 512
-            assert src.width == 512
-            assert src.meta["dtype"] == "uint8"
             assert src.is_tiled
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
-            assert src.interleaving.value == "PIXEL"
             assert src.overviews(1) == [2, 4]
 
 
@@ -210,21 +207,20 @@ def test_cogeo_validNodataCustom():
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
             assert src.meta["dtype"] == "float64"
-            assert src.is_tiled
+            assert src.nodata
             assert src.compression.value == "DEFLATE"
-            assert src.overviews(1) == [2, 4, 8]
             assert not src.dataset_mask().all()
             assert src.dataset_mask()[0][0] == 0
 
         result = runner.invoke(
             cogeo,
             [
-                raster_path_nan,
+                raster_path_missingnodata,
                 "output.tif",
                 "--cog-profile",
                 "deflate",
                 "--nodata",
-                "0.5",
+                "-9999",
                 "--co",
                 "BLOCKXSIZE=64",
                 "--co",
@@ -234,16 +230,16 @@ def test_cogeo_validNodataCustom():
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert src.meta["dtype"] == "float64"
-            assert src.is_tiled
+            assert src.nodata == -9999
             assert src.compression.value == "DEFLATE"
-            assert src.overviews(1) == [2, 4, 8]
-            assert src.dataset_mask()[0][0] == 255
+            assert not src.dataset_mask().all()
+            assert src.dataset_mask()[0][0] == 0
+            assert src.dataset_mask()[-1][-1] == 255
 
         result = runner.invoke(
             cogeo,
             [
-                raster_path_nan,
+                raster_path_missingnodata,
                 "output.tif",
                 "--cog-profile",
                 "deflate",
@@ -258,10 +254,7 @@ def test_cogeo_validNodataCustom():
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert src.meta["dtype"] == "float64"
-            assert src.is_tiled
             assert src.compression.value == "DEFLATE"
-            assert src.overviews(1) == [2, 4, 8]
             assert src.dataset_mask().all()
 
         result = runner.invoke(
@@ -273,10 +266,6 @@ def test_cogeo_validNodataCustom():
                 "deflate",
                 "--nodata",
                 "non",
-                "--co",
-                "BLOCKXSIZE=64",
-                "--co",
-                "BLOCKYSIZE=64",
             ],
         )
         assert result.exception

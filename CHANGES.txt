@@ -1,3 +1,11 @@
+Next (TBD)
+----------
+
+Breacking Changes:
+
+- internal mask creation is now optional (--add-mask).
+- internal nodata or alpha channel can be forwarded to the output dataset.
+
 1.0dev10 (2019-02-12)
 ---------------------
 - allow non integer nodata value (#51)
