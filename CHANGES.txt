@@ -2,6 +2,11 @@ Next (TBD)
 ----------
 - add more logging and `--quiet` option (#46)
 
+Bug fixes:
+
+- copy tags and description from input to output (#19)
+- copy input mask band to output mask
+
 Breacking Changes:
 
 - internal mask creation is now optional (--add-mask).

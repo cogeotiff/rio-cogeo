@@ -13,7 +13,7 @@ from rasterio.enums import Resampling
 from rasterio.shutil import copy
 
 from rio_cogeo.errors import LossyCompression
-from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band
+from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band, has_mask_band
 
 
 def cog_translate(
@@ -69,6 +69,7 @@ def cog_translate(
             indexes = indexes if indexes else src_dst.indexes
             nodata = nodata if nodata is not None else src_dst.nodata
             alpha = has_alpha_band(src_dst)
+            mask = has_mask_band(src_dst)
 
             if not add_mask and (
                 (nodata is not None or alpha)
@@ -116,7 +117,7 @@ def cog_translate(
                                 matrix = vrt_dst.read(window=w, indexes=indexes)
                                 mem.write(matrix, window=w)
 
-                                if add_mask:
+                                if add_mask or mask:
                                     mask_value = vrt_dst.dataset_mask(window=w)
                                     mem.write_mask(mask_value, window=w)
 
@@ -127,11 +128,19 @@ def cog_translate(
 
                         if not quiet:
                             click.echo("Updating dataset tags...", err=True)
-                        mem.update_tags(
-                            OVR_RESAMPLING_ALG=Resampling[
-                                overview_resampling
-                            ].name.upper()
+
+                        for i, b in enumerate(indexes):
+                            mem.set_band_description(i + 1, src_dst.descriptions[b - 1])
+
+                        tags = src_dst.tags()
+                        tags.update(
+                            dict(
+                                OVR_RESAMPLING_ALG=Resampling[
+                                    overview_resampling
+                                ].name.upper()
+                            )
                         )
+                        mem.update_tags(**tags)
 
                         if not quiet:
                             click.echo(
