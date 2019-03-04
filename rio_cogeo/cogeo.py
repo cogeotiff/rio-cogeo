@@ -127,11 +127,19 @@ def cog_translate(
 
                         if not quiet:
                             click.echo("Updating dataset tags...", err=True)
-                        mem.update_tags(
-                            OVR_RESAMPLING_ALG=Resampling[
-                                overview_resampling
-                            ].name.upper()
+
+                        for i, b in enumerate(indexes):
+                            mem.set_band_description(i + 1, src_dst.descriptions[b - 1])
+
+                        tags = src_dst.tags()
+                        tags.update(
+                            dict(
+                                OVR_RESAMPLING_ALG=Resampling[
+                                    overview_resampling
+                                ].name.upper()
+                            )
                         )
+                        mem.update_tags(**tags)
 
                         if not quiet:
                             click.echo(
