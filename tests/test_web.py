@@ -1,8 +1,10 @@
-"""tests rio_cogeo.cogeo."""
+"""tests rio_cogeo web."""
 
 import os
+import sys
 import struct
 
+import pytest
 from click.testing import CliRunner
 
 import numpy
@@ -15,14 +17,13 @@ from rio_cogeo.utils import get_max_zoom
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
-from cogdumper.cog_tiles import COGTiff
-from cogdumper.filedumper import Reader as FileReader
 from rio_tiler.utils import tile_read
 
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")
 def test_cog_translate_web():
     """
     Test Web-Optimized COG.
@@ -34,6 +35,9 @@ def test_cog_translate_web():
     - Test overview internal tiles are equal to mercator tile using
       cogdumper and rio-tiler
     """
+    from cogdumper.cog_tiles import COGTiff
+    from cogdumper.filedumper import Reader as FileReader
+
     runner = CliRunner()
     with runner.isolated_filesystem():
 
@@ -61,7 +65,7 @@ def test_cog_translate_web():
                 bounds = list(
                     transform_bounds(
                         *[src_dst.crs, "epsg:4326"] + list(src_dst.bounds),
-                        densify_pts=21,
+                        densify_pts=21
                     )
                 )
 
@@ -92,7 +96,7 @@ def test_cog_translate_web():
                     # Top Left tile
                     mime_type, tile = cog.get_tile(0, 0, 0)
                     tile_lenght = 256 * 256 * 3
-                    t = struct.unpack_from(f"{tile_lenght}b", tile)
+                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
@@ -105,7 +109,7 @@ def test_cog_translate_web():
                     # Bottom right tile
                     mime_type, tile = cog.get_tile(4, 3, 0)
                     tile_lenght = 256 * 256 * 3
-                    t = struct.unpack_from(f"{tile_lenght}b", tile)
+                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
@@ -123,13 +127,13 @@ def test_cog_translate_web():
                     # ref: https://github.com/cogeotiff/rio-cogeo/issues/60
                     mime_type, tile = cog.get_tile(1, 0, 1)
                     tile_lenght = 128 * 128 * 3
-                    t = struct.unpack_from(f"{tile_lenght}b", tile)
+                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
                     arr1 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
                     arr1 = numpy.transpose(arr1, [2, 0, 1])
 
                     mime_type, tile = cog.get_tile(2, 0, 1)
                     tile_lenght = 128 * 128 * 3
-                    t = struct.unpack_from(f"{tile_lenght}b", tile)
+                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
                     arr2 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
                     arr2 = numpy.transpose(arr2, [2, 0, 1])
                     arr = numpy.dstack((arr1, arr2))

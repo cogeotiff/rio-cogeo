@@ -1,4 +1,6 @@
 """Setup."""
+
+import sys
 from setuptools import setup, find_packages
 
 with open("rio_cogeo/__init__.py") as f:
@@ -23,20 +25,24 @@ inst_reqs = [
 ]
 
 extra_reqs = {
-    "test": ["mock", "pytest", "pytest-cov", "cogdumper", "rio-tiler"],
-    "dev": ["mock", "pytest", "pytest-cov", "cogdumper", "rio-tiler", "pre-commit"],
+    "test": ["mock", "pytest", "pytest-cov", "rio-tiler"],
+    "dev": ["mock", "pytest", "pytest-cov", "rio-tiler", "pre-commit"],
 }
+
+if sys.version_info >= (3, 6):
+    extra_reqs["test"].append("cogdumper")
+    extra_reqs["dev"].append("cogdumper")
 
 setup(
     name="rio-cogeo",
     version=version,
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
-    python_requires=">=3",
     classifiers=[
         "Intended Audience :: Information Technology",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: GIS",
@@ -44,7 +50,7 @@ setup(
     keywords="COGEO CloudOptimized Geotiff rasterio",
     author=u"Vincent Sarago",
     author_email="vincent@developmentseed.com",
-    url="https://github.com/mapbox/rio-cogeo",
+    url="https://github.com/cogeotiff/rio-cogeo",
     license="BSD-3",
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
     install_requires=inst_reqs,

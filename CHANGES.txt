@@ -1,6 +1,8 @@
 Next (TBD)
 ----------
 - add more logging and `--quiet` option (#46)
+- add `--overview-blocksize` to set overview's internal tile size (#60)
+- add `--web-optimized` option to create a web optimized COG (#10)
 
 Bug fixes:
 
@@ -11,6 +13,8 @@ Breacking Changes:
 
 - internal mask creation is now optional (--add-mask).
 - internal nodata or alpha channel can be forwarded to the output dataset.
+- removed default overview blocksize to be equal to the raw data blocksize (#60)
+- Web-optimized tests needs python3.6 (cogdumper)
 
 1.0dev10 (2019-02-12)
 ---------------------

@@ -22,6 +22,14 @@ raster_path_missingnodata = os.path.join(
 )
 
 
+@pytest.fixture(autouse=True)
+def testing_env_var(monkeypatch):
+    """Set GDAL env."""
+    monkeypatch.setenv("GDAL_DISABLE_READDIR_ON_OPEN", "TRUE")
+    monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "TRUE")
+    monkeypatch.delenv("GDAL_TIFF_OVR_BLOCKSIZE", raising=False)
+
+
 def test_cogeo_valid():
     """Should work as expected."""
     runner = CliRunner()
@@ -162,6 +170,72 @@ def test_cogeo_validOvrOption():
                 not src.is_tiled
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
             assert src.overviews(1) == [2, 4]
+
+
+def test_cogeo_overviewTilesize(monkeypatch):
+    """Should work as expected."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--quiet",
+                "--co",
+                "BLOCKXSIZE=128",
+                "--co",
+                "BLOCKYSIZE=128",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.is_tiled
+            assert src.overviews(1)
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (128, 128)
+
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--quiet",
+                "--co",
+                "BLOCKXSIZE=128",
+                "--co",
+                "BLOCKYSIZE=128",
+                "--overview-blocksize",
+                "64",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (64, 64)
+
+    monkeypatch.setenv("GDAL_TIFF_OVR_BLOCKSIZE", "64")
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                raster_path_rgb,
+                "output.tif",
+                "--quiet",
+                "--co",
+                "BLOCKXSIZE=128",
+                "--co",
+                "BLOCKYSIZE=128",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (64, 64)
 
 
 def test_cogeo_validgdalBlockOption():

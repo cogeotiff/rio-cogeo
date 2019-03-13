@@ -75,6 +75,8 @@ def test_cog_translate_valid():
         )
         with rasterio.open("cogeo.tif") as src:
             assert has_mask_band(src)
+        with rasterio.open("cogeo.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (64, 64)
 
 
 def test_cog_translate_NodataLossyWarning():

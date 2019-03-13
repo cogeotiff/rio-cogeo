@@ -49,6 +49,8 @@ Usage
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
                                     smallest overview is smaller than the internal block size).
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
+    --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
+    -w, --web-optimized             Create COGEO optimized for Web.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
     -q, --quiet                     Suppress progress bar and other non-error output.
@@ -67,6 +69,11 @@ Examples
 
   # Create a COGEO without compression and with 1024x1024 block size
   $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
+
+  # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
+  $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
+  $ GDAL_TIFF_OVR_BLOCKSIZE=256 rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
+
 
 Default COGEO profiles
 ======================
@@ -127,7 +134,7 @@ Default profiles are tiled with 512x512 blocksizes.
 Overview levels
 ===============
 
-By default rio cogeo will calculate the optimal overview level based on dataset size and internal tile size 
+By default rio cogeo will calculate the optimal overview level based on dataset size and internal tile size
 (overview should not be smaller than internal tile size (e.g 512px). Overview level will be translated to decimation level of power of two.
 
 Internal tile size
@@ -135,23 +142,25 @@ Internal tile size
 
 By default rio cogeo will create a dataset with 512x512 internal tile size. This can be updated by passing `--co BLOCKXSIZE=64 --co BLOCKYSIZE=64` options.
 
-**Web tiling optimization** 
+**Web tiling optimization**
 
-if the input dataset is aligned to web mercator grid, the internal tile size should be equal to the web map tile size (256 or 512px) 
-output dataset is compressed, 
+if the input dataset is aligned to web mercator grid, the internal tile size should be equal to the web map tile size (256 or 512px)
+output dataset is compressed,
 
-if the input dataset is not aligned to web mercator grid, the tiler will need to fetch multiple internal tiles. 
-Because GDAL can merge range request, using small internal tiles (e.g 128) will reduce the number of byte transfered and minimized the useless bytes transfered. 
+if the input dataset is not aligned to web mercator grid, the tiler will need to fetch multiple internal tiles.
+Because GDAL can merge range request, using small internal tiles (e.g 128) will reduce the number of byte transfered and minimized the useless bytes transfered.
+
+More info in https://github.com/cogeotiff/rio-cogeo/issues/60
 
 Nodata, Alpha and Mask
 ======================
 
-By default rio-cogeo will forward any nodata value or alpha channel to the output COG. 
+By default rio-cogeo will forward any nodata value or alpha channel to the output COG.
 
 If your dataset type is **Byte** or **Unit16**, you could use internal bit mask (with the `--add-mask` option)
 to replace the Nodata value or Alpha band in output dataset (supported by most GDAL based backends).
 
-Note: when adding a `mask` with an input dataset having an alpha band you'll 
+Note: when adding a `mask` with an input dataset having an alpha band you'll
 need to use the `bidx` options to remove it from the output dataset.
 
 .. code-block:: console
@@ -159,9 +168,9 @@ need to use the `bidx` options to remove it from the output dataset.
   # Replace the alpha band by an internal mask
   $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --add-mask --bidx 1,2,3
 
-**Important** 
+**Important**
 
-Using internal nodata value with lossy compression (`webp`, `jpeg`) is not recommanded. 
+Using internal nodata value with lossy compression (`webp`, `jpeg`) is not recommanded.
 Please use internal masking (or alpha band if using webp)
 
 
