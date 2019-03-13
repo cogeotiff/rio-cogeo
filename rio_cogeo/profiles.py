@@ -1,5 +1,7 @@
 """rio_cogeo.profiles: CloudOptimized profiles."""
 
+import warnings
+from rio_cogeo.errors import DeprecationWarning
 from rasterio.profiles import Profile
 
 
@@ -14,6 +16,33 @@ class YCbCrProfile(Profile):
         "blockysize": 512,
         "compress": "JPEG",
         "photometric": "YCbCr",
+    }
+
+
+class JPEGProfile(Profile):
+    """Tiled, pixel-interleaved, JPEG-compressed, YCbCr colorspace, 8-bit GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "JPEG",
+        "photometric": "YCbCr",
+    }
+
+
+class WEBPProfile(Profile):
+    """Tiled, pixel-interleaved, WEBP-compressed, 8-bit GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "WEBP",
     }
 
 
@@ -92,6 +121,8 @@ class COGProfiles(dict):
         self.update(
             {
                 "ycbcr": YCbCrProfile(),
+                "jpeg": JPEGProfile(),
+                "webp": WEBPProfile(),
                 "zstd": ZSTDProfile(),
                 "lzw": LZWProfile(),
                 "deflate": DEFLATEProfile(),
@@ -102,6 +133,12 @@ class COGProfiles(dict):
 
     def get(self, key):
         """Like normal item access but error."""
+        if key == "ycbcr":
+            warnings.warn(
+                "'ycbcr' profile will be removed in 1.0, use 'jpeg' instead",
+                DeprecationWarning,
+            )
+
         if key not in (self.keys()):
             raise KeyError("{} is not a valid COG profile name".format(key))
 

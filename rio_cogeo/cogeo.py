@@ -2,16 +2,19 @@
 
 import os
 import sys
+import warnings
 
 import click
-
-import numpy
 
 import rasterio
 from rasterio.io import MemoryFile
 from rasterio.env import GDALVersion
+from rasterio.vrt import WarpedVRT
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
+
+from rio_cogeo.errors import LossyCompression
+from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band, has_mask_band
 
 
 def cog_translate(
@@ -20,10 +23,11 @@ def cog_translate(
     dst_kwargs,
     indexes=None,
     nodata=None,
-    alpha=None,
-    overview_level=6,
+    add_mask=None,
+    overview_level=None,
     overview_resampling="nearest",
     config=None,
+    quiet=False,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -40,66 +44,115 @@ def cog_translate(
     indexes : tuple, int, optional
         Raster band indexes to copy.
     nodata, int, optional
-        nodata value for mask creation.
-    alpha, int, optional
-        alpha band index for mask creation.
+        Overwrite nodata masking values for input dataset.
+    add_mask, bool, optional
+        Force output dataset creation with a mask.
     overview_level : int, optional (default: 6)
         COGEO overview (decimation) level
+    overview_resampling : str, optional (default: "nearest")
+        Resampling algorithm for overviews
     config : dict
         Rasterio Env options.
+    quiet: bool, optional (default: False)
+        Mask processing steps.
 
     """
     config = config or {}
 
+    if overview_level is None:
+        overview_level = get_maximum_overview_level(
+            src_path, min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
+        )
+
     with rasterio.Env(**config):
-        with rasterio.open(src_path) as src:
+        with rasterio.open(src_path) as src_dst:
+            meta = src_dst.meta
+            indexes = indexes if indexes else src_dst.indexes
+            nodata = nodata if nodata is not None else src_dst.nodata
+            alpha = has_alpha_band(src_dst)
+            mask = has_mask_band(src_dst)
 
-            indexes = indexes if indexes else src.indexes
-            meta = src.meta
-            meta["count"] = len(indexes)
-            meta.pop("nodata", None)
-            meta.pop("alpha", None)
+            if not add_mask and (
+                (nodata is not None or alpha)
+                and dst_kwargs.get("compress") in ["JPEG", "jpeg"]
+            ):
+                warnings.warn(
+                    "Using lossy compression with Nodata or Alpha band "
+                    "can results in unwanted artefacts.",
+                    LossyCompression,
+                )
 
-            meta.update(**dst_kwargs)
-            meta.pop("compress", None)
-            meta.pop("photometric", None)
+            vrt_params = dict(add_alpha=True)
 
-            with MemoryFile() as memfile:
-                with memfile.open(**meta) as mem:
-                    wind = list(mem.block_windows(1))
-                    with click.progressbar(
-                        wind, length=len(wind), file=sys.stderr, show_percent=True
-                    ) as windows:
-                        for ij, w in windows:
-                            matrix = src.read(window=w, indexes=indexes)
-                            mem.write(matrix, window=w)
+            if nodata is not None:
+                vrt_params.update(
+                    dict(nodata=nodata, add_alpha=False, src_nodata=nodata)
+                )
 
-                            if nodata is not None:
-                                mask_value = (
-                                    numpy.all(matrix != nodata, axis=0).astype(
-                                        numpy.uint8
-                                    )
-                                    * 255
-                                )
-                            elif alpha is not None:
-                                mask_value = src.read(alpha, window=w)
-                            else:
-                                mask_value = src.dataset_mask(window=w)
-                            mem.write_mask(mask_value, window=w)
+            if alpha:
+                vrt_params.update(dict(add_alpha=False))
 
-                    overviews = [2 ** j for j in range(1, overview_level + 1)]
+            with WarpedVRT(src_dst, **vrt_params) as vrt_dst:
+                meta = vrt_dst.meta
+                meta["count"] = len(indexes)
 
-                    mem.build_overviews(overviews, Resampling[overview_resampling])
-                    mem.update_tags(
-                        OVR_RESAMPLING_ALG=Resampling[overview_resampling].name.upper()
-                    )
+                if add_mask:
+                    meta.pop("nodata", None)
+                    meta.pop("alpha", None)
 
-                    copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
+                meta.update(**dst_kwargs)
+                meta.pop("compress", None)
+                meta.pop("photometric", None)
+
+                with MemoryFile() as memfile:
+                    with memfile.open(**meta) as mem:
+                        wind = list(mem.block_windows(1))
+
+                        if not quiet:
+                            click.echo("Reading input: {}".format(src_path), err=True)
+                        fout = os.devnull if quiet else sys.stderr
+                        with click.progressbar(
+                            wind, length=len(wind), file=fout, show_percent=True
+                        ) as windows:
+                            for ij, w in windows:
+                                matrix = vrt_dst.read(window=w, indexes=indexes)
+                                mem.write(matrix, window=w)
+
+                                if add_mask or mask:
+                                    mask_value = vrt_dst.dataset_mask(window=w)
+                                    mem.write_mask(mask_value, window=w)
+
+                        if not quiet:
+                            click.echo("Adding overviews...", err=True)
+                        overviews = [2 ** j for j in range(1, overview_level + 1)]
+                        mem.build_overviews(overviews, Resampling[overview_resampling])
+
+                        if not quiet:
+                            click.echo("Updating dataset tags...", err=True)
+
+                        for i, b in enumerate(indexes):
+                            mem.set_band_description(i + 1, src_dst.descriptions[b - 1])
+
+                        tags = src_dst.tags()
+                        tags.update(
+                            dict(
+                                OVR_RESAMPLING_ALG=Resampling[
+                                    overview_resampling
+                                ].name.upper()
+                            )
+                        )
+                        mem.update_tags(**tags)
+
+                        if not quiet:
+                            click.echo(
+                                "Writing output to: {}".format(dst_path), err=True
+                            )
+                        copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
 def cog_validate(src_path):
     """
-    Create Cloud Optimized Geotiff.
+    Validate Cloud Optimized Geotiff.
 
     Parameters
     ----------

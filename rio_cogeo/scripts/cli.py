@@ -1,7 +1,9 @@
 """Rio_cogeo.scripts.cli."""
 
 import os
+
 import click
+import numpy
 
 from rasterio.rio import options
 from rasterio.enums import Resampling
@@ -10,28 +12,41 @@ from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
 
-class CustomType:
-    """Click CustomType."""
+class BdxParamType(click.ParamType):
+    """Band inddex type."""
 
-    class BdxParamType(click.ParamType):
-        """Band inddex type."""
+    name = "bidx"
 
-        name = "bidx"
+    def convert(self, value, param, ctx):
+        """Validate and parse band index."""
+        try:
+            bands = [int(x) for x in value.split(",")]
+            assert all(b > 0 for b in bands)
+            return bands
 
-        def convert(self, value, param, ctx):
-            """Validate and parse band index."""
-            try:
-                bands = [int(x) for x in value.split(",")]
-                assert all(b > 0 for b in bands)
-                return bands
+        except (ValueError, AttributeError, AssertionError):
+            raise click.ClickException(
+                "bidx must be a string of comma-separated integers (> 0), "
+                "representing the band indexes."
+            )
 
-            except (ValueError, AttributeError, AssertionError):
-                raise click.ClickException(
-                    "bidx must be a string of comma-separated integers (> 0), "
-                    "representing the band indexes."
-                )
 
-    bidx = BdxParamType()
+class NodataParamType(click.ParamType):
+    """Nodata inddex type."""
+
+    name = "nodata"
+
+    def convert(self, value, param, ctx):
+        """Validate and parse band index."""
+        try:
+            if value.lower() == "nan":
+                return numpy.nan
+            elif value.lower() in ["nil", "none", "nada"]:
+                return None
+            else:
+                return float(value)
+        except (TypeError, ValueError):
+            raise click.ClickException("{} is not a valid nodata value.".format(value))
 
 
 @click.group(short_help="Create and Validate COGEO")
@@ -40,26 +55,33 @@ def cogeo():
     pass
 
 
-@cogeo.command(short_help="Create a COGEO")
+@cogeo.command(short_help="Create COGEO")
 @options.file_in_arg
 @options.file_out_arg
-@click.option("--bidx", "-b", type=CustomType.bidx, help="Band index to copy")
+@click.option("--bidx", "-b", type=BdxParamType(), help="Band indexes to copy.")
 @click.option(
     "--cog-profile",
     "-p",
     "cogeo_profile",
     type=click.Choice(cog_profiles.keys()),
-    default="ycbcr",
-    help="CloudOptimized GeoTIFF profile (default: ycbcr)",
+    default="jpeg",
+    help="CloudOptimized GeoTIFF profile (default: jpeg).",
 )
 @click.option(
-    "--nodata", type=int, help="Force mask creation from a given nodata value"
+    "--nodata",
+    type=NodataParamType(),
+    metavar="NUMBER|nan",
+    help="Set nodata masking values for input dataset.",
 )
 @click.option(
-    "--alpha", type=int, help="Force mask creation from a given alpha band number"
+    "--add-mask",
+    is_flag=True,
+    help="Force output dataset creation with an internal mask (convert alpha band or nodata to mask).",
 )
 @click.option(
-    "--overview-level", type=int, default=6, help="Overview level (default: 6)"
+    "--overview-level",
+    type=int,
+    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size).",
 )
 @click.option(
     "--overview-resampling",
@@ -69,35 +91,43 @@ def cogeo():
     ),
     default="nearest",
 )
+@click.option(
+    "--overview-blocksize",
+    default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
+    help="Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
+@click.option(
+    "--quiet",
+    "-q",
+    help="Suppress progress bar and other non-error output.",
+    is_flag=True,
+)
 def create(
     input,
     output,
     bidx,
     cogeo_profile,
     nodata,
-    alpha,
+    add_mask,
     overview_level,
     overview_resampling,
+    overview_blocksize,
     threads,
     creation_options,
+    quiet,
 ):
     """Create Cloud Optimized Geotiff."""
-    if nodata is not None and alpha is not None:
-        raise click.ClickException('Incompatible options "alpha" and "nodata"')
-
     output_profile = cog_profiles.get(cogeo_profile)
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
         output_profile.update(creation_options)
 
-    block_size = min(output_profile["blockxsize"], output_profile["blockysize"])
-
     config = dict(
         NUM_THREADS=threads,
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-        GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
+        GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
     )
 
     cog_translate(
@@ -106,10 +136,11 @@ def create(
         output_profile,
         bidx,
         nodata,
-        alpha,
+        add_mask,
         overview_level,
         overview_resampling,
         config,
+        quiet,
     )
 
 

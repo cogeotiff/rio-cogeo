@@ -1,3 +1,33 @@
+Next (TBD)
+----------
+- add more logging and `--quiet` option (#46)
+- add `--overview-blocksize` to set overview's internal tile size (#60)
+
+Bug fixes:
+
+- copy tags and description from input to output (#19)
+- copy input mask band to output mask
+
+Breacking Changes:
+
+- internal mask creation is now optional (--add-mask).
+- internal nodata or alpha channel can be forwarded to the output dataset.
+- removed default overview blocksize to be equal to the raw data blocksize (#60)
+
+1.0dev10 (2019-02-12)
+---------------------
+- allow non integer nodata value (#51)
+- fix GDAL blocksize options casting for overview calculation (#50)
+
+1.0dev9 (2019-02-11)
+--------------------
+- Renamed "ycbcr" profile's name to "jpeg" to reflect the compression name.
+  "ycbcr" profile will raise a "DeprecationWarning" (#44)
+- "webp" profile has been added to COG profiles. Exploitation of this new
+  compression mode will require GDAL 2.4 (#27)
+- Rio-cogeo can calculate the overview level based on the internal tile size
+  and the dataset width/height (#37)
+
 1.0dev8 (2018-10-02)
 --------------------
 - write tags in output file (#31)

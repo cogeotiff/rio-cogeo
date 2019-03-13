@@ -1,0 +1,1 @@
+"""rio-cogeo tests suite."""
