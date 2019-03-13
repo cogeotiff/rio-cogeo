@@ -14,11 +14,17 @@ with open("README.rst") as f:
     readme = f.read()
 
 # Runtime requirements.
-inst_reqs = ["click", "rasterio[s3]>=1.0.9", "numpy~=1.15"]
+inst_reqs = [
+    "click",
+    "rasterio[s3]>=1.0.9",
+    "numpy~=1.15",
+    "supermercado",
+    "mercantile",
+]
 
 extra_reqs = {
-    "test": ["mock", "pytest", "pytest-cov"],
-    "dev": ["mock", "pytest", "pytest-cov", "pre-commit"],
+    "test": ["mock", "pytest", "pytest-cov", "cogdumper", "rio-tiler"],
+    "dev": ["mock", "pytest", "pytest-cov", "cogdumper", "rio-tiler", "pre-commit"],
 }
 
 setup(
@@ -26,17 +32,18 @@ setup(
     version=version,
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
+    python_requires=">=3",
     classifiers=[
         "Intended Audience :: Information Technology",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: GIS",
     ],
     keywords="COGEO CloudOptimized Geotiff rasterio",
     author=u"Vincent Sarago",
-    author_email="vincent@mapbox.com",
+    author_email="vincent@developmentseed.com",
     url="https://github.com/mapbox/rio-cogeo",
     license="BSD-3",
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),

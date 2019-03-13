@@ -9,11 +9,22 @@ import click
 import rasterio
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
+from rasterio.warp import transform_bounds
 from rasterio.enums import Resampling
 from rasterio.shutil import copy
+from rasterio.transform import Affine
+
+import mercantile
+from supermercado.burntiles import tile_extrema
 
 from rio_cogeo.errors import LossyCompression
-from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band, has_mask_band
+from rio_cogeo.utils import (
+    get_maximum_overview_level,
+    has_alpha_band,
+    has_mask_band,
+    get_max_zoom,
+    _meters_per_pixel,
+)
 
 
 def cog_translate(
@@ -25,6 +36,7 @@ def cog_translate(
     add_mask=None,
     overview_level=None,
     overview_resampling="nearest",
+    web_optimized=False,
     config=None,
     quiet=False,
 ):
@@ -39,7 +51,7 @@ def cog_translate(
         An output dataset path or or PathLike object.
         Will be opened in "w" mode.
     dst_kwargs: dict
-        output dataset creation options.
+        Output dataset creation options.
     indexes : tuple, int, optional
         Raster band indexes to copy.
     nodata, int, optional
@@ -50,6 +62,8 @@ def cog_translate(
         COGEO overview (decimation) level
     overview_resampling : str, optional (default: "nearest")
         Resampling algorithm for overviews
+    web_optimized: bool, option (default: False)
+        Create web-optimized cogeo.
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
@@ -57,11 +71,6 @@ def cog_translate(
 
     """
     config = config or {}
-
-    if overview_level is None:
-        overview_level = get_maximum_overview_level(
-            src_path, min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
-        )
 
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src_dst:
@@ -90,6 +99,35 @@ def cog_translate(
 
             if alpha:
                 vrt_params.update(dict(add_alpha=False))
+
+            if web_optimized:
+                max_zoom = get_max_zoom(src_dst)
+                bounds = list(
+                    transform_bounds(
+                        *[src_dst.crs, "epsg:4326"] + list(src_dst.bounds),
+                        densify_pts=21
+                    )
+                )
+
+                extrema = tile_extrema(bounds, max_zoom)
+                w, n = mercantile.xy(
+                    *mercantile.ul(extrema["x"]["min"], extrema["y"]["min"], max_zoom)
+                )
+                vrt_res = _meters_per_pixel(max_zoom, 0)
+                vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)
+
+                vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * 256
+                vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * 256
+
+                vrt_params.update(
+                    dict(
+                        crs="epsg:3857",
+                        transform=vrt_transform,
+                        width=vrt_width,
+                        height=vrt_height,
+                        resampling=Resampling[overview_resampling],
+                    )
+                )
 
             with WarpedVRT(src_dst, **vrt_params) as vrt_dst:
                 meta = vrt_dst.meta
@@ -123,6 +161,16 @@ def cog_translate(
 
                         if not quiet:
                             click.echo("Adding overviews...", err=True)
+
+                        if overview_level is None or web_optimized:
+                            overview_level = get_maximum_overview_level(
+                                vrt_dst,
+                                min(
+                                    int(dst_kwargs["blockxsize"]),
+                                    int(dst_kwargs["blockysize"]),
+                                ),
+                            )
+
                         overviews = [2 ** j for j in range(1, overview_level + 1)]
                         mem.build_overviews(overviews, Resampling[overview_resampling])
 

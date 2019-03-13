@@ -85,6 +85,9 @@ class NodataParamType(click.ParamType):
     ),
     default="nearest",
 )
+@click.option(
+    "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
@@ -102,6 +105,7 @@ def cogeo(
     add_mask,
     overview_level,
     overview_resampling,
+    web_optimized,
     threads,
     creation_options,
     quiet,
@@ -131,6 +135,7 @@ def cogeo(
         add_mask,
         overview_level,
         overview_resampling,
+        web_optimized,
         config,
         quiet,
     )

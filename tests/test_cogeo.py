@@ -33,7 +33,6 @@ raster_path_mask = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_rgb_mask.tif"
 )
 
-
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
 webp_profile = cog_profiles.get("webp")
