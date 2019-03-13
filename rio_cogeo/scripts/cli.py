@@ -85,6 +85,11 @@ class NodataParamType(click.ParamType):
     ),
     default="nearest",
 )
+@click.option(
+    "--overview-blocksize",
+    default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
+    help="Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
@@ -102,6 +107,7 @@ def cogeo(
     add_mask,
     overview_level,
     overview_resampling,
+    overview_blocksize,
     threads,
     creation_options,
     quiet,
@@ -112,14 +118,10 @@ def cogeo(
     if creation_options:
         output_profile.update(creation_options)
 
-    block_size = min(
-        int(output_profile["blockxsize"]), int(output_profile["blockysize"])
-    )
-
     config = dict(
         NUM_THREADS=threads,
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-        GDAL_TIFF_OVR_BLOCKSIZE=os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", block_size),
+        GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
     )
 
     cog_translate(
