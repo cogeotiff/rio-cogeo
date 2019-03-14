@@ -122,7 +122,7 @@ def test_cogeo_validnodata():
     with runner.isolated_filesystem():
         with pytest.warns(LossyCompression):
             result = runner.invoke(
-                cogeo, [raster_path_rgb, "output.tif", "--nodata", "0"]
+                cogeo, ["create", raster_path_rgb, "output.tif", "--nodata", "0"]
             )
             assert not result.exception
             assert result.exit_code == 0
