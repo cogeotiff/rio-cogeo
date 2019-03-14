@@ -8,7 +8,7 @@ import numpy
 from rasterio.rio import options
 from rasterio.enums import Resampling
 
-from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
 
@@ -49,7 +49,13 @@ class NodataParamType(click.ParamType):
             raise click.ClickException("{} is not a valid nodata value.".format(value))
 
 
-@click.command()
+@click.group(short_help="Create and Validate COGEO")
+def cogeo():
+    """Rasterio cogeo subcommands."""
+    pass
+
+
+@cogeo.command(short_help="Create COGEO")
 @options.file_in_arg
 @options.file_out_arg
 @click.option("--bidx", "-b", type=BdxParamType(), help="Band indexes to copy.")
@@ -98,7 +104,7 @@ class NodataParamType(click.ParamType):
     help="Suppress progress bar and other non-error output.",
     is_flag=True,
 )
-def cogeo(
+def create(
     input,
     output,
     bidx,
@@ -136,3 +142,13 @@ def cogeo(
         config,
         quiet,
     )
+
+
+@cogeo.command(short_help="Validate COGEO")
+@options.file_in_arg
+def validate(input):
+    """Validate Cloud Optimized Geotiff."""
+    if cog_validate(input):
+        click.echo("{} is a valid cloud optimized GeoTIFF".format(input))
+    else:
+        click.echo("{} is NOT a valid cloud optimized GeoTIFF".format(input))

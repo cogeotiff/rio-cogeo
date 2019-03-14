@@ -2,7 +2,7 @@
 rio-cogeo
 =========
 
-Cloud Optimized GeoTIFF (COG) creation plugin for rasterio
+Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio
 
 .. image:: https://badge.fury.io/py/rio-cogeo.svg
     :target: https://badge.fury.io/py/rio-cogeo
@@ -17,14 +17,14 @@ Cloud Optimized GeoTIFF (COG) creation plugin for rasterio
 Install
 =======
 
-.. code-block:: console
+.. code-block::console
 
   $ pip install -U pip
   $ pip install rio-cogeo
 
 Or install from source:
 
-.. code-block:: console
+.. code-block::console
 
    $ git clone https://github.com/cogeotiff/rio-cogeo.git
    $ cd rio-cogeo
@@ -34,7 +34,23 @@ Or install from source:
 Usage
 =====
 
-.. code-block::
+.. code-block::console
+
+  $ rio cogeo --help
+  Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
+
+    Rasterio cogeo subcommands.
+
+  Options:
+    --help  Show this message and exit.
+
+  Commands:
+    create    Create COGEO
+    validate  Validate COGEO
+
+- Create a Cloud Optimized Geotiff.
+
+.. code-block::console
 
   $ rio cogeo --help
   Usage: rio cogeo [OPTIONS] INPUT OUTPUT
@@ -55,23 +71,36 @@ Usage
     -q, --quiet                     Suppress progress bar and other non-error output.
     --help                          Show this message and exit.
 
+- Check if a Cloud Optimized Geotiff is valid.
+
+.. code-block::console
+
+  $ rio cogeo validate --help
+  Usage: rio cogeo validate [OPTIONS] INPUT
+
+    Validate Cloud Optimized Geotiff.
+
+  Options:
+    --help  Show this message and exit.
+
+
 Examples
 ========
 
-.. code-block:: console
+.. code-block::console
 
   # Create a COGEO with JPEG profile and the first 3 bands of the data
-  $ rio cogeo mydataset.tif mydataset_jpeg.tif -b 1,2,3
+  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3
+
+  # Validate COGEO
+  $ rio cogeo validate mydataset_jpeg.tif
 
   # Create a COGEO with JPEG profile and the first 3 bands of the data and add internal mask
-  $ rio cogeo mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask
-
-  # Create a COGEO without compression and with 1024x1024 block size
-  $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
+  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask
 
   # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
-  $ rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
-  $ GDAL_TIFF_OVR_BLOCKSIZE=256 rio cogeo mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
+  $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
+  $ GDAL_TIFF_OVR_BLOCKSIZE=256 rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
 
 
 Default COGEO profiles
@@ -160,7 +189,7 @@ to replace the Nodata value or Alpha band in output dataset (supported by most G
 Note: when adding a `mask` with an input dataset having an alpha band you'll
 need to use the `bidx` options to remove it from the output dataset.
 
-.. code-block:: console
+.. code-block::console
 
   # Replace the alpha band by an internal mask
   $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --add-mask --bidx 1,2,3
@@ -180,7 +209,7 @@ Issues and pull requests are more than welcome.
 
 **dev install**
 
-.. code-block:: console
+.. code-block::console
 
   $ git clone https://github.com/cogeotiff/rio-cogeo.git
   $ cd rio-cogeo
@@ -190,13 +219,13 @@ Issues and pull requests are more than welcome.
 
 This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* ("uncompromising Python code formatter") when commiting new code.
 
-.. code-block:: console
+.. code-block::console
 
   $ pre-commit install
 
 Extras
 ======
 
-Blog post good and bad COG formats: https://medium.com/@_VincentS_/do-you-really-want-people-using-your-data-ec94cd94dc3f
+Blog post on good and bad COG formats: https://medium.com/@_VincentS_/do-you-really-want-people-using-your-data-ec94cd94dc3f
 
 Checkout **rio-glui** (https://github.com/mapbox/rio-glui/) rasterio plugin to explore COG locally in your web browser.
