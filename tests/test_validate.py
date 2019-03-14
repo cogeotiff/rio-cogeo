@@ -26,21 +26,11 @@ raster_big = os.path.join(os.path.dirname(__file__), "fixtures", "image_2000px.t
 
 
 jpeg_profile = cog_profiles.get("jpeg")
-jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
-
-
-@pytest.fixture(autouse=True)
-def testing_env_var(monkeypatch):
-    """Set GDAL env."""
-    monkeypatch.setenv("GDAL_DISABLE_READDIR_ON_OPEN", "TRUE")
-    monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "TRUE")
-    monkeypatch.setenv("GDAL_TIFF_OVR_BLOCKSIZE", "64")
+jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 
 
 def test_cog_validate_valid(monkeypatch):
     """Should work as expected (validate cogeo file)."""
-    runner = CliRunner()
-
     # not tiled
     assert not cog_validate(raster_rgb)
 
@@ -56,6 +46,10 @@ def test_cog_validate_valid(monkeypatch):
     with pytest.raises(Exception):
         cog_validate(raster_jpeg)
 
+
+def test_cog_validate_validCreatioValid(monkeypatch):
+    """Should work as expected (validate cogeo file)."""
+    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_rgb, "cogeo.tif", jpeg_profile, quiet=True)
         assert cog_validate("cogeo.tif")
@@ -65,9 +59,13 @@ def test_cog_validate_valid(monkeypatch):
         )
         assert cog_validate("cogeo.tif")
 
-        # overview is not tiled
-        monkeypatch.setenv("GDAL_TIFF_OVR_BLOCKSIZE", "1024")
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="1024")
         cog_translate(
-            raster_big, "cogeo.tif", jpeg_profile, overview_level=1, quiet=True
+            raster_big,
+            "cogeo.tif",
+            jpeg_profile,
+            overview_level=1,
+            config=config,
+            quiet=True,
         )
         assert not cog_validate("cogeo.tif")

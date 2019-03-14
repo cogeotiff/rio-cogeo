@@ -20,6 +20,9 @@ raster_path_nodata = os.path.join(
 raster_path_missingnodata = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
 )
+raster_jpeg = os.path.join(
+    os.path.dirname(__file__), "fixtures", "validate", "nontiff.jpg"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -380,3 +383,11 @@ def test_cogeo_validNodataCustom():
         )
         assert result.exception
         assert result.exit_code == 1
+
+
+def test_cogeo_validate():
+    """Should work as expected."""
+    runner = CliRunner()
+    result = runner.invoke(cogeo, ["validate", raster_path_rgb])
+    assert not result.exception
+    assert result.exit_code == 0

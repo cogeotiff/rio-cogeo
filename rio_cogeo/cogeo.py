@@ -289,12 +289,10 @@ def cog_validate(src_path):
 
         for ix, dec in enumerate(overviews):
             with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
-                print(ovr_dst.meta)
-                print(ovr_dst.is_tiled)
-                # if ovr_dst.width >= 512 or ovr_dst.height >= 512:
                 if ovr_dst.width >= 512 or ovr_dst.height >= 512:
                     if not ovr_dst.is_tiled:
                         errors.append("Overview of index {} is not tiled".format(ix))
+
     if warnings:
         click.secho("The following warnings were found:", fg="yellow", err=True)
         for w in warnings:
