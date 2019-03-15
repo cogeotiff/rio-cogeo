@@ -17,14 +17,14 @@ Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio
 Install
 =======
 
-.. code-block::console
+.. code-block:: console
 
   $ pip install -U pip
   $ pip install rio-cogeo
 
 Or install from source:
 
-.. code-block::console
+.. code-block:: console
 
    $ git clone https://github.com/cogeotiff/rio-cogeo.git
    $ cd rio-cogeo
@@ -34,7 +34,7 @@ Or install from source:
 Usage
 =====
 
-.. code-block::console
+.. code-block:: console
 
   $ rio cogeo --help
   Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
@@ -50,7 +50,7 @@ Usage
 
 - Create a Cloud Optimized Geotiff.
 
-.. code-block::console
+.. code-block:: console
 
   $ rio cogeo --help
   Usage: rio cogeo [OPTIONS] INPUT OUTPUT
@@ -73,7 +73,7 @@ Usage
 
 - Check if a Cloud Optimized Geotiff is valid.
 
-.. code-block::console
+.. code-block:: console
 
   $ rio cogeo validate --help
   Usage: rio cogeo validate [OPTIONS] INPUT
@@ -87,7 +87,7 @@ Usage
 Examples
 ========
 
-.. code-block::console
+.. code-block:: console
 
   # Create a COGEO with JPEG profile and the first 3 bands of the data
   $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3
@@ -189,7 +189,7 @@ to replace the Nodata value or Alpha band in output dataset (supported by most G
 Note: when adding a `mask` with an input dataset having an alpha band you'll
 need to use the `bidx` options to remove it from the output dataset.
 
-.. code-block::console
+.. code-block:: console
 
   # Replace the alpha band by an internal mask
   $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --add-mask --bidx 1,2,3
@@ -209,7 +209,7 @@ Issues and pull requests are more than welcome.
 
 **dev install**
 
-.. code-block::console
+.. code-block:: console
 
   $ git clone https://github.com/cogeotiff/rio-cogeo.git
   $ cd rio-cogeo
@@ -219,7 +219,7 @@ Issues and pull requests are more than welcome.
 
 This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* ("uncompromising Python code formatter") when commiting new code.
 
-.. code-block::console
+.. code-block:: console
 
   $ pre-commit install
 
