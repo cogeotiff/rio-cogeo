@@ -1,5 +1,5 @@
-Next (TBD)
-----------
+1.0b0 (2019-03-15)
+------------------
 - add more logging and `--quiet` option (#46)
 - add `--overview-blocksize` to set overview's internal tile size (#60)
 
