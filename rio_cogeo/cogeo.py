@@ -59,11 +59,6 @@ def cog_translate(
     """
     config = config or {}
 
-    if overview_level is None:
-        overview_level = get_maximum_overview_level(
-            src_path, min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
-        )
-
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src_dst:
             meta = src_dst.meta
@@ -80,6 +75,12 @@ def cog_translate(
                     "Using lossy compression with Nodata or Alpha band "
                     "can results in unwanted artefacts.",
                     LossyCompression,
+                )
+
+            if overview_level is None:
+                overview_level = get_maximum_overview_level(
+                    src_dst,
+                    min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"])),
                 )
 
             vrt_params = dict(add_alpha=True)
