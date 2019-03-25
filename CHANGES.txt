@@ -1,3 +1,12 @@
+1.0b1 (2019-03-25)
+------------------
+
+Breacking Changes:
+
+- refactor utils.get_maximum_overview_level to get rasterio dataset 
+as input and reduce the number of dataset opennings (#61)
+
+
 1.0b0 (2019-03-15)
 ------------------
 - add more logging and `--quiet` option (#46)

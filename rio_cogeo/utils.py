@@ -1,14 +1,27 @@
 """rio_cogeo.utils: Utility functions."""
 
-import rasterio
 from rasterio.enums import MaskFlags, ColorInterp
 
 
-def get_maximum_overview_level(src_path, minsize=512):
-    """Calculate the maximum overview level."""
-    with rasterio.open(src_path) as src:
-        width = src.width
-        height = src.height
+def get_maximum_overview_level(src_dst, minsize=512):
+    """
+    Calculate the maximum overview level.
+
+    Attributes
+    ----------
+    src_dst : rasterio.io.DatasetReader
+        Rasterio io.DatasetReader object.
+    minsize : int (default: 512)
+        Minimum overview size.
+
+    Returns
+    -------
+    nlevel: int
+        overview level.
+
+    """
+    width = src_dst.width
+    height = src_dst.height
 
     nlevel = 0
     overview = 1
