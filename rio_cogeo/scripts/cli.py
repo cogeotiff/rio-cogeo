@@ -64,8 +64,8 @@ def cogeo():
     "-p",
     "cogeo_profile",
     type=click.Choice(cog_profiles.keys()),
-    default="jpeg",
-    help="CloudOptimized GeoTIFF profile (default: jpeg).",
+    default="deflate",
+    help="CloudOptimized GeoTIFF profile (default: deflate).",
 )
 @click.option(
     "--nodata",

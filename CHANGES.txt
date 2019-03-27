@@ -1,3 +1,11 @@
+1.0b2 (2019-03-27)
+------------------
+
+Breacking Changes:
+
+- Switch from JPEG to DEFLATE as default profile in CLI (#66)
+
+
 1.0b1 (2019-03-25)
 ------------------
 

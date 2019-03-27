@@ -49,8 +49,8 @@ def test_cogeo_valid():
             assert (
                 not src.is_tiled
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
+            assert src.compression.value == "DEFLATE"
+            assert not src.photometric
             assert src.interleaving.value == "PIXEL"
             assert not src.overviews(1)
             assert has_mask_band(src)
@@ -125,7 +125,16 @@ def test_cogeo_validnodata():
     with runner.isolated_filesystem():
         with pytest.warns(LossyCompression):
             result = runner.invoke(
-                cogeo, ["create", raster_path_rgb, "output.tif", "--nodata", "0"]
+                cogeo,
+                [
+                    "create",
+                    raster_path_rgb,
+                    "output.tif",
+                    "--nodata",
+                    "0",
+                    "--cog-profile",
+                    "jpeg",
+                ],
             )
             assert not result.exception
             assert result.exit_code == 0
