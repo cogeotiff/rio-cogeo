@@ -59,7 +59,7 @@ Usage
 
   Options:
     -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: jpeg).
+    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
@@ -89,14 +89,14 @@ Examples
 
 .. code-block:: console
 
-  # Create a COGEO with JPEG profile and the first 3 bands of the data
-  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3
+  # Create a COGEO with DEFLATE compression (Using default `Deflate` profile)
+  $ rio cogeo create mydataset.tif mydataset_jpeg.tif
 
   # Validate COGEO
   $ rio cogeo validate mydataset_jpeg.tif
 
   # Create a COGEO with JPEG profile and the first 3 bands of the data and add internal mask
-  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask
+  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-profile JPEG
 
   # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
   $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
@@ -106,7 +106,8 @@ Examples
 Default COGEO profiles
 ======================
 
-Profiles can be extended by providing '--co' option in command line (e.g: rio cogeo mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
+Profiles can be extended by providing '--co' option in command line
+(e.g: rio cogeo create mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
 
 **YCbCr** *DEPRECATED in 1.0*
 
@@ -162,29 +163,37 @@ Default profiles are tiled with 512x512 blocksizes.
 Overview levels
 ===============
 
-By default rio cogeo will calculate the optimal overview level based on dataset size and internal tile size
-(overview should not be smaller than internal tile size (e.g 512px). Overview level will be translated to decimation level of power of two.
+By default rio cogeo will calculate the optimal overview level based on dataset
+size and internal tile size (overview should not be smaller than internal tile
+size (e.g 512px). Overview level will be translated to decimation level of
+power of two.
 
 Internal tile size
 ==================
 
-By default rio cogeo will create a dataset with 512x512 internal tile size. This can be updated by passing `--co BLOCKXSIZE=64 --co BLOCKYSIZE=64` options.
+By default rio cogeo will create a dataset with 512x512 internal tile size.
+This can be updated by passing `--co BLOCKXSIZE=64 --co BLOCKYSIZE=64` options.
 
 **Web tiling optimization**
 
-if the input dataset is aligned to web mercator grid, the internal tile size should be equal to the web map tile size (256 or 512px)
-output dataset is compressed,
+if the input dataset is aligned to web mercator grid, the internal tile size
+should be equal to the web map tile size (256 or 512px) output dataset is
+compressed,
 
-if the input dataset is not aligned to web mercator grid, the tiler will need to fetch multiple internal tiles.
-Because GDAL can merge range request, using small internal tiles (e.g 128) will reduce the number of byte transfered and minimized the useless bytes transfered.
+if the input dataset is not aligned to web mercator grid, the tiler will need
+to fetch multiple internal tiles. Because GDAL can merge range request, using
+small internal tiles (e.g 128) will reduce the number of byte transfered and
+minimized the useless bytes transfered.
 
 Nodata, Alpha and Mask
 ======================
 
-By default rio-cogeo will forward any nodata value or alpha channel to the output COG.
+By default rio-cogeo will forward any nodata value or alpha channel to the
+output COG.
 
-If your dataset type is **Byte** or **Unit16**, you could use internal bit mask (with the `--add-mask` option)
-to replace the Nodata value or Alpha band in output dataset (supported by most GDAL based backends).
+If your dataset type is **Byte** or **Unit16**, you could use internal bit mask
+(with the `--add-mask` option) to replace the Nodata value or Alpha band in
+output dataset (supported by most GDAL based backends).
 
 Note: when adding a `mask` with an input dataset having an alpha band you'll
 need to use the `bidx` options to remove it from the output dataset.
@@ -196,14 +205,15 @@ need to use the `bidx` options to remove it from the output dataset.
 
 **Important**
 
-Using internal nodata value with lossy compression (`webp`, `jpeg`) is not recommanded.
-Please use internal masking (or alpha band if using webp)
+Using internal nodata value with lossy compression (`webp`, `jpeg`) is not
+recommanded. Please use internal masking (or alpha band if using webp).
 
 
 Contribution & Development
 ==========================
 
-The rio-cogeo project was begun at Mapbox and has been transferred in January 2019.
+The rio-cogeo project was begun at Mapbox and has been transferred to the
+CogeoTIFF organization in January 2019.
 
 Issues and pull requests are more than welcome.
 
@@ -217,7 +227,8 @@ Issues and pull requests are more than welcome.
 
 **Python3.6 only**
 
-This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black* ("uncompromising Python code formatter") when commiting new code.
+This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black*
+("uncompromising Python code formatter") when commiting new code.
 
 .. code-block:: console
 
