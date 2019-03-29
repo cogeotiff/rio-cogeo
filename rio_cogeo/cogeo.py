@@ -184,13 +184,13 @@ def cog_validate(src_path):
                     "Overviews found in external .ovr file. They should be internal"
                 )
 
-            if src.width >= 512 or src.height >= 512:
+            overviews = src.overviews(1)
+            if src.width > 512 or src.height > 512:
                 if not src.is_tiled:
                     errors.append(
                         "The file is greater than 512xH or 512xW, but is not tiled"
                     )
 
-                overviews = src.overviews(1)
                 if not overviews:
                     warnings.append(
                         "The file is greater than 512xH or 512xW, it is recommended "
@@ -208,7 +208,7 @@ def cog_validate(src_path):
             details["ifd_offsets"] = {}
             details["ifd_offsets"]["main"] = ifd_offset
 
-            if not overviews == sorted(overviews):
+            if overviews and overviews != sorted(overviews):
                 errors.append("Overviews should be sorted")
 
             for ix, dec in enumerate(overviews):

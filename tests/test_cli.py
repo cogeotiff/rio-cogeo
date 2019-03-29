@@ -20,8 +20,8 @@ raster_path_nodata = os.path.join(
 raster_path_missingnodata = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
 )
-raster_jpeg = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "nontiff.jpg"
+raster_invalid_cog = os.path.join(
+    os.path.dirname(__file__), "fixtures", "validate", "image_dec.tif"
 )
 
 
@@ -409,7 +409,7 @@ def test_cogeo_validate():
         assert not result.exception
         assert result.exit_code == 0
 
-        result = runner.invoke(cogeo, ["validate", raster_path_rgb])
+        result = runner.invoke(cogeo, ["validate", raster_invalid_cog])
         assert "is NOT a valid cloud optimized GeoTIFF" in result.output
         assert not result.exception
         assert result.exit_code == 0
