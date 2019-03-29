@@ -31,8 +31,11 @@ jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 
 def test_cog_validate_valid(monkeypatch):
     """Should work as expected (validate cogeo file)."""
-    # not tiled
-    assert not cog_validate(raster_rgb)
+    # not tiled but 512x512
+    assert cog_validate(raster_rgb)
+
+    # not tiled, no overview
+    assert not cog_validate(raster_big)
 
     # external overview
     assert not cog_validate(raster_external)
