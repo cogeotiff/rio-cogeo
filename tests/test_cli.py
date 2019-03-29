@@ -397,6 +397,19 @@ def test_cogeo_validNodataCustom():
 def test_cogeo_validate():
     """Should work as expected."""
     runner = CliRunner()
-    result = runner.invoke(cogeo, ["validate", raster_path_rgb])
-    assert not result.exception
-    assert result.exit_code == 0
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "--quiet"]
+        )
+        with rasterio.open("output.tif") as src_dst:
+            print(src_dst.meta)
+
+        result = runner.invoke(cogeo, ["validate", "output.tif"])
+        assert "is a valid cloud optimized GeoTIFF" in result.output
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(cogeo, ["validate", raster_path_rgb])
+        assert "is NOT a valid cloud optimized GeoTIFF" in result.output
+        assert not result.exception
+        assert result.exit_code == 0
