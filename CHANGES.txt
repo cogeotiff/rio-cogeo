@@ -1,3 +1,12 @@
+
+1.0.0 (2019-04-03)
+------------------
+
+Breacking Changes:
+
+- remove deprecated YCBCR profile
+- 512x512 dataset without internal tiling are valid
+
 1.0b2 (2019-03-27)
 ------------------
 
@@ -11,7 +20,7 @@ Breacking Changes:
 
 Breacking Changes:
 
-- refactor utils.get_maximum_overview_level to get rasterio dataset 
+- refactor utils.get_maximum_overview_level to get rasterio dataset
 as input and reduce the number of dataset opennings (#61)
 
 
