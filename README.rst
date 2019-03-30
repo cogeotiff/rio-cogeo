@@ -14,6 +14,18 @@ Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio
    :target: https://codecov.io/gh/cogeotiff/rio-cogeo
 
 
+Cloud Optimized GeoTIFF
+=======================
+
+This plugin aim to facilitate the creation and validation of Cloud Optimized
+GeoTIFF (COG or COGEO). While it respects the
+`COG specifications <https://github.com/cogeotiff/cog-spec/blob/master/spec.md>`__, this plugin also
+enforce several features:
+
+- **Internal overviews** (User can remove overview with option `--overview-level 0`)
+- **Internal tiles** (default profiles have 512x512 internal tiles)
+
+
 Install
 =======
 
@@ -30,6 +42,7 @@ Or install from source:
    $ cd rio-cogeo
    $ pip install -U pip
    $ pip install -e .
+
 
 Usage
 =====
@@ -59,7 +72,7 @@ Usage
 
   Options:
     -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [ycbcr|jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
+    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
@@ -96,25 +109,11 @@ Examples
   $ rio cogeo validate mydataset_jpeg.tif
 
   # Create a COGEO with JPEG profile and the first 3 bands of the data and add internal mask
-  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-profile JPEG
-
-  # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
-  $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
-  $ GDAL_TIFF_OVR_BLOCKSIZE=256 rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw
+  $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-profile jpeg
 
 
 Default COGEO profiles
 ======================
-
-Profiles can be extended by providing '--co' option in command line
-(e.g: rio cogeo create mydataset.tif mydataset_zstd.tif -b 1,2,3 --profile deflate --co "COMPRESS=ZSTD" )
-
-**YCbCr** *DEPRECATED in 1.0*
-
-- JPEG compression
-- PIXEL interleave
-- YCbCr colorspace
-- limited to uint8 datatype and 3 bands data
 
 **JPEG**
 
@@ -160,13 +159,28 @@ Profiles can be extended by providing '--co' option in command line
 
 Default profiles are tiled with 512x512 blocksizes.
 
+Profiles can be extended by providing '--co' option in command line
+
+.. code-block:: console
+
+    # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
+    $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
+
+
 Overview levels
 ===============
 
 By default rio cogeo will calculate the optimal overview level based on dataset
 size and internal tile size (overview should not be smaller than internal tile
 size (e.g 512px). Overview level will be translated to decimation level of
-power of two.
+power of two:
+
+.. code-block:: python
+
+  overview_level = 3
+  overviews = [2 ** j for j in range(1, overview_level + 1)]
+  print(overviews)
+  [2, 4, 8]
 
 Internal tile size
 ==================
@@ -177,13 +191,29 @@ This can be updated by passing `--co BLOCKXSIZE=64 --co BLOCKYSIZE=64` options.
 **Web tiling optimization**
 
 if the input dataset is aligned to web mercator grid, the internal tile size
-should be equal to the web map tile size (256 or 512px) output dataset is
-compressed,
+should be equal to the web map tile size (256 or 512px). Dataset should be compressed.
 
 if the input dataset is not aligned to web mercator grid, the tiler will need
 to fetch multiple internal tiles. Because GDAL can merge range request, using
 small internal tiles (e.g 128) will reduce the number of byte transfered and
 minimized the useless bytes transfered.
+
+
+GDAL configuration to merge consecutive range requests
+
+.. code-block:: console
+
+    GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
+    GDAL_HTTP_MULTIPLEX=YES
+    GDAL_HTTP_VERSION=2
+
+
+GDAL Version
+============
+
+It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
+create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
+
 
 Nodata, Alpha and Mask
 ======================
@@ -207,6 +237,30 @@ need to use the `bidx` options to remove it from the output dataset.
 
 Using internal nodata value with lossy compression (`webp`, `jpeg`) is not
 recommanded. Please use internal masking (or alpha band if using webp).
+
+
+Statistics
+==========
+
+Some libraries might request to use COGs with statistics written in the internal
+metadata. **rio-cogeo** doesn't calculate nor copy those when creating the output
+dataset (because statistics may change due to lossy compression).
+To add the statistics to the output dataset you could use the code above:
+
+.. code-block:: python
+
+  import rasterio
+
+  with rasterio.open("my-data.tif", "r+") as src_dst:
+      for b in src_dst.indexes:
+          band = src_dst.read(indexes=b, masked=masked)
+          stats = {
+              'min': float(band.min()),
+              'max': float(band.max()),
+              'mean': float(band.mean())
+              'stddev': float(band.std())
+          }
+          src_dst.update_tags(b, **stats)
 
 
 Contribution & Development
@@ -239,4 +293,4 @@ Extras
 
 Blog post on good and bad COG formats: https://medium.com/@_VincentS_/do-you-really-want-people-using-your-data-ec94cd94dc3f
 
-Checkout **rio-glui** (https://github.com/mapbox/rio-glui/) rasterio plugin to explore COG locally in your web browser.
+Checkout `**rio-glui** <https://github.com/mapbox/rio-glui/>__` rasterio plugin to explore COG locally in your web browser.
