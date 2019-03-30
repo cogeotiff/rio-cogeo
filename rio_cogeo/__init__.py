@@ -1,3 +1,3 @@
 """rio_cogeo"""
 
-__version__ = "1.0.0"
+__version__ = "1.0b3"
