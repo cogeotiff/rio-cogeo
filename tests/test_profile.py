@@ -1,20 +1,7 @@
 """tests rio_cogeo.profiles."""
 
 import pytest
-from rio_cogeo.errors import DeprecationWarning
 from rio_cogeo.profiles import cog_profiles
-
-
-def test_profiles_ycbcr():
-    """Should work as expected (return ycbcr profile and raise warning)."""
-    with pytest.warns(DeprecationWarning):
-        profile = cog_profiles.get("ycbcr")
-        assert profile["tiled"]
-        assert profile["compress"] == "JPEG"
-        assert profile["blockxsize"] == 512
-        assert profile["blockysize"] == 512
-        assert profile["photometric"] == "YCbCr"
-        assert profile["interleave"] == "pixel"
 
 
 def test_profiles_jpeg():

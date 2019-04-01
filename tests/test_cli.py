@@ -20,6 +20,9 @@ raster_path_nodata = os.path.join(
 raster_path_missingnodata = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
 )
+raster_invalid_cog = os.path.join(
+    os.path.dirname(__file__), "fixtures", "validate", "image_dec.tif"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +38,7 @@ def test_cogeo_valid():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
-            cogeo, [raster_path_rgb, "output.tif", "--add-mask", "--quiet"]
+            cogeo, ["create", raster_path_rgb, "output.tif", "--add-mask", "--quiet"]
         )
         assert not result.exception
         assert result.exit_code == 0
@@ -46,8 +49,8 @@ def test_cogeo_valid():
             assert (
                 not src.is_tiled
             )  # Because blocksize is 512 and the file is 512, the output is not tiled
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
+            assert src.compression.value == "DEFLATE"
+            assert not src.photometric
             assert src.interleaving.value == "PIXEL"
             assert not src.overviews(1)
             assert has_mask_band(src)
@@ -60,7 +63,9 @@ def test_cogeo_valid_external_mask(monkeypatch):
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "--add-mask"])
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "--add-mask"]
+        )
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
@@ -73,7 +78,17 @@ def test_cogeo_validbidx():
     runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
-            cogeo, [raster_path_rgb, "output.tif", "-b", "1", "-p", "raw", "--add-mask"]
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "-b",
+                "1",
+                "-p",
+                "raw",
+                "--add-mask",
+            ],
         )
         assert not result.exception
         assert result.exit_code == 0
@@ -86,7 +101,9 @@ def test_cogeo_invalidbidx():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "-b", "0"])
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "-b", "0"]
+        )
         assert result.exception
         assert result.exit_code == 1
 
@@ -95,7 +112,9 @@ def test_cogeo_invalidbidxString():
     """Should exit with invalid band indexes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, [raster_path_rgb, "output.tif", "-b", "a"])
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "-b", "a"]
+        )
         assert result.exception
         assert result.exit_code == 1
 
@@ -106,7 +125,16 @@ def test_cogeo_validnodata():
     with runner.isolated_filesystem():
         with pytest.warns(LossyCompression):
             result = runner.invoke(
-                cogeo, [raster_path_rgb, "output.tif", "--nodata", "0"]
+                cogeo,
+                [
+                    "create",
+                    raster_path_rgb,
+                    "output.tif",
+                    "--nodata",
+                    "0",
+                    "--cog-profile",
+                    "jpeg",
+                ],
             )
             assert not result.exception
             assert result.exit_code == 0
@@ -117,6 +145,7 @@ def test_cogeo_validnodata():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_nodata,
                 "output.tif",
                 "--co",
@@ -140,7 +169,15 @@ def test_cogeo_validGdalOptions():
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
-            [raster_path_rgb, "output.tif", "-p", "raw", "--co", "COMPRESS=DEFLATE"],
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "-p",
+                "raw",
+                "--co",
+                "COMPRESS=DEFLATE",
+            ],
         )
         assert not result.exception
         assert result.exit_code == 0
@@ -155,6 +192,7 @@ def test_cogeo_validOvrOption():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_rgb,
                 "output.tif",
                 "--overview-level",
@@ -180,6 +218,7 @@ def test_cogeo_overviewTilesize(monkeypatch):
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_rgb,
                 "output.tif",
                 "--quiet",
@@ -202,6 +241,7 @@ def test_cogeo_overviewTilesize(monkeypatch):
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_rgb,
                 "output.tif",
                 "--quiet",
@@ -223,6 +263,7 @@ def test_cogeo_overviewTilesize(monkeypatch):
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_rgb,
                 "output.tif",
                 "--quiet",
@@ -245,6 +286,7 @@ def test_cogeo_validgdalBlockOption():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_rgb,
                 "output.tif",
                 "--co",
@@ -267,6 +309,7 @@ def test_cogeo_validNodataCustom():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_nan,
                 "output.tif",
                 "--cog-profile",
@@ -291,6 +334,7 @@ def test_cogeo_validNodataCustom():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_missingnodata,
                 "output.tif",
                 "--cog-profile",
@@ -315,6 +359,7 @@ def test_cogeo_validNodataCustom():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_missingnodata,
                 "output.tif",
                 "--cog-profile",
@@ -336,6 +381,7 @@ def test_cogeo_validNodataCustom():
         result = runner.invoke(
             cogeo,
             [
+                "create",
                 raster_path_nan,
                 "output.tif",
                 "--cog-profile",
@@ -346,3 +392,24 @@ def test_cogeo_validNodataCustom():
         )
         assert result.exception
         assert result.exit_code == 1
+
+
+def test_cogeo_validate():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "--quiet"]
+        )
+        with rasterio.open("output.tif") as src_dst:
+            print(src_dst.meta)
+
+        result = runner.invoke(cogeo, ["validate", "output.tif"])
+        assert "is a valid cloud optimized GeoTIFF" in result.output
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(cogeo, ["validate", raster_invalid_cog])
+        assert "is NOT a valid cloud optimized GeoTIFF" in result.output
+        assert not result.exception
+        assert result.exit_code == 0

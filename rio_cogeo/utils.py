@@ -6,7 +6,7 @@ from rasterio.warp import calculate_default_transform
 from rasterio.enums import MaskFlags, ColorInterp
 
 
-def _meters_per_pixel(zoom, lat):
+def _meters_per_pixel(zoom, lat=0.0, tilesize=256):
     """
     Return the pixel resolution for a given mercator tile zoom and lattitude.
 
@@ -14,18 +14,50 @@ def _meters_per_pixel(zoom, lat):
     ----------
     zoom: int
         Mercator zoom level
-    lat: float
-        Latitude in decimal degree
+    lat: float, optional
+        Latitude in decimal degree (default: 0)
+    tilesize: int, optional
+        Mercator tile size (default: 256).
 
     Returns
     -------
     Pixel resolution in meters
 
     """
-    return (math.cos(lat * math.pi / 180.0) * 2 * math.pi * 6378137) / (256 * 2 ** zoom)
+    return (math.cos(lat * math.pi / 180.0) * 2 * math.pi * 6378137) / (
+        tilesize * 2 ** zoom
+    )
 
 
-def get_max_zoom(src_dst, snap=0.5, max_z=23):
+def zoom_for_pixelsize(pixel_size, max_z=24, tilesize=256):
+    """
+    Get mercator zoom level corresponding to a pixel resolution.
+
+    Freely adapted from
+    https://github.com/OSGeo/gdal/blob/b0dfc591929ebdbccd8a0557510c5efdb893b852/gdal/swig/python/scripts/gdal2tiles.py#L294
+
+    Parameters
+    ----------
+    pixel_size: float
+        Pixel size
+    max_z: int, optional (default: 24)
+        Max mercator zoom level allowed
+    tilesize: int, optional
+        Mercator tile size (default: 256).
+
+    Returns
+    -------
+    Mercator zoom level corresponding to the pixel resolution
+
+    """
+    for z in range(max_z):
+        if pixel_size > _meters_per_pixel(z, 0, tilesize=tilesize):
+            return max(0, z - 1)  # We don't want to scale up
+
+    return max_z - 1
+
+
+def get_max_zoom(src_dst, lat=0.0, tilesize=256):
     """
     Calculate raster max zoom level.
 
@@ -33,42 +65,52 @@ def get_max_zoom(src_dst, snap=0.5, max_z=23):
     ----------
     src: rasterio.io.DatasetReader
         Rasterio io.DatasetReader object
-    snap: float or None
-        0   = snap to the next higher mercator zoom level resolution
-        0.5 = snap to the closest mercator resolution
-        1   = snap to next lower mercator zoom level resolution
-    max_z: int, optional (default: 23)
-        Max mercator zoom level allowed
+    lat: float, optional
+        Center latitude of the dataset. This is only needed in case you want to
+        apply latitude correction factor to ensure consitent maximum zoom level
+        (default: 0.0).
+    tilesize: int, optional
+        Mercator tile size (default: 256).
 
     Returns
     -------
-    Pixel resolution in meters
+    max_zoom: int
+        Max zoom level.
 
     """
     dst_affine, w, h = calculate_default_transform(
         src_dst.crs, "epsg:3857", src_dst.width, src_dst.height, *src_dst.bounds
     )
 
-    res_max = max(abs(dst_affine[0]), abs(dst_affine[4]))
+    native_resolution = max(abs(dst_affine[0]), abs(dst_affine[4]))
 
-    tgt_z = max_z
-    mpp = 0.0
+    # Correction factor for web-mercator projection latitude distortion
+    latitude_correction_factor = math.cos(math.radians(lat))
+    corrected_resolution = native_resolution * latitude_correction_factor
 
-    # loop through the pyramid to file the closest z level
-    for z in range(1, max_z):
-        mpp = _meters_per_pixel(z, 0)
-        if (mpp - ((mpp / 2) * snap)) < res_max:
-            tgt_z = z
-            break
-
-    return tgt_z
+    max_zoom = zoom_for_pixelsize(corrected_resolution, tilesize=tilesize)
+    return max_zoom
 
 
 def get_maximum_overview_level(src_dst, minsize=512):
-    """Calculate the maximum overview level."""
+    """
+    Calculate the maximum overview level.
+
+    Attributes
+    ----------
+    src_dst : rasterio.io.DatasetReader
+        Rasterio io.DatasetReader object.
+    minsize : int (default: 512)
+        Minimum overview size.
+
+    Returns
+    -------
+    nlevel: int
+        overview level.
+
+    """
     nlevel = 0
     overview = 1
-
     while min(src_dst.width // overview, src_dst.height // overview) > minsize:
         overview *= 2
         nlevel += 1

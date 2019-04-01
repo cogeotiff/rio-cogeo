@@ -12,3 +12,4 @@ def test_overviewlevel_valid():
     """Should work as expected (return overview level)."""
     with rasterio.open(raster_path_rgb) as src_dst:
         assert get_maximum_overview_level(src_dst, 128) == 2
+        assert get_maximum_overview_level(src_dst) == 0

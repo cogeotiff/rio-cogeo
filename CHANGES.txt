@@ -1,5 +1,31 @@
-Next (TBD)
-----------
+
+1.0b3 (2019-03-30)
+------------------
+
+Breacking Changes:
+
+- remove deprecated YCBCR profile
+- 512x512 dataset without internal tiling are valid
+
+1.0b2 (2019-03-27)
+------------------
+
+Breacking Changes:
+
+- Switch from JPEG to DEFLATE as default profile in CLI (#66)
+
+
+1.0b1 (2019-03-25)
+------------------
+
+Breacking Changes:
+
+- refactor utils.get_maximum_overview_level to get rasterio dataset
+as input and reduce the number of dataset opennings (#61)
+
+
+1.0b0 (2019-03-15)
+------------------
 - add more logging and `--quiet` option (#46)
 - add `--overview-blocksize` to set overview's internal tile size (#60)
 - add `--web-optimized` option to create a web optimized COG (#10)
@@ -11,6 +37,7 @@ Bug fixes:
 
 Breacking Changes:
 
+- rio cogeo now has subcommands: 'create' and 'validate' (#6).
 - internal mask creation is now optional (--add-mask).
 - internal nodata or alpha channel can be forwarded to the output dataset.
 - removed default overview blocksize to be equal to the raw data blocksize (#60)

@@ -25,8 +25,8 @@ inst_reqs = [
 ]
 
 extra_reqs = {
-    "test": ["mock", "pytest", "pytest-cov", "rio-tiler"],
-    "dev": ["mock", "pytest", "pytest-cov", "rio-tiler", "pre-commit"],
+    "test": ["pytest", "pytest-cov", "rio-tiler"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler", "pre-commit"],
 }
 
 if sys.version_info >= (3, 6):
