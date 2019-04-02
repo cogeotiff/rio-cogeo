@@ -66,7 +66,7 @@ Usage
 .. code-block:: console
 
   $ rio cogeo --help
-  Usage: rio cogeo [OPTIONS] INPUT OUTPUT
+  Usage: rio cogeo create [OPTIONS] INPUT OUTPUT
 
     Create Cloud Optimized Geotiff.
 
@@ -75,14 +75,15 @@ Usage
     -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
-    --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
-                                    smallest overview is smaller than the internal block size).
+    --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the value of the internal blocksize).
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
     -w, --web-optimized             Create COGEO optimized for Web.
+    --latitude-correction           Apply latitude correction to ensure max zoom equality for dataset accross different latitudes.
     --threads INTEGER
     --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
-    -q, --quiet                     Suppress progress bar and other non-error output.
+    -q, --quiet                     Suppress progress bar and other non-error
+                                    output.
     --help                          Show this message and exit.
 
 - Check if a Cloud Optimized Geotiff is valid.
@@ -168,20 +169,25 @@ Profiles can be extended by providing '--co' option in command line
     $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
 
 
-Overview levels
-===============
+Web-Optimized COG
+=================
 
-By default rio cogeo will calculate the optimal overview level based on dataset
-size and internal tile size (overview should not be smaller than internal tile
-size (e.g 512px). Overview level will be translated to decimation level of
-power of two:
+rio-cogeo provide a *--web-optimized* option which aims to create a web-tiling friendly COG.
 
-.. code-block:: python
+Output dataset features:
 
-  overview_level = 3
-  overviews = [2 ** j for j in range(1, overview_level + 1)]
-  print(overviews)
-  [2, 4, 8]
+- bounds and internal tiles aligned with web-mercator grid.
+- raw data and overviews resolution match mercator zoom level resolution.
+
+**Important**
+
+Because the mercator project does not respect the distance, when working with
+multiple images covering different latitudes, you may want to use the *--latitude-correction* option
+to create output dataset having the same max_zoom (raw data resolution).
+
+Because it will certainly create a winder file, a nodata value or alpha band should
+be present in the input dataset. If not the original data will be surrounded by black (0) data.
+
 
 Internal tile size
 ==================
@@ -209,6 +215,22 @@ GDAL configuration to merge consecutive range requests
     GDAL_HTTP_VERSION=2
 
 
+Overview levels
+===============
+
+By default rio cogeo will calculate the optimal overview level based on dataset
+size and internal tile size (overview should not be smaller than internal tile
+size (e.g 512px). Overview level will be translated to decimation level of
+power of two:
+
+.. code-block:: python
+
+  overview_level = 3
+  overviews = [2 ** j for j in range(1, overview_level + 1)]
+  print(overviews)
+  [2, 4, 8]
+
+
 GDAL Version
 ============
 
@@ -217,6 +239,7 @@ create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
 
 
 More info in https://github.com/cogeotiff/rio-cogeo/issues/60
+
 
 Nodata, Alpha and Mask
 ======================
@@ -290,6 +313,7 @@ This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black*
 .. code-block:: console
 
   $ pre-commit install
+
 
 Extras
 ======

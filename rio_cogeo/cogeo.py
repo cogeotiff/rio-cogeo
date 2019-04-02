@@ -76,6 +76,12 @@ def cog_translate(
     """
     config = config or {}
 
+    if latitude_correction and not web_optimized:
+        warnings.warn(
+            "--latitude-correction option has to be used with --web-optimized options. "
+            "Will be ignored."
+        )
+
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src_dst:
             meta = src_dst.meta

@@ -76,12 +76,15 @@ def cogeo():
 @click.option(
     "--add-mask",
     is_flag=True,
-    help="Force output dataset creation with an internal mask (convert alpha band or nodata to mask).",
+    help="Force output dataset creation with an internal mask (convert alpha "
+    "band or nodata to mask).",
 )
 @click.option(
     "--overview-level",
     type=int,
-    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size).",
+    help="Overview level (if not provided, appropriate overview level will be "
+    "selected until the smallest overview is smaller than the value of the "
+    "internal blocksize)",
 )
 @click.option(
     "--overview-resampling",
@@ -94,7 +97,8 @@ def cogeo():
 @click.option(
     "--overview-blocksize",
     default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
-    help="Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+    help="Overview's internal tile size (default defined by "
+    "GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
 )
 @click.option(
     "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
@@ -102,16 +106,13 @@ def cogeo():
 @click.option(
     "--latitude-correction",
     is_flag=True,
-    help="Apply latitude correction to ensure max zoom equality for dataset"
+    help="Apply latitude correction to ensure max zoom equality for dataset "
     "accross different latitudes.",
 )
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
-    "--quiet",
-    "-q",
-    help="Suppress progress bar and other non-error output.",
-    is_flag=True,
+    "--quiet", "-q", help="Remove progressbar and other non-error output.", is_flag=True
 )
 def create(
     input,

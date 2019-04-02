@@ -93,6 +93,20 @@ def test_cog_translate_NodataLossyWarning():
                 assert not has_mask_band(src)
 
 
+def test_cog_translate_optionWarnings():
+    """Should work as expected but warns about invalid options."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgb, "cogeo.tif", jpeg_profile, nodata=0, quiet=True
+            )
+            with rasterio.open("cogeo.tif") as src:
+                assert src.nodata == 0
+                assert src.compression.value == "JPEG"
+                assert not has_mask_band(src)
+
+
 def test_cog_translate_NodataMask():
     """Should work as expected (create cogeo and translate nodata to mask)."""
     runner = CliRunner()
@@ -111,12 +125,14 @@ def test_cog_translate_NodataMask():
             assert not src.dataset_mask().all()
 
         cog_translate(
-            raster_path_nodata, "cogeo.tif", deflate_profile, add_mask=True, quiet=True
+            raster_path_nodata,
+            "cogeo.tif",
+            deflate_profile,
+            latitude_correction=True,
+            quiet=True,
         )
         with rasterio.open("cogeo.tif") as src:
-            assert src.nodata is None
-            assert has_mask_band(src)
-            assert not src.dataset_mask().all()
+            assert src.compression.value == "DEFLATE"
 
 
 def test_cog_translate_validRaw():
