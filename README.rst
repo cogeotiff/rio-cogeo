@@ -65,7 +65,7 @@ Usage
 
 .. code-block:: console
 
-  $ rio cogeo --help
+  $ rio cogeo create --help
   Usage: rio cogeo create [OPTIONS] INPUT OUTPUT
 
     Create Cloud Optimized Geotiff.
