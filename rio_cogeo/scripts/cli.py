@@ -11,6 +11,8 @@ from rasterio.enums import Resampling
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
+IN_MEMORY_THRESHOLD = 10980 * 10980
+
 
 class BdxParamType(click.ParamType):
     """Band inddex type."""
@@ -96,6 +98,11 @@ def cogeo():
     default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
     help="Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
 )
+@click.option(
+    "--in-memory/--no-in-memory",
+    help="Force processing raster in memory / not in memory [default: process in memory "
+    f"if smaller than {IN_MEMORY_THRESHOLD // 1e6:.0f} million pixels]",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
@@ -114,6 +121,7 @@ def create(
     overview_level,
     overview_resampling,
     overview_blocksize,
+    in_memory,
     threads,
     creation_options,
     quiet,
@@ -124,10 +132,17 @@ def create(
     if creation_options:
         output_profile.update(creation_options)
 
+    cache_mask = os.environ.get("GDAL_CACHEMAX", 1024 * 1024 * 512)
+    swath_size = os.environ.get("GDAL_SWATH_SIZE", cache_mask * 2)
+    if swath_size < cache_mask:
+        swath_size = cache_mask
+
     config = dict(
         NUM_THREADS=threads,
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
         GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
+        GDAL_CACHEMAX=cache_mask,
+        GDAL_SWATH_SIZE=swath_size,
     )
 
     cog_translate(
@@ -139,6 +154,7 @@ def create(
         add_mask,
         overview_level,
         overview_resampling,
+        in_memory,
         config,
         quiet,
     )

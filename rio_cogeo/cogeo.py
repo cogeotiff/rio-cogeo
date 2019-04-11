@@ -30,6 +30,7 @@ def cog_translate(
     add_mask=None,
     overview_level=None,
     overview_resampling="nearest",
+    in_memory=None,
     config=None,
     quiet=False,
 ):
@@ -110,7 +111,10 @@ def cog_translate(
                 meta.pop("photometric", None)
 
                 with contextlib.ExitStack() as ctx:
-                    if vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD:
+                    if (
+                        in_memory
+                        or vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
+                    ):
                         memfile = ctx.enter_context(MemoryFile())
                         tmp_dst = ctx.enter_context(memfile.open(**meta))
                     else:
