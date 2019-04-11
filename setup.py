@@ -1,4 +1,6 @@
 """Setup."""
+
+import sys
 from setuptools import setup, find_packages
 
 with open("rio_cogeo/__init__.py") as f:
@@ -15,6 +17,9 @@ with open("README.rst") as f:
 
 # Runtime requirements.
 inst_reqs = ["click", "rasterio[s3]>=1.0.9", "numpy~=1.15"]
+
+if sys.version_info < (3, 3):
+    inst_reqs.append("contextlib2")
 
 extra_reqs = {
     "test": ["pytest", "pytest-cov"],

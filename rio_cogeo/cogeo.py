@@ -4,7 +4,7 @@ import os
 import sys
 import warnings
 import tempfile
-import contextlib
+
 
 import click
 
@@ -17,6 +17,12 @@ from rasterio.shutil import copy
 
 from rio_cogeo.errors import LossyCompression
 from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band, has_mask_band
+
+try:
+    from contextlib import ExitStack
+except ImportError:
+    from contextlib2 import ExitStack
+
 
 IN_MEMORY_THRESHOLD = os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980)
 
@@ -112,7 +118,7 @@ def cog_translate(
                 meta.pop("compress", None)
                 meta.pop("photometric", None)
 
-                with contextlib.ExitStack() as ctx:
+                with ExitStack() as ctx:
                     if in_memory is None:
                         in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
 

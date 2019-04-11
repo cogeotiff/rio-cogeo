@@ -104,7 +104,7 @@ def cogeo():
     "--in-memory/--no-in-memory",
     default=None,
     help="Force processing raster in memory / not in memory (default: process in memory "
-    f"if smaller than {IN_MEMORY_THRESHOLD // 1e6:.0f} million pixels)",
+    "if smaller than {:.0f} million pixels)".format(IN_MEMORY_THRESHOLD // 1e6),
 )
 @click.option("--threads", type=int, default=8)
 @options.creation_options
