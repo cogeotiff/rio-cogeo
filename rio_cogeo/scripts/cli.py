@@ -11,7 +11,7 @@ from rasterio.enums import Resampling
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
-IN_MEMORY_THRESHOLD = 10980 * 10980
+IN_MEMORY_THRESHOLD = os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980)
 
 
 class BdxParamType(click.ParamType):

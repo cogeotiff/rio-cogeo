@@ -18,7 +18,7 @@ from rasterio.shutil import copy
 from rio_cogeo.errors import LossyCompression
 from rio_cogeo.utils import get_maximum_overview_level, has_alpha_band, has_mask_band
 
-IN_MEMORY_THRESHOLD = os.environ.get("MAX_MEMORY", 10980 * 10980)
+IN_MEMORY_THRESHOLD = os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980)
 
 
 def cog_translate(
