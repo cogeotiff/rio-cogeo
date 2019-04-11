@@ -56,6 +56,8 @@ def cog_translate(
         COGEO overview (decimation) level
     overview_resampling : str, optional (default: "nearest")
         Resampling algorithm for overviews
+    in_memory: bool, optional
+        Force processing raster in memory (default: process in memory if smal)
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
@@ -111,10 +113,10 @@ def cog_translate(
                 meta.pop("photometric", None)
 
                 with contextlib.ExitStack() as ctx:
-                    if (
-                        in_memory
-                        or vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
-                    ):
+                    if in_memory is None:
+                        in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
+
+                    if in_memory:
                         memfile = ctx.enter_context(MemoryFile())
                         tmp_dst = ctx.enter_context(memfile.open(**meta))
                     else:

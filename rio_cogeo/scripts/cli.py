@@ -78,12 +78,14 @@ def cogeo():
 @click.option(
     "--add-mask",
     is_flag=True,
-    help="Force output dataset creation with an internal mask (convert alpha band or nodata to mask).",
+    help="Force output dataset creation with an internal mask (convert alpha "
+    "band or nodata to mask).",
 )
 @click.option(
     "--overview-level",
     type=int,
-    help="Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the internal block size).",
+    help="Overview level (if not provided, appropriate overview level will be"
+    "selected until the smallest overview is smaller than the internal block size).",
 )
 @click.option(
     "--overview-resampling",
@@ -100,8 +102,9 @@ def cogeo():
 )
 @click.option(
     "--in-memory/--no-in-memory",
-    help="Force processing raster in memory / not in memory [default: process in memory "
-    f"if smaller than {IN_MEMORY_THRESHOLD // 1e6:.0f} million pixels]",
+    default=None,
+    help="Force processing raster in memory / not in memory (default: process in memory "
+    f"if smaller than {IN_MEMORY_THRESHOLD // 1e6:.0f} million pixels)",
 )
 @click.option("--threads", type=int, default=8)
 @options.creation_options
