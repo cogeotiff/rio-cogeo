@@ -11,7 +11,7 @@ from rasterio.enums import Resampling
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
-IN_MEMORY_THRESHOLD = os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980)
+IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 class BdxParamType(click.ParamType):
@@ -135,18 +135,20 @@ def create(
     if creation_options:
         output_profile.update(creation_options)
 
-    cache_mask = os.environ.get("GDAL_CACHEMAX", 1024 * 1024 * 512)
-    swath_size = os.environ.get("GDAL_SWATH_SIZE", cache_mask * 2)
-    if swath_size < cache_mask:
-        swath_size = cache_mask
-
     config = dict(
         NUM_THREADS=threads,
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
         GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
-        GDAL_CACHEMAX=cache_mask,
-        GDAL_SWATH_SIZE=swath_size,
     )
+
+    if not os.environ.get("GDAL_CACHEMAX"):
+        cache_mask = 1024 * 1024 * 512
+        swath_size = os.environ.get("GDAL_SWATH_SIZE", cache_mask * 2)
+        if swath_size < cache_mask:
+            swath_size = cache_mask
+        config.update(
+            dict(GDAL_CACHEMAX=int(cache_mask), GDAL_SWATH_SIZE=int(swath_size))
+        )
 
     cog_translate(
         input,

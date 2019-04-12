@@ -5,7 +5,6 @@ import sys
 import warnings
 import tempfile
 
-
 import click
 
 import rasterio
@@ -23,8 +22,7 @@ try:
 except ImportError:
     from contextlib2 import ExitStack
 
-
-IN_MEMORY_THRESHOLD = os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980)
+IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 def cog_translate(
@@ -118,13 +116,13 @@ def cog_translate(
                 meta.pop("compress", None)
                 meta.pop("photometric", None)
 
-                with ExitStack() as ctx:
-                    if in_memory is None:
-                        in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
+                if in_memory is None:
+                    in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
 
+                with ExitStack() as ctx:
                     if in_memory:
-                        memfile = ctx.enter_context(MemoryFile())
-                        tmp_dst = ctx.enter_context(memfile.open(**meta))
+                        tmpfile = ctx.enter_context(MemoryFile())
+                        tmp_dst = ctx.enter_context(tmpfile.open(**meta))
                     else:
                         tmpfile = ctx.enter_context(tempfile.NamedTemporaryFile())
                         tmp_dst = ctx.enter_context(rasterio.open(tmpfile, "w", **meta))
