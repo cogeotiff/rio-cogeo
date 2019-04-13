@@ -27,8 +27,8 @@ IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 @contextmanager
-def _named_tempfile():
-    fileobj = tempfile.NamedTemporaryFile(suffix=".tif")
+def _named_tempfile(dir):
+    fileobj = tempfile.NamedTemporaryFile(dir=dir, suffix=".tif")
     fileobj.close()
     try:
         yield fileobj.name
@@ -138,7 +138,8 @@ def cog_translate(
                         tmpfile = ctx.enter_context(MemoryFile())
                         tmp_dst = ctx.enter_context(tmpfile.open(**meta))
                     else:
-                        tmpfile = ctx.enter_context(TemporaryRasterFile())
+                        outdir = os.path.dirname(dst_path)
+                        tmpfile = ctx.enter_context(TemporaryRasterFile(outdir))
                         tmp_dst = ctx.enter_context(rasterio.open(tmpfile, "w", **meta))
 
                     wind = list(tmp_dst.block_windows(1))
