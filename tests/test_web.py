@@ -95,8 +95,8 @@ def test_cog_translate_web():
                     # High resolution
                     # Top Left tile
                     mime_type, tile = cog.get_tile(0, 0, 0)
-                    tile_lenght = 256 * 256 * 3
-                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
+                    tile_length = 256 * 256 * 3
+                    t = struct.unpack_from("{}b".format(tile_length), tile)
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
@@ -108,8 +108,8 @@ def test_cog_translate_web():
 
                     # Bottom right tile
                     mime_type, tile = cog.get_tile(4, 3, 0)
-                    tile_lenght = 256 * 256 * 3
-                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
+                    tile_length = 256 * 256 * 3
+                    t = struct.unpack_from("{}b".format(tile_length), tile)
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
@@ -126,14 +126,14 @@ def test_cog_translate_web():
                     # the 256px mercator tile fetched by rio-tiler
                     # ref: https://github.com/cogeotiff/rio-cogeo/issues/60
                     mime_type, tile = cog.get_tile(1, 0, 1)
-                    tile_lenght = 128 * 128 * 3
-                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
+                    tile_length = 128 * 128 * 3
+                    t = struct.unpack_from("{}b".format(tile_length), tile)
                     arr1 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
                     arr1 = numpy.transpose(arr1, [2, 0, 1])
 
                     mime_type, tile = cog.get_tile(2, 0, 1)
-                    tile_lenght = 128 * 128 * 3
-                    t = struct.unpack_from("{}b".format(tile_lenght), tile)
+                    tile_length = 128 * 128 * 3
+                    t = struct.unpack_from("{}b".format(tile_length), tile)
                     arr2 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
                     arr2 = numpy.transpose(arr2, [2, 0, 1])
                     arr = numpy.dstack((arr1, arr2))

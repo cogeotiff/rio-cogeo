@@ -38,7 +38,7 @@ def cog_translate(
     overview_level=None,
     overview_resampling="nearest",
     web_optimized=False,
-    latitude_correction=False,
+    latitude_adjustment=True,
     config=None,
     quiet=False,
 ):
@@ -66,8 +66,8 @@ def cog_translate(
         Resampling algorithm for overviews
     web_optimized: bool, option (default: False)
         Create web-optimized cogeo.
-    latitude_correction: bool, option (default: False)
-        Apply web-mercator latitude correction to ensure max_zoom.
+    latitude_adjustment: bool, option (default: True)
+        Use mercator meters for zoom calculation or ensure max zoom equality.
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
@@ -75,12 +75,6 @@ def cog_translate(
 
     """
     config = config or {}
-
-    if latitude_correction and not web_optimized:
-        warnings.warn(
-            "--latitude-correction option has to be used with --web-optimized options. "
-            "Will be ignored."
-        )
 
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src_dst:
@@ -118,11 +112,11 @@ def cog_translate(
                     )
                 )
                 center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
-                lat = center[1] if latitude_correction else 0
+
                 tilesize = min(
                     int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"])
                 )
-
+                lat = 0 if latitude_adjustment else center[1]
                 max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
 
                 extrema = tile_extrema(bounds, max_zoom)

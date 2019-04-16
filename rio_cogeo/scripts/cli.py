@@ -1,6 +1,7 @@
 """Rio_cogeo.scripts.cli."""
 
 import os
+import warnings
 
 import click
 import numpy
@@ -104,10 +105,11 @@ def cogeo():
     "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
 )
 @click.option(
-    "--latitude-correction",
-    is_flag=True,
-    help="Apply latitude correction to ensure max zoom equality for dataset "
-    "accross different latitudes.",
+    "--latitude-adjustment/--global-maxzoom",
+    default=None,
+    help="Use dataset native mercator resolution for MAX_ZOOM calculation "
+    "(linked to dataset center latitude, default) or ensure MAX_ZOOM equality for multiple "
+    "dataset accross latitudes.",
 )
 @click.option("--threads", type=int, default=8)
 @options.creation_options
@@ -125,12 +127,18 @@ def create(
     overview_resampling,
     overview_blocksize,
     web_optimized,
-    latitude_correction,
+    latitude_adjustment,
     threads,
     creation_options,
     quiet,
 ):
     """Create Cloud Optimized Geotiff."""
+    if latitude_adjustment is not None and not web_optimized:
+        warnings.warn(
+            "'latitude_adjustment' option has to be used with --web-optimized options. "
+            "Will be ignored."
+        )
+
     output_profile = cog_profiles.get(cogeo_profile)
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
@@ -152,7 +160,7 @@ def create(
         overview_level,
         overview_resampling,
         web_optimized,
-        latitude_correction,
+        latitude_adjustment,
         config,
         quiet,
     )

@@ -124,16 +124,6 @@ def test_cog_translate_NodataMask():
             assert has_mask_band(src)
             assert not src.dataset_mask().all()
 
-        cog_translate(
-            raster_path_nodata,
-            "cogeo.tif",
-            deflate_profile,
-            latitude_correction=True,
-            quiet=True,
-        )
-        with rasterio.open("cogeo.tif") as src:
-            assert src.compression.value == "DEFLATE"
-
 
 def test_cog_translate_validRaw():
     """Should work as expected (create cogeo file)."""
