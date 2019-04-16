@@ -11,7 +11,7 @@ from rasterio.io import MemoryFile
 from rasterio.env import GDALVersion
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
-from rasterio.enums import Resampling
+from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.shutil import copy
 from rasterio.transform import Affine
 
@@ -39,6 +39,7 @@ def cog_translate(
     overview_resampling="nearest",
     web_optimized=False,
     latitude_adjustment=True,
+    resampling="nearest",
     config=None,
     quiet=False,
 ):
@@ -68,6 +69,8 @@ def cog_translate(
         Create web-optimized cogeo.
     latitude_adjustment: bool, option (default: True)
         Use mercator meters for zoom calculation or ensure max zoom equality.
+    resampling : str, optional (default: "nearest")
+        Resampling algorithm.
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
@@ -135,7 +138,7 @@ def cog_translate(
                         transform=vrt_transform,
                         width=vrt_width,
                         height=vrt_height,
-                        resampling=Resampling[overview_resampling],
+                        resampling=ResamplingEnums[resampling],
                     )
                 )
 
@@ -182,7 +185,9 @@ def cog_translate(
                             )
 
                         overviews = [2 ** j for j in range(1, overview_level + 1)]
-                        mem.build_overviews(overviews, Resampling[overview_resampling])
+                        mem.build_overviews(
+                            overviews, ResamplingEnums[overview_resampling]
+                        )
 
                         if not quiet:
                             click.echo("Updating dataset tags...", err=True)
@@ -193,7 +198,7 @@ def cog_translate(
                         tags = src_dst.tags()
                         tags.update(
                             dict(
-                                OVR_RESAMPLING_ALG=Resampling[
+                                OVR_RESAMPLING_ALG=ResamplingEnums[
                                     overview_resampling
                                 ].name.upper()
                             )

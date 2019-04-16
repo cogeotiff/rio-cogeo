@@ -4,6 +4,7 @@ Next (TBD)
 - add `--web-optimized` option to create a web optimized COG (#10)
 - add `--latitude-adjustment/--global-maxzoom` option to adjust MAX_ZOOM for global datasets
 - Web-optimized tests needs python3.6 (cogdumper)
+- add `--resampling` option to select the resampling algorithm when using `--web-optimized`
 
 
 1.0b3 (2019-03-30)

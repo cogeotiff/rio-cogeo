@@ -7,7 +7,7 @@ import click
 import numpy
 
 from rasterio.rio import options
-from rasterio.enums import Resampling
+from rasterio.enums import Resampling as ResamplingEnums
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -89,9 +89,9 @@ def cogeo():
 )
 @click.option(
     "--overview-resampling",
-    help="Resampling algorithm.",
+    help="Overview creation resampling algorithm.",
     type=click.Choice(
-        [it.name for it in Resampling if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
     ),
     default="nearest",
 )
@@ -111,6 +111,15 @@ def cogeo():
     "(linked to dataset center latitude, default) or ensure MAX_ZOOM equality for multiple "
     "dataset accross latitudes.",
 )
+@click.option(
+    "--resampling",
+    "-r",
+    help="Resampling algorithm.",
+    type=click.Choice(
+        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+    ),
+    default="nearest",
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
@@ -128,6 +137,7 @@ def create(
     overview_blocksize,
     web_optimized,
     latitude_adjustment,
+    resampling,
     threads,
     creation_options,
     quiet,
@@ -161,6 +171,7 @@ def create(
         overview_resampling,
         web_optimized,
         latitude_adjustment,
+        resampling,
         config,
         quiet,
     )
