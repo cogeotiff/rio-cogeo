@@ -141,15 +141,6 @@ def create(
         GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
     )
 
-    if not os.environ.get("GDAL_CACHEMAX"):
-        cache_mask = 1024 * 1024 * 512
-        swath_size = os.environ.get("GDAL_SWATH_SIZE", cache_mask * 2)
-        if swath_size < cache_mask:
-            swath_size = cache_mask
-        config.update(
-            dict(GDAL_CACHEMAX=int(cache_mask), GDAL_SWATH_SIZE=int(swath_size))
-        )
-
     cog_translate(
         input,
         output,
