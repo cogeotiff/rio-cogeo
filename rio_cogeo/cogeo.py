@@ -124,8 +124,14 @@ def cog_translate(
                         tmpfile = ctx.enter_context(MemoryFile())
                         tmp_dst = ctx.enter_context(tmpfile.open(**meta))
                     else:
-                        tmpfile = ctx.enter_context(tempfile.NamedTemporaryFile())
-                        tmp_dst = ctx.enter_context(rasterio.open(tmpfile, "w", **meta))
+                        tmpfile = ctx.enter_context(
+                            tempfile.NamedTemporaryFile(
+                                dir=os.path.dirname(dst_path), suffix=".tif"
+                            )
+                        )
+                        tmp_dst = ctx.enter_context(
+                            rasterio.open(tmpfile.name, "w", **meta)
+                        )
 
                     wind = list(tmp_dst.block_windows(1))
 
