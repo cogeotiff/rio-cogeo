@@ -77,12 +77,13 @@ Usage
         --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
         --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected
                                         until the smallest overview is smaller than the value of the internal blocksize)
-        --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
+        --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Overview creation resampling algorithm.
         --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
         -w, --web-optimized             Create COGEO optimized for Web.
         --latitude-adjustment / --global-maxzoom
                                         Use dataset native mercator resolution for MAX_ZOOM calculation (linked to dataset center latitude, default)
                                         or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
+        -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
         --threads INTEGER
         --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
         -q, --quiet                     Remove progressbar and other non-error output.
