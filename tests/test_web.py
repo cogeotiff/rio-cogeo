@@ -21,10 +21,113 @@ from rio_tiler.utils import tile_read
 
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
+raster_path_north = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_north.tif"
+)
+
+
+def test_cog_translate_webZooms():
+    """
+    Test Web-Optimized COG.
+
+    - Test COG size is a multiple of 256 (mercator tile size)
+    - Test COG bounds are aligned with mercator grid at max zoom
+    - Test high resolution internal tiles are equal to mercator tile using
+      cogdumper and rio-tiler
+    - Test overview internal tiles are equal to mercator tile using
+      cogdumper and rio-tiler
+    """
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="128")
+
+        cog_translate(
+            raster_path_north,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+        )
+        with rasterio.open("cogeo.tif") as out_dst:
+            assert get_max_zoom(out_dst) == 8
+
+        cog_translate(
+            raster_path_north,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            latitude_adjustment=False,
+            config=config,
+        )
+        with rasterio.open("cogeo.tif") as out_dst:
+            assert get_max_zoom(out_dst) == 10
+
+
+def test_cog_translate_web():
+    """
+    Test Web-Optimized COG.
+
+    - Test COG size is a multiple of 256 (mercator tile size)
+    - Test COG bounds are aligned with mercator grid at max zoom
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="128")
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+        )
+        with rasterio.open(raster_path_web) as src_dst:
+            with rasterio.open("cogeo.tif") as out_dst:
+                blocks = list(set(out_dst.block_shapes))
+                assert len(blocks) == 1
+                ts = blocks[0][0]
+                assert not out_dst.width % ts
+                assert not out_dst.height % ts
+                max_zoom = get_max_zoom(out_dst)
+
+                bounds = list(
+                    transform_bounds(
+                        *[src_dst.crs, "epsg:4326"] + list(src_dst.bounds),
+                        densify_pts=21
+                    )
+                )
+
+                leftTile = mercantile.tile(bounds[0], bounds[3], max_zoom)
+                tbounds = mercantile.xy_bounds(leftTile)
+                west, north = tbounds.left, tbounds.top
+                assert out_dst.transform.xoff == west
+                assert out_dst.transform.yoff == north
+
+                rightTile = mercantile.tile(bounds[2], bounds[1], max_zoom)
+                tbounds = mercantile.xy_bounds(rightTile)
+                east, south = tbounds.right, tbounds.bottom
+
+                lrx = round(
+                    out_dst.transform.xoff + out_dst.transform.a * out_dst.width, 6
+                )
+                lry = round(
+                    out_dst.transform.yoff + out_dst.transform.e * out_dst.height, 6
+                )
+                assert lrx == round(east, 6)
+                assert lry == round(south, 6)
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")
-def test_cog_translate_web():
+def test_cog_translate_Internal():
     """
     Test Web-Optimized COG.
 
