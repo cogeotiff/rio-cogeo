@@ -1,3 +1,11 @@
+Next (TBD)
+----------
+
+- add `--web-optimized` option to create a web optimized COG (#10)
+- add `--latitude-adjustment/--global-maxzoom` option to adjust MAX_ZOOM for global datasets
+- Web-optimized tests needs python3.6 (cogdumper)
+- add `--resampling` option to select the resampling algorithm when using `--web-optimized`
+
 
 1.0b3 (2019-03-30)
 ------------------
@@ -40,6 +48,7 @@ Breacking Changes:
 - internal mask creation is now optional (--add-mask).
 - internal nodata or alpha channel can be forwarded to the output dataset.
 - removed default overview blocksize to be equal to the raw data blocksize (#60)
+
 
 1.0dev10 (2019-02-12)
 ---------------------

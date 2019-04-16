@@ -50,51 +50,56 @@ Usage
 .. code-block:: console
 
   $ rio cogeo --help
-  Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
+    Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
 
     Rasterio cogeo subcommands.
 
-  Options:
-    --help  Show this message and exit.
+    Options:
+      --help  Show this message and exit.
 
-  Commands:
-    create    Create COGEO
-    validate  Validate COGEO
+    Commands:
+      create    Create COGEO
+      validate  Validate COGEO
 
 - Create a Cloud Optimized Geotiff.
 
 .. code-block:: console
 
-  $ rio cogeo --help
-  Usage: rio cogeo [OPTIONS] INPUT OUTPUT
+    $ rio cogeo create --help
+      Usage: rio cogeo create [OPTIONS] INPUT OUTPUT
 
-    Create Cloud Optimized Geotiff.
+      Create Cloud Optimized Geotiff.
 
-  Options:
-    -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
-    --nodata NUMBER|nan             Set nodata masking values for input dataset.
-    --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
-    --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the
-                                    smallest overview is smaller than the internal block size).
-    --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
-    --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
-    --threads INTEGER
-    --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
-    -q, --quiet                     Suppress progress bar and other non-error output.
-    --help                          Show this message and exit.
+      Options:
+        -b, --bidx BIDX                 Band indexes to copy.
+        -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
+        --nodata NUMBER|nan             Set nodata masking values for input dataset.
+        --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
+        --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected
+                                        until the smallest overview is smaller than the value of the internal blocksize)
+        --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Overview creation resampling algorithm.
+        --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
+        -w, --web-optimized             Create COGEO optimized for Web.
+        --latitude-adjustment / --global-maxzoom
+                                        Use dataset native mercator resolution for MAX_ZOOM calculation (linked to dataset center latitude, default)
+                                        or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
+        -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
+        --threads INTEGER
+        --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
+        -q, --quiet                     Remove progressbar and other non-error output.
+        --help                          Show this message and exit.
 
 - Check if a Cloud Optimized Geotiff is valid.
 
 .. code-block:: console
 
   $ rio cogeo validate --help
-  Usage: rio cogeo validate [OPTIONS] INPUT
+    Usage: rio cogeo validate [OPTIONS] INPUT
 
     Validate Cloud Optimized Geotiff.
 
-  Options:
-    --help  Show this message and exit.
+    Options:
+      --help  Show this message and exit.
 
 
 Examples
@@ -167,20 +172,25 @@ Profiles can be extended by providing '--co' option in command line
     $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
 
 
-Overview levels
-===============
+Web-Optimized COG
+=================
 
-By default rio cogeo will calculate the optimal overview level based on dataset
-size and internal tile size (overview should not be smaller than internal tile
-size (e.g 512px). Overview level will be translated to decimation level of
-power of two:
+rio-cogeo provide a *--web-optimized* option which aims to create a web-tiling friendly COG.
 
-.. code-block:: python
+Output dataset features:
 
-  overview_level = 3
-  overviews = [2 ** j for j in range(1, overview_level + 1)]
-  print(overviews)
-  [2, 4, 8]
+- bounds and internal tiles aligned with web-mercator grid.
+- raw data and overviews resolution match mercator zoom level resolution.
+
+**Important**
+
+Because the mercator project does not respect the distance, when working with
+multiple images covering different latitudes, you may want to use the *--global-maxzoom* option
+to create output dataset having the same MAX_ZOOM (raw data resolution).
+
+Because it will certainly create a larger file, a nodata value or alpha band should
+be present in the input dataset. If not the original data will be surrounded by black (0) data.
+
 
 Internal tile size
 ==================
@@ -208,11 +218,30 @@ GDAL configuration to merge consecutive range requests
     GDAL_HTTP_VERSION=2
 
 
+Overview levels
+===============
+
+By default rio cogeo will calculate the optimal overview level based on dataset
+size and internal tile size (overview should not be smaller than internal tile
+size (e.g 512px). Overview level will be translated to decimation level of
+power of two:
+
+.. code-block:: python
+
+  overview_level = 3
+  overviews = [2 ** j for j in range(1, overview_level + 1)]
+  print(overviews)
+  [2, 4, 8]
+
+
 GDAL Version
 ============
 
 It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
 create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
+
+
+More info in https://github.com/cogeotiff/rio-cogeo/issues/60
 
 
 Nodata, Alpha and Mask
@@ -288,9 +317,10 @@ This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black*
 
   $ pre-commit install
 
+
 Extras
 ======
 
 Blog post on good and bad COG formats: https://medium.com/@_VincentS_/do-you-really-want-people-using-your-data-ec94cd94dc3f
 
-Checkout `**rio-glui** <https://github.com/mapbox/rio-glui/>__` rasterio plugin to explore COG locally in your web browser.
+Checkout `rio-glui <https://github.com/mapbox/rio-glui/>`__ rasterio plugin to explore COG locally in your web browser.
