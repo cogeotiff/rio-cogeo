@@ -2,6 +2,7 @@
 
 import os
 import sys
+import tempfile
 import warnings
 from contextlib import contextmanager
 
@@ -26,10 +27,11 @@ IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 @contextmanager
-def TemporaryRasterFile(fname, suffix=".tmp"):
+def TemporaryRasterFile(dst_path, suffix=".tif"):
     """Create temporary file."""
-    tmp_name = fname + suffix
-    fileobj = open(tmp_name, "wb")
+    dir = os.path.dirname(dst_path)
+    # Make sure we can write file
+    fileobj = tempfile.NamedTemporaryFile(dir=dir, suffix=suffix, delete=False)
     fileobj.close()
     try:
         yield fileobj.name
