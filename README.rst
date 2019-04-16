@@ -322,4 +322,4 @@ Extras
 
 Blog post on good and bad COG formats: https://medium.com/@_VincentS_/do-you-really-want-people-using-your-data-ec94cd94dc3f
 
-Checkout `**rio-glui** <https://github.com/mapbox/rio-glui/>__` rasterio plugin to explore COG locally in your web browser.
+Checkout `rio-glui <https://github.com/mapbox/rio-glui/>`__ rasterio plugin to explore COG locally in your web browser.
