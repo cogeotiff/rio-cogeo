@@ -50,53 +50,55 @@ Usage
 .. code-block:: console
 
   $ rio cogeo --help
-  Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
+    Usage: rio cogeo [OPTIONS] COMMAND [ARGS]...
 
     Rasterio cogeo subcommands.
 
-  Options:
-    --help  Show this message and exit.
+    Options:
+      --help  Show this message and exit.
 
-  Commands:
-    create    Create COGEO
-    validate  Validate COGEO
+    Commands:
+      create    Create COGEO
+      validate  Validate COGEO
 
 - Create a Cloud Optimized Geotiff.
 
 .. code-block:: console
 
-  $ rio cogeo create --help
-  Usage: rio cogeo create [OPTIONS] INPUT OUTPUT
+    $ rio cogeo create --help
+      Usage: rio cogeo create [OPTIONS] INPUT OUTPUT
 
-    Create Cloud Optimized Geotiff.
+      Create Cloud Optimized Geotiff.
 
-  Options:
-    -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
-    --nodata NUMBER|nan             Set nodata masking values for input dataset.
-    --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
-    --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the value of the internal blocksize).
-    --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
-    --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
-    -w, --web-optimized             Create COGEO optimized for Web.
-    --latitude-correction           Apply latitude correction to ensure max zoom equality for dataset accross different latitudes.
-    --threads INTEGER
-    --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
-    -q, --quiet                     Suppress progress bar and other non-error
-                                    output.
-    --help                          Show this message and exit.
+      Options:
+        -b, --bidx BIDX                 Band indexes to copy.
+        -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
+        --nodata NUMBER|nan             Set nodata masking values for input dataset.
+        --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
+        --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected
+                                        until the smallest overview is smaller than the value of the internal blocksize)
+        --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
+        --overview-blocksize TEXT       Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
+        -w, --web-optimized             Create COGEO optimized for Web.
+        --latitude-adjustment / --global-maxzoom
+                                        Use dataset native mercator resolution for MAX_ZOOM calculation (linked to dataset center latitude, default)
+                                        or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
+        --threads INTEGER
+        --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
+        -q, --quiet                     Remove progressbar and other non-error output.
+        --help                          Show this message and exit.
 
 - Check if a Cloud Optimized Geotiff is valid.
 
 .. code-block:: console
 
   $ rio cogeo validate --help
-  Usage: rio cogeo validate [OPTIONS] INPUT
+    Usage: rio cogeo validate [OPTIONS] INPUT
 
     Validate Cloud Optimized Geotiff.
 
-  Options:
-    --help  Show this message and exit.
+    Options:
+      --help  Show this message and exit.
 
 
 Examples
@@ -182,10 +184,10 @@ Output dataset features:
 **Important**
 
 Because the mercator project does not respect the distance, when working with
-multiple images covering different latitudes, you may want to use the *--latitude-correction* option
-to create output dataset having the same max_zoom (raw data resolution).
+multiple images covering different latitudes, you may want to use the *--global-maxzoom* option
+to create output dataset having the same MAX_ZOOM (raw data resolution).
 
-Because it will certainly create a winder file, a nodata value or alpha band should
+Because it will certainly create a larger file, a nodata value or alpha band should
 be present in the input dataset. If not the original data will be surrounded by black (0) data.
 
 
