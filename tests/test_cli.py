@@ -394,6 +394,23 @@ def test_cogeo_validNodataCustom():
         assert result.exit_code == 1
 
 
+def test_cogeo_validTempFile(monkeypatch):
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "--no-in-memory"]
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+
+    monkeypatch.setenv("IN_MEMORY_THRESHOLD", "100")
+    with runner.isolated_filesystem():
+        result = runner.invoke(cogeo, ["create", raster_path_rgb, "output.tif"])
+        assert not result.exception
+        assert result.exit_code == 0
+
+
 def test_cogeo_validate():
     """Should work as expected."""
     runner = CliRunner()
