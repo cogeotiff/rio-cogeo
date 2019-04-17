@@ -4,6 +4,7 @@ import os
 import sys
 import warnings
 import tempfile
+from contextlib import contextmanager
 
 import click
 
@@ -34,6 +35,19 @@ except ImportError:
     from contextlib2 import ExitStack
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
+
+
+@contextmanager
+def TemporaryRasterFile(dst_path, suffix=".tif"):
+    """Create temporary file."""
+    fileobj = tempfile.NamedTemporaryFile(
+        dir=os.path.dirname(dst_path), suffix=suffix, delete=False
+    )
+    fileobj.close()
+    try:
+        yield fileobj
+    finally:
+        os.remove(fileobj.name)
 
 
 def cog_translate(
@@ -173,11 +187,7 @@ def cog_translate(
                         tmpfile = ctx.enter_context(MemoryFile())
                         tmp_dst = ctx.enter_context(tmpfile.open(**meta))
                     else:
-                        tmpfile = ctx.enter_context(
-                            tempfile.NamedTemporaryFile(
-                                dir=os.path.dirname(dst_path), suffix=".tif"
-                            )
-                        )
+                        tmpfile = ctx.enter_context(TemporaryRasterFile(dst_path))
                         tmp_dst = ctx.enter_context(
                             rasterio.open(tmpfile.name, "w", **meta)
                         )
