@@ -279,6 +279,32 @@ def test_cogeo_overviewTilesize(monkeypatch):
             assert src.block_shapes[0] == (64, 64)
 
 
+def test_cogeo_web():
+    """Should work as expected."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with pytest.warns(UserWarning):
+            result = runner.invoke(
+                cogeo,
+                ["create", raster_path_rgb, "output.tif", "--latitude-adjustment"],
+            )
+            assert not result.exception
+            assert result.exit_code == 0
+
+        with pytest.warns(UserWarning):
+            result = runner.invoke(
+                cogeo, ["create", raster_path_rgb, "output.tif", "--global-maxzoom"]
+            )
+            assert not result.exception
+            assert result.exit_code == 0
+
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "--web-optimized"]
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+
+
 def test_cogeo_validgdalBlockOption():
     """Should work as expected."""
     runner = CliRunner()
@@ -418,9 +444,6 @@ def test_cogeo_validate():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--quiet"]
         )
-        with rasterio.open("output.tif") as src_dst:
-            print(src_dst.meta)
-
         result = runner.invoke(cogeo, ["validate", "output.tif"])
         assert "is a valid cloud optimized GeoTIFF" in result.output
         assert not result.exception

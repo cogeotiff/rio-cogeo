@@ -1,12 +1,13 @@
 """Rio_cogeo.scripts.cli."""
 
 import os
+import warnings
 
 import click
 import numpy
 
 from rasterio.rio import options
-from rasterio.enums import Resampling
+from rasterio.enums import Resampling as ResamplingEnums
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -84,21 +85,42 @@ def cogeo():
 @click.option(
     "--overview-level",
     type=int,
-    help="Overview level (if not provided, appropriate overview level will be"
-    "selected until the smallest overview is smaller than the internal block size).",
+    help="Overview level (if not provided, appropriate overview level will be "
+    "selected until the smallest overview is smaller than the value of the "
+    "internal blocksize)",
 )
 @click.option(
     "--overview-resampling",
-    help="Resampling algorithm.",
+    help="Overview creation resampling algorithm.",
     type=click.Choice(
-        [it.name for it in Resampling if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
     ),
     default="nearest",
 )
 @click.option(
     "--overview-blocksize",
     default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
-    help="Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+    help="Overview's internal tile size (default defined by "
+    "GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+)
+@click.option(
+    "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
+)
+@click.option(
+    "--latitude-adjustment/--global-maxzoom",
+    default=None,
+    help="Use dataset native mercator resolution for MAX_ZOOM calculation "
+    "(linked to dataset center latitude, default) or ensure MAX_ZOOM equality for multiple "
+    "dataset accross latitudes.",
+)
+@click.option(
+    "--resampling",
+    "-r",
+    help="Resampling algorithm.",
+    type=click.Choice(
+        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+    ),
+    default="nearest",
 )
 @click.option(
     "--in-memory/--no-in-memory",
@@ -109,10 +131,7 @@ def cogeo():
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
-    "--quiet",
-    "-q",
-    help="Suppress progress bar and other non-error output.",
-    is_flag=True,
+    "--quiet", "-q", help="Remove progressbar and other non-error output.", is_flag=True
 )
 def create(
     input,
@@ -124,12 +143,21 @@ def create(
     overview_level,
     overview_resampling,
     overview_blocksize,
+    web_optimized,
+    latitude_adjustment,
+    resampling,
     in_memory,
     threads,
     creation_options,
     quiet,
 ):
     """Create Cloud Optimized Geotiff."""
+    if latitude_adjustment is not None and not web_optimized:
+        warnings.warn(
+            "'latitude_adjustment' option has to be used with --web-optimized options. "
+            "Will be ignored."
+        )
+
     output_profile = cog_profiles.get(cogeo_profile)
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
@@ -150,6 +178,9 @@ def create(
         add_mask,
         overview_level,
         overview_resampling,
+        web_optimized,
+        latitude_adjustment,
+        resampling,
         in_memory,
         config,
         quiet,
