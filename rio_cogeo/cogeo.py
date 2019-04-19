@@ -95,7 +95,7 @@ def cog_translate(
     resampling : str, optional (default: "nearest")
         Resampling algorithm.
     in_memory: bool, optional
-        Force processing raster in memory (default: process in memory if smal)
+        Force processing raster in memory (default: process in memory if small)
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
