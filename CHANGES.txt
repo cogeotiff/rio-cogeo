@@ -1,5 +1,5 @@
-Next (TBD)
-----------
+1.0.0 (2019-04-19)
+------------------
 
 - add `--web-optimized` option to create a web optimized COG (#10)
 - add `--latitude-adjustment/--global-maxzoom` option to adjust MAX_ZOOM for global datasets
