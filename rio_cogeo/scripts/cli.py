@@ -12,6 +12,8 @@ from rasterio.enums import Resampling as ResamplingEnums
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
+IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
+
 
 class BdxParamType(click.ParamType):
     """Band inddex type."""
@@ -120,6 +122,12 @@ def cogeo():
     ),
     default="nearest",
 )
+@click.option(
+    "--in-memory/--no-in-memory",
+    default=None,
+    help="Force processing raster in memory / not in memory (default: process in memory "
+    "if smaller than {:.0f} million pixels)".format(IN_MEMORY_THRESHOLD // 1e6),
+)
 @click.option("--threads", type=int, default=8)
 @options.creation_options
 @click.option(
@@ -138,6 +146,7 @@ def create(
     web_optimized,
     latitude_adjustment,
     resampling,
+    in_memory,
     threads,
     creation_options,
     quiet,
@@ -172,6 +181,7 @@ def create(
         web_optimized,
         latitude_adjustment,
         resampling,
+        in_memory,
         config,
         quiet,
     )

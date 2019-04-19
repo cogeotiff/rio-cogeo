@@ -3,6 +3,8 @@
 import os
 import sys
 import warnings
+import tempfile
+from contextlib import contextmanager
 
 import click
 
@@ -27,6 +29,26 @@ from rio_cogeo.utils import (
     _meters_per_pixel,
 )
 
+try:
+    from contextlib import ExitStack
+except ImportError:
+    from contextlib2 import ExitStack
+
+IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
+
+
+@contextmanager
+def TemporaryRasterFile(dst_path, suffix=".tif"):
+    """Create temporary file."""
+    fileobj = tempfile.NamedTemporaryFile(
+        dir=os.path.dirname(dst_path), suffix=suffix, delete=False
+    )
+    fileobj.close()
+    try:
+        yield fileobj
+    finally:
+        os.remove(fileobj.name)
+
 
 def cog_translate(
     src_path,
@@ -40,6 +62,7 @@ def cog_translate(
     web_optimized=False,
     latitude_adjustment=True,
     resampling="nearest",
+    in_memory=None,
     config=None,
     quiet=False,
 ):
@@ -71,6 +94,8 @@ def cog_translate(
         Use mercator meters for zoom calculation or ensure max zoom equality.
     resampling : str, optional (default: "nearest")
         Resampling algorithm.
+    in_memory: bool, optional
+        Force processing raster in memory (default: process in memory if small)
     config : dict
         Rasterio Env options.
     quiet: bool, optional (default: False)
@@ -154,62 +179,71 @@ def cog_translate(
                 meta.pop("compress", None)
                 meta.pop("photometric", None)
 
-                with MemoryFile() as memfile:
-                    with memfile.open(**meta) as mem:
-                        wind = list(mem.block_windows(1))
+                if in_memory is None:
+                    in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
 
-                        if not quiet:
-                            click.echo("Reading input: {}".format(src_path), err=True)
-                        fout = os.devnull if quiet else sys.stderr
-                        with click.progressbar(
-                            wind, length=len(wind), file=fout, show_percent=True
-                        ) as windows:
-                            for ij, w in windows:
-                                matrix = vrt_dst.read(window=w, indexes=indexes)
-                                mem.write(matrix, window=w)
-
-                                if add_mask or mask:
-                                    mask_value = vrt_dst.dataset_mask(window=w)
-                                    mem.write_mask(mask_value, window=w)
-
-                        if not quiet:
-                            click.echo("Adding overviews...", err=True)
-
-                        if overview_level is None:
-                            overview_level = get_maximum_overview_level(
-                                vrt_dst,
-                                min(
-                                    int(dst_kwargs["blockxsize"]),
-                                    int(dst_kwargs["blockysize"]),
-                                ),
-                            )
-
-                        overviews = [2 ** j for j in range(1, overview_level + 1)]
-                        mem.build_overviews(
-                            overviews, ResamplingEnums[overview_resampling]
+                with ExitStack() as ctx:
+                    if in_memory:
+                        tmpfile = ctx.enter_context(MemoryFile())
+                        tmp_dst = ctx.enter_context(tmpfile.open(**meta))
+                    else:
+                        tmpfile = ctx.enter_context(TemporaryRasterFile(dst_path))
+                        tmp_dst = ctx.enter_context(
+                            rasterio.open(tmpfile.name, "w", **meta)
                         )
 
-                        if not quiet:
-                            click.echo("Updating dataset tags...", err=True)
+                    wind = list(tmp_dst.block_windows(1))
 
-                        for i, b in enumerate(indexes):
-                            mem.set_band_description(i + 1, src_dst.descriptions[b - 1])
+                    if not quiet:
+                        click.echo("Reading input: {}".format(src_path), err=True)
+                    fout = os.devnull if quiet else sys.stderr
+                    with click.progressbar(
+                        wind, length=len(wind), file=fout, show_percent=True
+                    ) as windows:
+                        for ij, w in windows:
+                            matrix = vrt_dst.read(window=w, indexes=indexes)
+                            tmp_dst.write(matrix, window=w)
 
-                        tags = src_dst.tags()
-                        tags.update(
-                            dict(
-                                OVR_RESAMPLING_ALG=ResamplingEnums[
-                                    overview_resampling
-                                ].name.upper()
-                            )
+                            if add_mask or mask:
+                                mask_value = vrt_dst.dataset_mask(window=w)
+                                tmp_dst.write_mask(mask_value, window=w)
+
+                    if not quiet:
+                        click.echo("Adding overviews...", err=True)
+
+                    if overview_level is None:
+                        overview_level = get_maximum_overview_level(
+                            vrt_dst,
+                            min(
+                                int(dst_kwargs["blockxsize"]),
+                                int(dst_kwargs["blockysize"]),
+                            ),
                         )
-                        mem.update_tags(**tags)
 
-                        if not quiet:
-                            click.echo(
-                                "Writing output to: {}".format(dst_path), err=True
-                            )
-                        copy(mem, dst_path, copy_src_overviews=True, **dst_kwargs)
+                    overviews = [2 ** j for j in range(1, overview_level + 1)]
+                    tmp_dst.build_overviews(
+                        overviews, ResamplingEnums[overview_resampling]
+                    )
+
+                    if not quiet:
+                        click.echo("Updating dataset tags...", err=True)
+
+                    for i, b in enumerate(indexes):
+                        tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
+
+                    tags = src_dst.tags()
+                    tags.update(
+                        dict(
+                            OVR_RESAMPLING_ALG=ResamplingEnums[
+                                overview_resampling
+                            ].name.upper()
+                        )
+                    )
+                    tmp_dst.update_tags(**tags)
+
+                    if not quiet:
+                        click.echo("Writing output to: {}".format(dst_path), err=True)
+                    copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
 def cog_validate(src_path):
