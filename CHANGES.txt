@@ -5,7 +5,7 @@ Next (TBD)
 - add `--latitude-adjustment/--global-maxzoom` option to adjust MAX_ZOOM for global datasets
 - Web-optimized tests needs python3.6 (cogdumper)
 - add `--resampling` option to select the resampling algorithm when using `--web-optimized`
-
+- add `--in-memory/--no-in-memory` options to use temporyNamedd file instead of in-memory temp file.
 
 1.0b3 (2019-03-30)
 ------------------

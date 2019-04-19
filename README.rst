@@ -84,6 +84,7 @@ Usage
                                         Use dataset native mercator resolution for MAX_ZOOM calculation (linked to dataset center latitude, default)
                                         or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
         -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
+        --in-memory / --no-in-memory    Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
         --threads INTEGER
         --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
         -q, --quiet                     Remove progressbar and other non-error output.
