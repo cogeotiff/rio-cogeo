@@ -3,16 +3,7 @@
 import sys
 from setuptools import setup, find_packages
 
-with open("rio_cogeo/__init__.py") as f:
-    for line in f:
-        if line.find("__version__") >= 0:
-            version = line.split("=")[1].strip()
-            version = version.strip('"')
-            version = version.strip("'")
-            continue
-
-
-with open("README.rst") as f:
+with open("README.md") as f:
     readme = f.read()
 
 # Runtime requirements.
@@ -38,9 +29,10 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version=version,
+    version="1.0.0",
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Intended Audience :: Information Technology",
         "Intended Audience :: Science/Research",

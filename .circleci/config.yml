@@ -56,9 +56,12 @@ jobs:
       steps:
         - checkout
         - run:
+            name: install dependencies
+            command: pip install -e .
+        - run:
             name: verify git tag vs. version
             command: |
-              VERSION=$(python -c 'import rio_cogeo; print(rio_cogeo.__version__)')
+              VERSION=$(python -c 'import rio_cogeo; print(rio_cogeo.version)')
               if [ "$VERSION" = "$CIRCLE_TAG" ]; then exit 0; else exit 3; fi
         - run:
             name: install dependencies

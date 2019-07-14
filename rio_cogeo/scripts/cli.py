@@ -9,6 +9,7 @@ import numpy
 from rasterio.rio import options
 from rasterio.enums import Resampling as ResamplingEnums
 
+from rio_cogeo import version as cogeo_version
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
@@ -53,6 +54,7 @@ class NodataParamType(click.ParamType):
 
 
 @click.group(short_help="Create and Validate COGEO")
+@click.version_option(version=cogeo_version, message="%(version)s")
 def cogeo():
     """Rasterio cogeo subcommands."""
     pass
