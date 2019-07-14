@@ -284,6 +284,7 @@ def test_cog_translate_valid_blocksize():
             cog_translate(
                 raster_path_toosmall, "cogeo.tif", default_profile, quiet=True
             )
+            assert cog_validate("cogeo.tif")
             with rasterio.open("cogeo.tif") as src:
                 assert src.height == 51
                 assert src.width == 51
