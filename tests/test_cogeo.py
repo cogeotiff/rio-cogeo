@@ -8,9 +8,9 @@ import pytest
 from click.testing import CliRunner
 
 import rasterio
-from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.utils import has_mask_band, has_alpha_band
-from rio_cogeo.errors import LossyCompression
+from rio_cogeo.errors import LossyCompression, IncompatibleBlockRasterSize
 from rio_cogeo.profiles import cog_profiles
 
 from .conftest import requires_webp
@@ -32,6 +32,12 @@ raster_path_tags = os.path.join(os.path.dirname(__file__), "fixtures", "image_ta
 raster_path_mask = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_rgb_mask.tif"
 )
+raster_path_small = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_171px.tif"
+)
+raster_path_toosmall = os.path.join(
+    os.path.dirname(__file__), "fixtures", "image_51px.tif"
+)
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -41,6 +47,7 @@ deflate_profile = cog_profiles.get("deflate")
 deflate_profile.update({"blockxsize": 64, "blockysize": 64})
 raw_profile = cog_profiles.get("raw")
 raw_profile.update({"blockxsize": 64, "blockysize": 64})
+default_profile = cog_profiles.get("raw")
 
 
 @pytest.fixture(autouse=True)
@@ -256,3 +263,31 @@ def test_cog_translate_tags():
             assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
             assert src.tags()["DatasetName"] == "my useful dataset"
             assert src.descriptions[0] == "second band"
+
+
+def test_cog_translate_valid_blocksize():
+    """Should work as expected (create cogeo file)."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with pytest.warns(IncompatibleBlockRasterSize):
+            cog_translate(raster_path_small, "cogeo.tif", default_profile, quiet=True)
+            assert cog_validate("cogeo.tif")
+            with rasterio.open("cogeo.tif") as src:
+                assert src.height == 171
+                assert src.width == 171
+                assert src.is_tiled
+                assert src.profile["blockxsize"] == 128
+                assert src.profile["blockysize"] == 128
+                assert src.overviews(1) == [2]
+
+        with pytest.warns(IncompatibleBlockRasterSize):
+            cog_translate(
+                raster_path_toosmall, "cogeo.tif", default_profile, quiet=True
+            )
+            with rasterio.open("cogeo.tif") as src:
+                assert src.height == 51
+                assert src.width == 51
+                assert not src.is_tiled
+                assert not src.profile.get("blockxsize")
+                assert not src.profile.get("blockysize")
+                assert not src.overviews(1)
