@@ -1,3 +1,8 @@
+1.1.0 (2019-07-16)
+------------------
+
+- check internal blocksize and adapt if raster is too small (#80)
+
 1.0.0 (2019-04-19)
 ------------------
 
