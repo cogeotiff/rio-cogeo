@@ -2,6 +2,7 @@
 
 import os
 import sys
+import math
 import warnings
 import tempfile
 from contextlib import contextmanager
@@ -20,7 +21,7 @@ from rasterio.transform import Affine
 import mercantile
 from supermercado.burntiles import tile_extrema
 
-from rio_cogeo.errors import LossyCompression
+from rio_cogeo.errors import LossyCompression, IncompatibleBlockRasterSize
 from rio_cogeo.utils import (
     get_maximum_overview_level,
     has_alpha_band,
@@ -122,6 +123,30 @@ def cog_translate(
                     LossyCompression,
                 )
 
+            tilesize = min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
+
+            if src_dst.width < tilesize or src_dst.height < tilesize:
+                tilesize = 2 ** int(math.log(min(src_dst.width, src_dst.height), 2))
+                if tilesize < 64:
+                    warnings.warn(
+                        "Raster has dimension < 64px. Output COG cannot be tiled"
+                        " and overviews cannot be added.",
+                        IncompatibleBlockRasterSize,
+                    )
+                    dst_kwargs.pop("blockxsize", None)
+                    dst_kwargs.pop("blockysize", None)
+                    dst_kwargs.pop("tiled")
+                    overview_level = 0
+
+                else:
+                    warnings.warn(
+                        "Block Size are bigger than raster sizes. "
+                        "Setting blocksize to {}".format(tilesize),
+                        IncompatibleBlockRasterSize,
+                    )
+                    dst_kwargs["blockxsize"] = tilesize
+                    dst_kwargs["blockysize"] = tilesize
+
             vrt_params = dict(add_alpha=True)
 
             if nodata is not None:
@@ -141,9 +166,6 @@ def cog_translate(
                 )
                 center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
 
-                tilesize = min(
-                    int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"])
-                )
                 lat = 0 if latitude_adjustment else center[1]
                 max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
 
@@ -208,17 +230,11 @@ def cog_translate(
                                 mask_value = vrt_dst.dataset_mask(window=w)
                                 tmp_dst.write_mask(mask_value, window=w)
 
-                    if not quiet:
-                        click.echo("Adding overviews...", err=True)
-
                     if overview_level is None:
-                        overview_level = get_maximum_overview_level(
-                            vrt_dst,
-                            min(
-                                int(dst_kwargs["blockxsize"]),
-                                int(dst_kwargs["blockysize"]),
-                            ),
-                        )
+                        overview_level = get_maximum_overview_level(vrt_dst, tilesize)
+
+                    if not quiet and overview_level:
+                        click.echo("Adding overviews...", err=True)
 
                     overviews = [2 ** j for j in range(1, overview_level + 1)]
                     tmp_dst.build_overviews(
