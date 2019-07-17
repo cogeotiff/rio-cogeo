@@ -57,7 +57,7 @@ jobs:
         - checkout
         - run:
             name: install dependencies
-            command: pip install -e .
+            command: pip install -e . --user
         - run:
             name: verify git tag vs. version
             command: |
