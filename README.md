@@ -224,7 +224,7 @@ create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
 
 More info in https://github.com/cogeotiff/rio-cogeo/issues/60
 
-⚠️ **GDAL>=3 is not yet supported by rasterio**
+**GDAL>=3 is not yet supported by rasterio**
 
 ## Nodata, Alpha and Mask
 
