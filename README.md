@@ -17,6 +17,7 @@ enforce several features:
 - **Internal overviews** (User can remove overview with option `--overview-level 0`)
 - **Internal tiles** (default profiles have 512x512 internal tiles)
 
+**Important**: Starting from GDAL 3.1 a new COG generator driver will be added ([doc](https://gdal.org/drivers/raster/cog.html), [discussion](https://lists.osgeo.org/pipermail/gdal-dev/2019-May/050169.html)) and will make `rio-cogeo` kinda obsolete.
 
 ## Install
 
@@ -222,9 +223,8 @@ It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
 create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
 
 
-More info in https://github.com/cogeotiff/rio-cogeo/issues/60
+More info in https://github.com/cogeotiff/rio-cogeo/issues/55
 
-⚠️ **GDAL>=3 is not yet supported by rasterio**
 
 ## Nodata, Alpha and Mask
 
