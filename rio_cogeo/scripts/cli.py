@@ -84,6 +84,7 @@ def cogeo():
     help="Force output dataset creation with an internal mask (convert alpha "
     "band or nodata to mask).",
 )
+@options.dtype_opt
 @click.option(
     "--overview-level",
     type=int,
@@ -141,6 +142,7 @@ def create(
     bidx,
     cogeo_profile,
     nodata,
+    dtype,
     add_mask,
     overview_level,
     overview_resampling,
@@ -175,17 +177,18 @@ def create(
         input,
         output,
         output_profile,
-        bidx,
-        nodata,
-        add_mask,
-        overview_level,
-        overview_resampling,
-        web_optimized,
-        latitude_adjustment,
-        resampling,
-        in_memory,
-        config,
-        quiet,
+        indexes=bidx,
+        nodata=nodata,
+        dtype=dtype,
+        add_mask=add_mask,
+        overview_level=overview_level,
+        overview_resampling=overview_resampling,
+        web_optimized=web_optimized,
+        latitude_adjustment=latitude_adjustment,
+        resampling=resampling,
+        in_memory=in_memory,
+        config=config,
+        quiet=quiet,
     )
 
 

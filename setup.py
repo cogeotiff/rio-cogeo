@@ -9,7 +9,7 @@ with open("README.md") as f:
 # Runtime requirements.
 inst_reqs = [
     "click",
-    "rasterio[s3]>=1.0.1",
+    "rasterio[s3]>=1.0.28",
     "numpy~=1.15",
     "supermercado",
     "mercantile",
@@ -29,7 +29,7 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="1.1.0",
+    version="1.1.1",
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",

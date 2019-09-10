@@ -65,6 +65,8 @@ $ rio cogeo create --help
     -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
+    -t, --dtype [ubyte|uint8|uint16|int16|uint32|int32|float32|float64]
+                                    Output data type.
     --overview-level INTEGER        Overview level (if not provided, appropriate overview level will be selected
                                     until the smallest overview is smaller than the value of the internal blocksize)
     --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Overview creation resampling algorithm.

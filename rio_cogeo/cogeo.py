@@ -57,6 +57,7 @@ def cog_translate(
     dst_kwargs,
     indexes=None,
     nodata=None,
+    dtype=None,
     add_mask=None,
     overview_level=None,
     overview_resampling="nearest",
@@ -83,6 +84,8 @@ def cog_translate(
         Raster band indexes to copy.
     nodata, int, optional
         Overwrite nodata masking values for input dataset.
+    dtype: str, optional
+        Overwrite output data type. Default will be the input data type.
     add_mask, bool, optional
         Force output dataset creation with a mask.
     overview_level : int, optional (default: 6)
@@ -110,6 +113,7 @@ def cog_translate(
             meta = src_dst.meta
             indexes = indexes if indexes else src_dst.indexes
             nodata = nodata if nodata is not None else src_dst.nodata
+            dtype = dtype if dtype else src_dst.dtypes[0]
             alpha = has_alpha_band(src_dst)
             mask = has_mask_band(src_dst)
 
@@ -147,7 +151,7 @@ def cog_translate(
                     dst_kwargs["blockxsize"] = tilesize
                     dst_kwargs["blockysize"] = tilesize
 
-            vrt_params = dict(add_alpha=True)
+            vrt_params = dict(add_alpha=True, dtype=dtype)
 
             if nodata is not None:
                 vrt_params.update(

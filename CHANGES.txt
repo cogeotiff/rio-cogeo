@@ -1,3 +1,13 @@
+1.1.1 (2019-09-10)
+------------------
+
+CLI Changes:
+- add `-t, --dtype` datatype option.
+
+API Changes:
+- add datatype option (fixes #85)
+- update for rasterio>=1.0.28
+
 1.1.0 (2019-07-16)
 ------------------
 
