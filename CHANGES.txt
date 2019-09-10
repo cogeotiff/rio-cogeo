@@ -5,8 +5,9 @@ CLI Changes:
 - add `-t, --dtype` datatype option.
 
 API Changes:
-- add datatype option (fixes #85)
+- add datatype option (#85)
 - update for rasterio>=1.0.28
+- allow rasterio.io.DatasetReader input (#89)
 
 1.1.0 (2019-07-16)
 ------------------

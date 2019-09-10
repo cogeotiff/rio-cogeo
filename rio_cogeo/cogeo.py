@@ -51,7 +51,7 @@ def TemporaryRasterFile(dst_path, suffix=".tif"):
 
 
 def cog_translate(
-    src_path,
+    source,
     dst_path,
     dst_kwargs,
     indexes=None,
@@ -72,8 +72,9 @@ def cog_translate(
 
     Parameters
     ----------
-    src_path : str or PathLike object
-        A dataset path or URL. Will be opened in "r" mode.
+    source : str, PathLike object or rasterio.io.DatasetReader
+        A dataset path, URL or rasterio.io.DatasetReader object.
+        Will be opened in "r" mode.
     dst_path : str or Path-like object
         An output dataset path or or PathLike object.
         Will be opened in "w" mode.
@@ -109,10 +110,10 @@ def cog_translate(
 
     with rasterio.Env(**config):
         with ExitStack() as ctx:
-            if isinstance(src_path, DatasetReader):
-                src_dst = ctx.enter_context(src_path)
+            if isinstance(source, DatasetReader):
+                src_dst = ctx.enter_context(source)
             else:
-                src_dst = ctx.enter_context(rasterio.open(src_path))
+                src_dst = ctx.enter_context(rasterio.open(source))
 
             meta = src_dst.meta
             indexes = indexes if indexes else src_dst.indexes
@@ -224,7 +225,7 @@ def cog_translate(
                 wind = list(tmp_dst.block_windows(1))
 
                 if not quiet:
-                    click.echo("Reading input: {}".format(src_path), err=True)
+                    click.echo("Reading input: {}".format(source), err=True)
                 fout = os.devnull if quiet else sys.stderr
                 with click.progressbar(
                     wind, length=len(wind), file=fout, show_percent=True
