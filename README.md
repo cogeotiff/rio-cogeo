@@ -171,7 +171,7 @@ Output dataset features:
 
 **Important**
 
-Because the mercator project does not respect the distance, when working with
+Because the mercator projection does not respect the distance, when working with
 multiple images covering different latitudes, you may want to use the *--global-maxzoom* option
 to create output dataset having the same MAX_ZOOM (raw data resolution).
 
