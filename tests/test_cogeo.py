@@ -300,6 +300,7 @@ def test_cog_translate_validDataset():
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as src_dst:
             cog_translate(src_dst, "cogeo.tif", jpeg_profile, quiet=True)
+            assert not src_dst.closed
 
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
