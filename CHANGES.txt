@@ -1,11 +1,13 @@
 1.1.1 (2019-09-10)
 ------------------
 
+- add safeguard to keep datatype from input to output files (#85)
+
 CLI Changes:
 - add `-t, --dtype` datatype option.
 
 API Changes:
-- add datatype option (#85)
+- add datatype option
 - update for rasterio>=1.0.28
 - allow rasterio.io.DatasetReader input (#89)
 
