@@ -3,7 +3,7 @@
 
 - Fix incorrect context behavior closing input Dataset (#94)
 
-1.1.1 (2019-09-10)
+1.1.1 (2019-09-10) - Not on PyPi
 ------------------
 
 - add safeguard to keep datatype from input to output files (#85)
