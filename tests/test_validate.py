@@ -62,6 +62,8 @@ def test_cog_validate_validCreatioValid(monkeypatch):
         )
         assert cog_validate("cogeo.tif")
 
+        # Change in rasterio 1.0.26
+        # https://github.com/mapbox/rasterio/blob/master/CHANGES.txt#L43
         config = dict(GDAL_TIFF_OVR_BLOCKSIZE="1024")
         cog_translate(
             raster_big,
@@ -71,4 +73,4 @@ def test_cog_validate_validCreatioValid(monkeypatch):
             config=config,
             quiet=True,
         )
-        assert not cog_validate("cogeo.tif")
+        assert cog_validate("cogeo.tif")
