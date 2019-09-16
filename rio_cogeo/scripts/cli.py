@@ -17,7 +17,7 @@ IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 class BdxParamType(click.ParamType):
-    """Band inddex type."""
+    """Band index type."""
 
     name = "bidx"
 
@@ -36,7 +36,7 @@ class BdxParamType(click.ParamType):
 
 
 class NodataParamType(click.ParamType):
-    """Nodata inddex type."""
+    """Nodata type."""
 
     name = "nodata"
 
@@ -51,6 +51,22 @@ class NodataParamType(click.ParamType):
                 return float(value)
         except (TypeError, ValueError):
             raise click.ClickException("{} is not a valid nodata value.".format(value))
+
+
+class ThreadsParamType(click.ParamType):
+    """num_threads index type."""
+
+    name = "threads"
+
+    def convert(self, value, param, ctx):
+        """Validate and parse thread number."""
+        try:
+            if value.lower() == "all_cpus":
+                return "ALL_CPUS"
+            else:
+                return int(value)
+        except (TypeError, ValueError):
+            raise click.ClickException("{} is not a valid thread value.".format(value))
 
 
 @click.group(short_help="Create and Validate COGEO")
@@ -131,7 +147,12 @@ def cogeo():
     help="Force processing raster in memory / not in memory (default: process in memory "
     "if smaller than {:.0f} million pixels)".format(IN_MEMORY_THRESHOLD // 1e6),
 )
-@click.option("--threads", type=int, default=8)
+@click.option(
+    "--threads",
+    type=ThreadsParamType(),
+    default="ALL_CPUS",
+    help="Number of worker threads for multi-threaded compression (default: ALL_CPUS)",
+)
 @options.creation_options
 @click.option(
     "--quiet", "-q", help="Remove progressbar and other non-error output.", is_flag=True
@@ -168,7 +189,7 @@ def create(
         output_profile.update(creation_options)
 
     config = dict(
-        NUM_THREADS=threads,
+        GDAL_NUM_THREADS=threads,
         GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
         GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
     )
