@@ -62,7 +62,8 @@ $ rio cogeo create --help
 
   Options:
     -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|raw] CloudOptimized GeoTIFF profile (default: deflate).
+    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|lzma|lerc|lerc_deflate|lerc_zstd|raw] 
+                                    CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
     -t, --dtype [ubyte|uint8|uint16|int16|uint32|int32|float32|float64]
@@ -77,7 +78,7 @@ $ rio cogeo create --help
                                     or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
     -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --in-memory / --no-in-memory    Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
-    --threads INTEGER
+    --threads THREADS               Number of worker threads for multi-threaded compression (default: ALL_CPUS)
     --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
     -q, --quiet                     Remove progressbar and other non-error output.
     --help                          Show this message and exit.
@@ -110,6 +111,8 @@ $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-pr
 
 ## Default COGEO profiles
 
+Default profiles are tiled with 512x512 blocksizes.
+
 **JPEG**
 
 - JPEG compression
@@ -122,12 +125,14 @@ $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-pr
 - WEBP compression
 - PIXEL interleave
 - limited to uint8 datatype and 3 or 4 bands data
+- Non-Standard, might not be supported by software not build against GDAL+internal libtiff + libwebp
 - Available for GDAL>=2.4.0
 
 **ZSTD**
 
 - ZSTD compression
 - PIXEL interleave
+- Non-Standard, might not be supported by software not build against GDAL + internal libtiff + libzstd
 - Available for GDAL>=2.3.0
 
 *Note* in Nov 2018, there was a change in libtiff's ZSTD tags which create incompatibility for old ZSTD compressed GeoTIFF [(link)](https://lists.osgeo.org/pipermail/gdal-dev/2018-November/049289.html)
@@ -147,20 +152,49 @@ $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-pr
 - PACKBITS compression
 - PIXEL interleave
 
+**LZMA**
+
+- LZMA compression
+- PIXEL interleave
+
+**LERC**
+
+- LERC compression
+- PIXEL interleave
+- Default MAX_Z_ERROR=0 (lossless)
+- Non-Standard, might not be supported by software not build against GDAL + internal libtiff
+- Available for GDAL>=2.4.0
+
+**LERC_DEFLATE**
+
+- LERC_DEFLATE compression
+- PIXEL interleave
+- Default MAX_Z_ERROR=0 (lossless)
+- Non-Standard, might not be supported by software not build against GDAL + internal libtiff + libzstd
+- Available for GDAL>=2.4.0
+
+**LERC_ZSTD**
+
+- LERC_ZSTD compression
+- PIXEL interleave
+- Default MAX_Z_ERROR=0 (lossless)
+- Non-Standard, might not be supported by software not build against GDAL + internal libtiff + libzstd
+- Available for GDAL>=2.4.0
+
 **RAW**
 
 - NO compression
 - PIXEL interleave
 
-Default profiles are tiled with 512x512 blocksizes.
-
-Profiles can be extended by providing '--co' option in command line
+**Profiles can be extended by providing '--co' option in command line**
 
 
 ```bash
 # Create a COGEO without compression and with 1024x1024 block size and 256 overview blocksize
 $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLOCKYSIZE=1024 --cog-profile raw --overview-blocksize 256
 ```
+
+See https://gdal.org/drivers/raster/gtiff.html#creation-options for full details of creation options.
 
 ## Web-Optimized COG
 
