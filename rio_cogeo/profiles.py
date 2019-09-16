@@ -1,5 +1,7 @@
 """rio_cogeo.profiles: CloudOptimized profiles."""
 
+import warnings
+
 from rasterio.profiles import Profile
 
 
@@ -85,6 +87,58 @@ class PACKBITSProfile(Profile):
     }
 
 
+class LZMAProfile(Profile):
+    """Tiled, pixel-interleaved, LZMA-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LZMA",
+    }
+
+
+class LERCProfile(Profile):
+    """Tiled, pixel-interleaved, LERC-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC",
+    }
+
+
+class LERCDEFLATEProfile(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+    }
+
+
+class LERCZSTDProfile(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+    }
+
+
 class RAWProfile(Profile):
     """Tiled, pixel-interleaved, no-compressed GTiff."""
 
@@ -110,6 +164,10 @@ class COGProfiles(dict):
                 "lzw": LZWProfile(),
                 "deflate": DEFLATEProfile(),
                 "packbits": PACKBITSProfile(),
+                "lzma": LZMAProfile(),
+                "lerc": LERCProfile(),
+                "lerc_deflate": LERCDEFLATEProfile(),
+                "lerc_zstd": LERCZSTDProfile(),
                 "raw": RAWProfile(),
             }
         )
@@ -118,6 +176,12 @@ class COGProfiles(dict):
         """Like normal item access but error."""
         if key not in (self.keys()):
             raise KeyError("{} is not a valid COG profile name".format(key))
+
+        if key in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]:
+            warnings.warn(
+                "Non-standard compression schema: {}. The output COG might not be fully"
+                " supported by software not build against latest libtiff.".format(key)
+            )
 
         return self[key].copy()
 
