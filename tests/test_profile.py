@@ -55,6 +55,46 @@ def test_profiles_packbits():
     assert profile["interleave"] == "pixel"
 
 
+def test_profiles_lzma():
+    """Should work as expected (return lzma profile)."""
+    profile = cog_profiles.get("lzma")
+    assert profile["tiled"]
+    assert profile["compress"] == "LZMA"
+    assert profile["blockxsize"] == 512
+    assert profile["blockysize"] == 512
+    assert profile["interleave"] == "pixel"
+
+
+def test_profiles_lerc():
+    """Should work as expected (return lerc profile)."""
+    profile = cog_profiles.get("lerc")
+    assert profile["tiled"]
+    assert profile["compress"] == "LERC"
+    assert profile["blockxsize"] == 512
+    assert profile["blockysize"] == 512
+    assert profile["interleave"] == "pixel"
+
+
+def test_profiles_lerc_deflate():
+    """Should work as expected (return lerc_deflate profile)."""
+    profile = cog_profiles.get("lerc_deflate")
+    assert profile["tiled"]
+    assert profile["compress"] == "LERC_DEFLATE"
+    assert profile["blockxsize"] == 512
+    assert profile["blockysize"] == 512
+    assert profile["interleave"] == "pixel"
+
+
+def test_profiles_lerc_zstd():
+    """Should work as expected (return lerc_deflate profile)."""
+    profile = cog_profiles.get("lerc_zstd")
+    assert profile["tiled"]
+    assert profile["compress"] == "LERC_ZSTD"
+    assert profile["blockxsize"] == 512
+    assert profile["blockysize"] == 512
+    assert profile["interleave"] == "pixel"
+
+
 def test_profiles_raw():
     """Should work as expected (return packbits profile)."""
     profile = cog_profiles.get("raw")
@@ -63,6 +103,12 @@ def test_profiles_raw():
     assert profile["blockxsize"] == 512
     assert profile["blockysize"] == 512
     assert profile["interleave"] == "pixel"
+
+
+def test_profiles_nonstandard():
+    """Should work as expected (warns on non-standard compression)."""
+    with pytest.warns(UserWarning):
+        cog_profiles.get("zstd")
 
 
 def test_profiles_copy():
