@@ -3,7 +3,6 @@
 import os
 
 import pytest
-from click.testing import CliRunner
 
 import rasterio
 from rio_cogeo.scripts.cli import cogeo
@@ -33,9 +32,8 @@ def testing_env_var(monkeypatch):
     monkeypatch.delenv("GDAL_TIFF_OVR_BLOCKSIZE", raising=False)
 
 
-def test_cogeo_valid():
+def test_cogeo_valid(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--add-mask", "--quiet"]
@@ -54,12 +52,11 @@ def test_cogeo_valid():
             assert has_mask_band(src)
 
 
-def test_cogeo_valid_external_mask(monkeypatch):
+def test_cogeo_valid_external_mask(monkeypatch, runner):
     """Should work as expected."""
     monkeypatch.setenv("GDAL_TIFF_INTERNAL_MASK", "FALSE")
     monkeypatch.setenv("GDAL_DISABLE_READDIR_ON_OPEN", "TRUE")
 
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--add-mask"]
@@ -71,9 +68,8 @@ def test_cogeo_valid_external_mask(monkeypatch):
             assert "output.tif.msk" in src.files
 
 
-def test_cogeo_validbidx():
+def test_cogeo_validbidx(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -95,9 +91,8 @@ def test_cogeo_validbidx():
             assert src.count == 1
 
 
-def test_cogeo_invalidbidx():
+def test_cogeo_invalidbidx(runner):
     """Should exit with invalid band indexes."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "-b", "0"]
@@ -106,9 +101,8 @@ def test_cogeo_invalidbidx():
         assert result.exit_code == 1
 
 
-def test_cogeo_invalidbidxString():
+def test_cogeo_invalidbidxString(runner):
     """Should exit with invalid band indexes."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "-b", "a"]
@@ -117,9 +111,8 @@ def test_cogeo_invalidbidxString():
         assert result.exit_code == 1
 
 
-def test_cogeo_validnodata():
+def test_cogeo_validnodata(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with pytest.warns(LossyCompression):
             result = runner.invoke(
@@ -161,9 +154,8 @@ def test_cogeo_validnodata():
             assert not has_mask_band(src)
 
 
-def test_cogeo_validGdalOptions():
+def test_cogeo_validGdalOptions(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -183,9 +175,8 @@ def test_cogeo_validGdalOptions():
             assert src.compression.value == "DEFLATE"
 
 
-def test_cogeo_validOvrOption():
+def test_cogeo_validOvrOption(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -206,10 +197,8 @@ def test_cogeo_validOvrOption():
             assert src.overviews(1) == [2, 4]
 
 
-def test_cogeo_overviewTilesize(monkeypatch):
+def test_cogeo_overviewTilesize(monkeypatch, runner):
     """Should work as expected."""
-    runner = CliRunner()
-
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -275,9 +264,8 @@ def test_cogeo_overviewTilesize(monkeypatch):
             assert src.block_shapes[0] == (64, 64)
 
 
-def test_cogeo_web():
+def test_cogeo_web(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with pytest.warns(UserWarning):
             result = runner.invoke(
@@ -301,9 +289,8 @@ def test_cogeo_web():
         assert result.exit_code == 0
 
 
-def test_cogeo_validgdalBlockOption():
+def test_cogeo_validgdalBlockOption(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -324,9 +311,8 @@ def test_cogeo_validgdalBlockOption():
             assert src.overviews(1) == [2, 4]
 
 
-def test_cogeo_validNodataCustom():
+def test_cogeo_validNodataCustom(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
@@ -416,9 +402,8 @@ def test_cogeo_validNodataCustom():
         assert result.exit_code == 1
 
 
-def test_cogeo_validTempFile(monkeypatch):
+def test_cogeo_validTempFile(monkeypatch, runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--no-in-memory"]
@@ -433,9 +418,8 @@ def test_cogeo_validTempFile(monkeypatch):
         assert result.exit_code == 0
 
 
-def test_cogeo_validate():
+def test_cogeo_validate(runner):
     """Should work as expected."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--quiet"]
