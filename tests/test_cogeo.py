@@ -5,7 +5,6 @@ import os
 import numpy
 
 import pytest
-from click.testing import CliRunner
 
 import rasterio
 from rio_cogeo.cogeo import cog_translate, cog_validate
@@ -15,29 +14,17 @@ from rio_cogeo.profiles import cog_profiles
 
 from .conftest import requires_webp
 
-
-raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
-raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
-raster_path_nan = os.path.join(os.path.dirname(__file__), "fixtures", "image_nan.tif")
-raster_path_nodata = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_nodata.tif"
-)
-raster_path_float = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_float.tif"
-)
-raster_path_missingnodata = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_missing_nodata.tif"
-)
-raster_path_tags = os.path.join(os.path.dirname(__file__), "fixtures", "image_tags.tif")
-raster_path_mask = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_rgb_mask.tif"
-)
-raster_path_small = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_171px.tif"
-)
-raster_path_toosmall = os.path.join(
-    os.path.dirname(__file__), "fixtures", "image_51px.tif"
-)
+FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
+raster_path_rgba = os.path.join(FIXTURES_DIR, "image_rgba.tif")
+raster_path_rgb = os.path.join(FIXTURES_DIR, "image_rgb.tif")
+raster_path_nan = os.path.join(FIXTURES_DIR, "image_nan.tif")
+raster_path_nodata = os.path.join(FIXTURES_DIR, "image_nodata.tif")
+raster_path_float = os.path.join(FIXTURES_DIR, "image_float.tif")
+raster_path_missingnodata = os.path.join(FIXTURES_DIR, "image_missing_nodata.tif")
+raster_path_tags = os.path.join(FIXTURES_DIR, "image_tags.tif")
+raster_path_mask = os.path.join(FIXTURES_DIR, "image_rgb_mask.tif")
+raster_path_small = os.path.join(FIXTURES_DIR, "image_171px.tif")
+raster_path_toosmall = os.path.join(FIXTURES_DIR, "image_51px.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -58,9 +45,8 @@ def testing_env_var(monkeypatch):
     monkeypatch.setenv("GDAL_TIFF_OVR_BLOCKSIZE", "64")
 
 
-def test_cog_translate_valid():
+def test_cog_translate_valid(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_rgb, "cogeo.tif", jpeg_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
@@ -86,9 +72,8 @@ def test_cog_translate_valid():
             assert src.block_shapes[0] == (64, 64)
 
 
-def test_cog_translate_NodataLossyWarning():
+def test_cog_translate_NodataLossyWarning(runner):
     """Should work as expected (create cogeo file but warns no lossy compression)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with pytest.warns(LossyCompression):
             cog_translate(
@@ -100,9 +85,8 @@ def test_cog_translate_NodataLossyWarning():
                 assert not has_mask_band(src)
 
 
-def test_cog_translate_optionWarnings():
+def test_cog_translate_optionWarnings(runner):
     """Should work as expected but warns about invalid options."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with pytest.warns(UserWarning):
             cog_translate(
@@ -114,9 +98,8 @@ def test_cog_translate_optionWarnings():
                 assert not has_mask_band(src)
 
 
-def test_cog_translate_NodataMask():
+def test_cog_translate_NodataMask(runner):
     """Should work as expected (create cogeo and translate nodata to mask)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(
             raster_path_missingnodata,
@@ -132,9 +115,8 @@ def test_cog_translate_NodataMask():
             assert not src.dataset_mask().all()
 
 
-def test_cog_translate_validRaw():
+def test_cog_translate_validRaw(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_rgb, "cogeo.tif", raw_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
@@ -146,9 +128,8 @@ def test_cog_translate_validRaw():
 
 
 @requires_webp
-def test_cog_translate_validAlpha():
+def test_cog_translate_validAlpha(runner):
     """Should work as expected (create cogeo file with alpha band)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_rgba, "cogeo.tif", webp_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
@@ -160,9 +141,8 @@ def test_cog_translate_validAlpha():
             assert has_alpha_band(src)
 
 
-def test_cog_translate_valiNodataNan():
+def test_cog_translate_valiNodataNan(runner):
     """Should work as expected and create mask from NaN."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_nan, "cogeo_nan.tif", raw_profile, quiet=True)
         with rasterio.open("cogeo_nan.tif") as src:
@@ -183,9 +163,8 @@ def test_cog_translate_valiNodataNan():
             assert not src.dataset_mask().all()
 
 
-def test_cog_translate_validOverviews():
+def test_cog_translate_validOverviews(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(
             raster_path_rgb, "cogeo.tif", jpeg_profile, overview_level=2, quiet=True
@@ -194,9 +173,8 @@ def test_cog_translate_validOverviews():
             assert src.overviews(1) == [2, 4]
 
 
-def test_cog_translate_valiEnv():
+def test_cog_translate_valiEnv(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         config = dict(GDAL_TIFF_INTERNAL_MASK=False)
         cog_translate(
@@ -212,9 +190,8 @@ def test_cog_translate_valiEnv():
             assert "cogeo_env.tif.msk" in src.files
 
 
-def test_cog_translate_validCustom():
+def test_cog_translate_validCustom(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         config = dict(GDAL_TIFF_OVR_BLOCKSIZE=256)
         profile = jpeg_profile.copy()
@@ -235,18 +212,16 @@ def test_cog_translate_validCustom():
             assert src.overviews(1) == [2]
 
 
-def test_cog_translate_mask():
+def test_cog_translate_mask(runner):
     """Should work as expected (copy mask from input)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_mask, "cogeo.tif", jpeg_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
             assert has_mask_band(src)
 
 
-def test_cog_translate_tags():
+def test_cog_translate_tags(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_path_tags, "cogeo.tif", jpeg_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
@@ -265,9 +240,8 @@ def test_cog_translate_tags():
             assert src.descriptions[0] == "second band"
 
 
-def test_cog_translate_valid_blocksize():
+def test_cog_translate_valid_blocksize(runner):
     """Should work as expected (create cogeo file)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with pytest.warns(IncompatibleBlockRasterSize):
             cog_translate(raster_path_small, "cogeo.tif", default_profile, quiet=True)
@@ -294,9 +268,8 @@ def test_cog_translate_valid_blocksize():
                 assert not src.overviews(1)
 
 
-def test_cog_translate_validDataset():
+def test_cog_translate_validDataset(runner):
     """Should work as expected (create cogeo from an open dataset)."""
-    runner = CliRunner()
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as src_dst:
             cog_translate(src_dst, "cogeo.tif", jpeg_profile, quiet=True)
