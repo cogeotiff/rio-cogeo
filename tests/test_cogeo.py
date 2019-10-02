@@ -268,12 +268,39 @@ def test_cog_translate_valid_blocksize(runner):
                 assert not src.overviews(1)
 
 
-def test_cog_translate_validDataset(runner):
+def test_cog_translate_Dataset(runner):
     """Should work as expected (create cogeo from an open dataset)."""
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as src_dst:
             cog_translate(src_dst, "cogeo.tif", jpeg_profile, quiet=True)
             assert not src_dst.closed
+
+        with rasterio.open("cogeo.tif") as src:
+            assert src.height == 512
+            assert src.width == 512
+            assert src.meta["dtype"] == "uint8"
+            assert src.is_tiled
+            assert src.profile["blockxsize"] == 64
+            assert src.profile["blockysize"] == 64
+            assert src.compression.value == "JPEG"
+            assert src.photometric.value == "YCbCr"
+            assert src.interleaving.value == "PIXEL"
+            assert src.overviews(1) == [2, 4, 8]
+            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+            assert not has_mask_band(src)
+
+
+def test_cog_translate_memfile(runner):
+    """Should work as expected (create cogeo from an open memfile)."""
+    from rasterio import MemoryFile
+
+    with runner.isolated_filesystem():
+        with rasterio.open(raster_path_rgb) as dataset:
+            data = dataset.read()
+            with MemoryFile() as memfile:
+                with memfile.open(**dataset.profile) as mem:
+                    mem.write(data)
+                    cog_translate(mem, "cogeo.tif", jpeg_profile, quiet=True)
 
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
