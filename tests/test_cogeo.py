@@ -285,8 +285,7 @@ def test_cog_translate_dataset(runner):
 
 def test_cog_translate_memfile(runner):
     """Should work as expected (create cogeo from an open memfile)."""
-    from rasterio import MemoryFile
-
+    from rasterio.io import MemoryFile
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as dataset:
             data = dataset.read()
@@ -302,7 +301,6 @@ def test_cog_translate_memfile(runner):
 def test_cog_translate_warpedvrt(runner):
     """Should work as expected (create cogeo from an open memfile)."""
     from rasterio.vrt import WarpedVRT
-
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as dataset:
             with WarpedVRT(dataset) as vrt:
