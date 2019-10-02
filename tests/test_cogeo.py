@@ -45,23 +45,27 @@ def testing_env_var(monkeypatch):
     monkeypatch.setenv("GDAL_TIFF_OVR_BLOCKSIZE", "64")
 
 
+def _validate_translated_rgb_jpeg(src):
+    assert src.height == 512
+    assert src.width == 512
+    assert src.meta["dtype"] == "uint8"
+    assert src.is_tiled
+    assert src.profile["blockxsize"] == 64
+    assert src.profile["blockysize"] == 64
+    assert src.compression.value == "JPEG"
+    assert src.photometric.value == "YCbCr"
+    assert src.interleaving.value == "PIXEL"
+    assert src.overviews(1) == [2, 4, 8]
+    assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+    assert not has_mask_band(src)
+
+
 def test_cog_translate_valid(runner):
     """Should work as expected (create cogeo file)."""
     with runner.isolated_filesystem():
         cog_translate(raster_path_rgb, "cogeo.tif", jpeg_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
-            assert src.height == 512
-            assert src.width == 512
-            assert src.meta["dtype"] == "uint8"
-            assert src.is_tiled
-            assert src.profile["blockxsize"] == 64
-            assert src.profile["blockysize"] == 64
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
-            assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8]
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
-            assert not has_mask_band(src)
+            _validate_translated_rgb_jpeg(src)
 
         cog_translate(
             raster_path_rgb, "cogeo.tif", jpeg_profile, add_mask=True, quiet=True
@@ -268,7 +272,7 @@ def test_cog_translate_valid_blocksize(runner):
                 assert not src.overviews(1)
 
 
-def test_cog_translate_Dataset(runner):
+def test_cog_translate_dataset(runner):
     """Should work as expected (create cogeo from an open dataset)."""
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as src_dst:
@@ -276,18 +280,7 @@ def test_cog_translate_Dataset(runner):
             assert not src_dst.closed
 
         with rasterio.open("cogeo.tif") as src:
-            assert src.height == 512
-            assert src.width == 512
-            assert src.meta["dtype"] == "uint8"
-            assert src.is_tiled
-            assert src.profile["blockxsize"] == 64
-            assert src.profile["blockysize"] == 64
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
-            assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8]
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
-            assert not has_mask_band(src)
+            _validate_translated_rgb_jpeg(src)
 
 
 def test_cog_translate_memfile(runner):
@@ -303,15 +296,17 @@ def test_cog_translate_memfile(runner):
                     cog_translate(mem, "cogeo.tif", jpeg_profile, quiet=True)
 
         with rasterio.open("cogeo.tif") as src:
-            assert src.height == 512
-            assert src.width == 512
-            assert src.meta["dtype"] == "uint8"
-            assert src.is_tiled
-            assert src.profile["blockxsize"] == 64
-            assert src.profile["blockysize"] == 64
-            assert src.compression.value == "JPEG"
-            assert src.photometric.value == "YCbCr"
-            assert src.interleaving.value == "PIXEL"
-            assert src.overviews(1) == [2, 4, 8]
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
-            assert not has_mask_band(src)
+            _validate_translated_rgb_jpeg(src)
+
+
+def test_cog_translate_warpedvrt(runner):
+    """Should work as expected (create cogeo from an open memfile)."""
+    from rasterio.vrt import WarpedVRT
+
+    with runner.isolated_filesystem():
+        with rasterio.open(raster_path_rgb) as dataset:
+            with WarpedVRT(dataset) as vrt:
+                cog_translate(vrt, "cogeo.tif", jpeg_profile, quiet=True)
+
+        with rasterio.open("cogeo.tif") as src:
+            _validate_translated_rgb_jpeg(src)
