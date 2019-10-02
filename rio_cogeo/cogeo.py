@@ -110,7 +110,7 @@ def cog_translate(
 
     with rasterio.Env(**config):
         with ExitStack() as ctx:
-            if isinstance(source, (DatasetReader, DatasetWriter, MemoryFile, WarpedVRT)):
+            if isinstance(source, (DatasetReader, DatasetWriter, WarpedVRT)):
                 src_dst = source
             else:
                 src_dst = ctx.enter_context(rasterio.open(source))
