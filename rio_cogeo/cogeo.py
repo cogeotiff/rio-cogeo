@@ -10,7 +10,7 @@ from contextlib import contextmanager
 import click
 
 import rasterio
-from rasterio.io import DatasetReader, MemoryFile
+from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.env import GDALVersion
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
@@ -110,7 +110,7 @@ def cog_translate(
 
     with rasterio.Env(**config):
         with ExitStack() as ctx:
-            if isinstance(source, DatasetReader):
+            if isinstance(source, (DatasetReader, DatasetWriter, WarpedVRT)):
                 src_dst = source
             else:
                 src_dst = ctx.enter_context(rasterio.open(source))
