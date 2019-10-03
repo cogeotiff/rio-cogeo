@@ -29,7 +29,7 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="1.1.3",
+    version="1.1.4",
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",

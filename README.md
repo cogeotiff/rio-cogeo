@@ -5,7 +5,7 @@ Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio
 
 [![Packaging status](https://badge.fury.io/py/rio-cogeo.svg)](https://badge.fury.io/py/rio-cogeo)
 [![CircleCI](https://circleci.com/gh/cogeotiff/rio-cogeo.svg?style=svg)](https://circleci.com/gh/cogeotiff/rio-cogeo)
-[![codecov](https://codecov.io/gh/cogeotiff/rio-cogeo/branch/master/graph/badge.svg?token=zuHupC20cG)](https://codecov.io/gh/cogeotiff/rio-cogeo)
+[![codecov](https://codecov.io/gh/cogeotiff/rio-cogeo/branch/master/graph/badge.svg)](https://codecov.io/gh/cogeotiff/rio-cogeo)
 
 ## Cloud Optimized GeoTIFF
 
@@ -195,6 +195,42 @@ $ rio cogeo create mydataset.tif mydataset_raw.tif --co BLOCKXSIZE=1024 --co BLO
 ```
 
 See https://gdal.org/drivers/raster/gtiff.html#creation-options for full details of creation options.
+
+## API
+
+Rio-cogeo can also be integrated directly in your custom script. See [rio_cogeo.cogeo.cog_translate](https://github.com/cogeotiff/rio-cogeo/blob/master/rio_cogeo/cogeo.py#L53-L108) function.
+
+e.g:
+
+```python
+from rio_cogeo.cogeo import cog_translate
+
+def _translate(src_path, dst_path, profile="webp", profile_options={}, **options):
+    """Convert image to COG."""
+    # Format creation option (see gdalwarp `-co` option)
+    output_profile = cog_profiles.get(profile)
+    output_profile.update(dict(BIGTIFF="IF_SAFER"))
+    output_profile.update(profile_options)
+
+    # Dataset Open option (see gdalwarp `-oo` option)
+    config = dict(
+        GDAL_NUM_THREADS="ALL_CPUS",
+        GDAL_TIFF_INTERNAL_MASK=True,
+        GDAL_TIFF_OVR_BLOCKSIZE="128",
+    )
+
+    cog_translate(
+        src_path,
+        dst_path,
+        output_profile,
+        config=config,
+        in_memory=False,
+        quiet=True,
+        **options,
+    )
+    return True
+```
+ref: https://github.com/developmentseed/cogeo-watchbot/blob/81df27470dd2eb7032d512c35af853b006d1c035/app/translator.py#L34-L56
 
 ## Web-Optimized COG
 
