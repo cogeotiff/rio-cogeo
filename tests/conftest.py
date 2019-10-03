@@ -16,5 +16,7 @@ requires_webp = pytest.mark.skipif(
 
 @pytest.fixture
 def runner():
+    """CLI Runner fixture."""
     from click.testing import CliRunner
+
     return CliRunner()
