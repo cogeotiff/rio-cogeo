@@ -1,4 +1,4 @@
-1.1.5 (TBD)
+1.1.5 (2019-10-04)
 ------------------
 
  - add `--allow-intermediate-compression` option to reduce the memory/disk footprint (#103)
