@@ -65,6 +65,7 @@ def cog_translate(
     resampling="nearest",
     in_memory=None,
     config=None,
+    allow_intermediate_compression=False,
     quiet=False,
 ):
     """
@@ -102,6 +103,10 @@ def cog_translate(
         Force processing raster in memory (default: process in memory if small)
     config : dict
         Rasterio Env options.
+    allow_intermediate_compression: bool, optional (default: False)
+        Allow intermediate file compression to reduce memory/disk footprint.
+        Note: This could reduce the speed of the process.
+        Ref: https://github.com/cogeotiff/rio-cogeo/issues/103
     quiet: bool, optional (default: False)
         Mask processing steps.
 
@@ -207,8 +212,9 @@ def cog_translate(
                     meta.pop("alpha", None)
 
                 meta.update(**dst_kwargs)
-                meta.pop("compress", None)
-                meta.pop("photometric", None)
+                if not allow_intermediate_compression:
+                    meta.pop("compress", None)
+                    meta.pop("photometric", None)
 
                 if in_memory is None:
                     in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
