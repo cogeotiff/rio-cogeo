@@ -148,6 +148,12 @@ def cogeo():
     "if smaller than {:.0f} million pixels)".format(IN_MEMORY_THRESHOLD // 1e6),
 )
 @click.option(
+    "--allow-intermediate-compression",
+    default=False,
+    is_flag=True,
+    help="Allow intermediate file compression to reduce memory/disk footprint.",
+)
+@click.option(
     "--threads",
     type=ThreadsParamType(),
     default="ALL_CPUS",
@@ -172,6 +178,7 @@ def create(
     latitude_adjustment,
     resampling,
     in_memory,
+    allow_intermediate_compression,
     threads,
     creation_options,
     quiet,
@@ -209,6 +216,7 @@ def create(
         resampling=resampling,
         in_memory=in_memory,
         config=config,
+        allow_intermediate_compression=allow_intermediate_compression,
         quiet=quiet,
     )
 
