@@ -154,6 +154,12 @@ def cogeo():
     help="Allow intermediate file compression to reduce memory/disk footprint.",
 )
 @click.option(
+    "--forward-band-tags",
+    default=False,
+    is_flag=True,
+    help="Forward band tags to output bands.",
+)
+@click.option(
     "--threads",
     type=ThreadsParamType(),
     default="ALL_CPUS",
@@ -179,6 +185,7 @@ def create(
     resampling,
     in_memory,
     allow_intermediate_compression,
+    forward_band_tags,
     threads,
     creation_options,
     quiet,
@@ -217,6 +224,7 @@ def create(
         in_memory=in_memory,
         config=config,
         allow_intermediate_compression=allow_intermediate_compression,
+        forward_band_tags=forward_band_tags,
         quiet=quiet,
     )
 

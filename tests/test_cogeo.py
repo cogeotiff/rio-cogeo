@@ -310,3 +310,27 @@ def test_cog_translate_warpedvrt(runner):
 
         with rasterio.open("cogeo.tif") as src:
             _validate_translated_rgb_jpeg(src)
+
+
+def test_cog_translate_forward_tags(runner):
+    """Should work as expected (create cogeo from an open memfile)."""
+    from rasterio.io import MemoryFile
+
+    with runner.isolated_filesystem():
+        with rasterio.open(raster_path_rgb) as dataset:
+            data = dataset.read()
+            with MemoryFile() as memfile:
+                with memfile.open(**dataset.profile) as mem:
+                    mem.write(data)
+                    mem.update_tags(1, jqt="dre")
+                    cog_translate(
+                        mem,
+                        "cogeo.tif",
+                        jpeg_profile,
+                        forward_band_tags=True,
+                        quiet=True,
+                    )
+
+        with rasterio.open("cogeo.tif") as src:
+            _validate_translated_rgb_jpeg(src)
+            assert src.tags(1) == {"jqt": "dre"}
