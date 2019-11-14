@@ -62,7 +62,7 @@ $ rio cogeo create --help
 
   Options:
     -b, --bidx BIDX                 Band indexes to copy.
-    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|lzma|lerc|lerc_deflate|lerc_zstd|raw] 
+    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|lzma|lerc|lerc_deflate|lerc_zstd|raw]
                                     CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan             Set nodata masking values for input dataset.
     --add-mask                      Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
@@ -78,8 +78,11 @@ $ rio cogeo create --help
                                     or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
     -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss] Resampling algorithm.
     --in-memory / --no-in-memory    Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
+    --allow-intermediate-compression
+                                    Allow intermediate file compression to reduce memory/disk footprint.
+    --forward-band-tags             Forward band tags to output bands.
     --threads THREADS               Number of worker threads for multi-threaded compression (default: ALL_CPUS)
-    --co, --profile NAME=VALUE      Driver specific creation options.See the documentation for the selected output driver for more information.
+    --co, --profile NAME=VALUE      Driver specific creation options. See the documentation for the selected GTiff driver for more information.
     -q, --quiet                     Remove progressbar and other non-error output.
     --help                          Show this message and exit.
 ```
@@ -319,29 +322,6 @@ $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --a
 
 Using internal nodata value with lossy compression (`webp`, `jpeg`) is not
 recommanded. Please use internal masking (or alpha band if using webp).
-
-
-## Statistics
-
-Some libraries might request to use COGs with statistics written in the internal
-metadata. **rio-cogeo** doesn't calculate nor copy those when creating the output
-dataset (because statistics may change due to lossy compression).
-To add the statistics to the output dataset you could use the code above:
-
-```python
-import rasterio
-
-with rasterio.open("my-data.tif", "r+") as src_dst:
-    for b in src_dst.indexes:
-        band = src_dst.read(indexes=b, masked=masked)
-        stats = {
-            'min': float(band.min()),
-            'max': float(band.max()),
-            'mean': float(band.mean())
-            'stddev': float(band.std())
-        }
-        src_dst.update_tags(b, **stats)
-```
 
 ## Contribution & Development
 

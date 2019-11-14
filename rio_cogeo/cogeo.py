@@ -66,6 +66,7 @@ def cog_translate(
     in_memory=None,
     config=None,
     allow_intermediate_compression=False,
+    forward_band_tags=False,
     quiet=False,
 ):
     """
@@ -107,6 +108,9 @@ def cog_translate(
         Allow intermediate file compression to reduce memory/disk footprint.
         Note: This could reduce the speed of the process.
         Ref: https://github.com/cogeotiff/rio-cogeo/issues/103
+    forward_band_tags:  bool, optional
+        Forward band tags to output bands.
+        Ref: https://github.com/cogeotiff/rio-cogeo/issues/19
     quiet: bool, optional (default: False)
         Mask processing steps.
 
@@ -258,6 +262,8 @@ def cog_translate(
 
                 for i, b in enumerate(indexes):
                     tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
+                    if forward_band_tags:
+                        tmp_dst.update_tags(i + 1, **src_dst.tags(b))
 
                 tags = src_dst.tags()
                 tags.update(
