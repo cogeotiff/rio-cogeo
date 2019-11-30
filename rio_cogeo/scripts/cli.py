@@ -231,9 +231,15 @@ def create(
 
 @cogeo.command(short_help="Validate COGEO")
 @options.file_in_arg
-def validate(input):
+@click.option(
+    "--strict",
+    default=False,
+    is_flag=True,
+    help="Treat warnings as errors.",
+)
+def validate(input, strict):
     """Validate Cloud Optimized Geotiff."""
-    if cog_validate(input):
+    if cog_validate(input, strict=strict):
         click.echo("{} is a valid cloud optimized GeoTIFF".format(input))
     else:
         click.echo("{} is NOT a valid cloud optimized GeoTIFF".format(input))
