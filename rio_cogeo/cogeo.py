@@ -437,7 +437,7 @@ def cog_validate(src_path, strict=False):
             click.echo("- " + e, err=True)
 
         return False
-    
+
     if warnings and strict:
         return False
 

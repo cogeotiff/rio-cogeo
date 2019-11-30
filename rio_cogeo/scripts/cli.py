@@ -232,10 +232,7 @@ def create(
 @cogeo.command(short_help="Validate COGEO")
 @options.file_in_arg
 @click.option(
-    "--strict",
-    default=False,
-    is_flag=True,
-    help="Treat warnings as errors.",
+    "--strict", default=False, is_flag=True, help="Treat warnings as errors.",
 )
 def validate(input, strict):
     """Validate Cloud Optimized Geotiff."""
