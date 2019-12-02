@@ -91,13 +91,16 @@ $ rio cogeo create --help
 
 ```
 $ rio cogeo validate --help
-  Usage: rio cogeo validate [OPTIONS] INPUT
+Usage: rio cogeo validate [OPTIONS] INPUT
 
   Validate Cloud Optimized Geotiff.
 
-  Options:
-    --help  Show this message and exit.
+Options:
+  --strict  Treat warnings as errors.
+  --help    Show this message and exit.
 ```
+
+The `strict` options will treat warnings (e.g missing overviews) as errors.
 
 ### Examples
 
@@ -120,7 +123,7 @@ Default profiles are tiled with 512x512 blocksizes.
 
 - JPEG compression
 - PIXEL interleave
-- YCbCr colorspace
+- YCbCr (3 bands) colorspace or MINISBLACK (1 band)
 - limited to uint8 datatype and 3 bands data
 
 **WEBP**
@@ -234,6 +237,74 @@ def _translate(src_path, dst_path, profile="webp", profile_options={}, **options
     return True
 ```
 ref: https://github.com/developmentseed/cogeo-watchbot/blob/81df27470dd2eb7032d512c35af853b006d1c035/app/translator.py#L34-L56
+
+
+### Using the API with in MemoryFile
+
+1. Create COG from numpy array
+```python
+import numpy
+
+import mercantile
+
+from rasterio.io import MemoryFile
+from rasterio.transform import from_bounds
+
+from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.profiles import cog_profiles
+
+# Create GeoTIFF profile
+bounds = mercantile.bounds(mercantile.Tile(0,0,0))
+src_transform = from_bounds(*bounds, 1024 1024)
+
+src_profile = dict(
+    driver="GTiff",
+    dtype="float32",
+    count=3,
+    height=1024,
+    width=1024,
+    crs="epsg:4326",
+    transform=dst_transform,
+)
+
+img_array = tile = numpy.random.rand(3, 1024, 1024)
+
+with MemoryFile() as memfile:
+    with memfile.open(**src_profile) as mem:
+        # Populate the input file with numpy array
+        mem.write(img_array)
+        
+        dst_profile = cog_profiles.get("deflate")        
+        cog_translate(
+            mem,
+            "my-output-cog.tif",
+            dst_profile,
+            in_memory=True,
+            quiet=True,
+        )
+```
+2. Create output COG in Memory
+
+```python
+from rasterio.io import MemoryFile
+
+from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.profiles import cog_profiles
+
+from boto3.session import Session as boto3_session
+
+dst_profile = cog_profiles.get("deflate")
+
+with MemoryFile() as mem_dst:
+    # Important, we pass `mem_dst.name` as output dataset path
+    cog_translate("my-input-file.tif", mem_dst.name, profile, in_memory=True)
+
+    # You can then use the memoryfile to do something else like
+    # upload to AWS S3
+    client = boto3_session.client("s3")
+    client.upload_fileobj(mem_dst, "my-bucket", "my-key")
+```
+
 
 ## Web-Optimized COG
 

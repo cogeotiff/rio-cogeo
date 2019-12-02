@@ -334,3 +334,16 @@ def test_cog_translate_forward_tags(runner):
         with rasterio.open("cogeo.tif") as src:
             _validate_translated_rgb_jpeg(src)
             assert src.tags(1) == {"jqt": "dre"}
+
+
+def test_cog_translate_oneBandJpeg(runner):
+    """Should work as expected (create cogeo file)."""
+    with runner.isolated_filesystem():
+        profile = jpeg_profile.copy()
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgb, "cogeo.tif", profile, indexes=(1,), quiet=True
+            )
+        with rasterio.open("cogeo.tif") as src:
+            assert src.compression.value == "JPEG"
+            assert src.colorinterp[0] == rasterio.enums.ColorInterp.gray
