@@ -1,3 +1,9 @@
+1.1.7 (2019-12-02)
+------------------
+- add `strict` option to cog_validate to treat warnings as error (#109) - Thanks @pierotofy
+- add documentation examples using MemoryFiles (#108 #107)
+- Switch to `PHOTOMETRIC=MINISBLACK` when PHOTOMETRIC is set to YCBCR for 1 band dataset (#41)
+
 1.1.6 (2019-11-13)
 ------------------
 
@@ -7,7 +13,6 @@
 ------------------
 
  - add `--allow-intermediate-compression` option to reduce the memory/disk footprint (#103)
-
 
 1.1.4 (2019-10-03)
 ------------------
