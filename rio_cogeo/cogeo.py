@@ -82,7 +82,7 @@ def cog_translate(
         Will be opened in "w" mode.
     dst_kwargs: dict
         Output dataset creation options.
-    indexes : tuple, int, optional
+    indexes : tuple, optional
         Raster band indexes to copy.
     nodata, int, optional
         Overwrite nodata masking values for input dataset.
@@ -214,6 +214,16 @@ def cog_translate(
                 if add_mask:
                     meta.pop("nodata", None)
                     meta.pop("alpha", None)
+
+                if (
+                    dst_kwargs.get("photometric", "").upper() == "YCBCR"
+                    and meta["count"] == 1
+                ):
+                    warnings.warn(
+                        "PHOTOMETRIC=YCBCR not supported on a 1-band raster"
+                        " and has been set to 'MINISBLACK'"
+                    )
+                    dst_kwargs["photometric"] = "MINISBLACK"
 
                 meta.update(**dst_kwargs)
                 if not allow_intermediate_compression:
