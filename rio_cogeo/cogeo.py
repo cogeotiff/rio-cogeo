@@ -280,7 +280,7 @@ def cog_translate(
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(src_path):
+def cog_validate(src_path, strict=False):
     """
     Validate Cloud Optimized Geotiff.
 
@@ -288,6 +288,8 @@ def cog_validate(src_path):
     ----------
     src_path : str or PathLike object
         A dataset path or URL. Will be opened in "r" mode.
+    strict: bool
+        Treat warnings as errors
 
     This script is the rasterio equivalent of
     https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
@@ -434,6 +436,9 @@ def cog_validate(src_path):
         for e in errors:
             click.echo("- " + e, err=True)
 
+        return False
+
+    if warnings and strict:
         return False
 
     return True
