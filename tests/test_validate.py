@@ -13,6 +13,9 @@ raster_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif"
 raster_external = os.path.join(
     os.path.dirname(__file__), "fixtures", "validate", "image_external.tif"
 )
+raster_no_ovr = os.path.join(
+    os.path.dirname(__file__), "fixtures", "validate", "image_no_overview.tif"
+)
 raster_ovrsorted = os.path.join(
     os.path.dirname(__file__), "fixtures", "validate", "image_sorted.tif"
 )
@@ -45,6 +48,10 @@ def test_cog_validate_valid(monkeypatch):
 
     # invalid decimation
     assert not cog_validate(raster_decim)
+
+    # no overview
+    assert cog_validate(raster_no_ovr)
+    assert not cog_validate(raster_no_ovr, strict=True)
 
     with pytest.raises(Exception):
         cog_validate(raster_jpeg)
