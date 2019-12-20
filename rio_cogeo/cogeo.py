@@ -82,7 +82,7 @@ def cog_translate(
         Will be opened in "w" mode.
     dst_kwargs: dict
         Output dataset creation options.
-    indexes : tuple, optional
+    indexes : tuple or int, optional
         Raster band indexes to copy.
     nodata, int, optional
         Overwrite nodata masking values for input dataset.
@@ -126,6 +126,8 @@ def cog_translate(
 
             meta = src_dst.meta
             indexes = indexes if indexes else src_dst.indexes
+            if isinstance(indexes, int):
+                indexes = (indexes,)
             nodata = nodata if nodata is not None else src_dst.nodata
             dtype = dtype if dtype else src_dst.dtypes[0]
             alpha = has_alpha_band(src_dst)
@@ -244,8 +246,6 @@ def cog_translate(
 
                 # Transfer color interpolation
                 ci = vrt_dst.colorinterp
-                if nodata is None and not alpha:
-                    ci = [c for c in ci if c != ColorInterp.alpha]
                 if indexes:
                     if len(indexes) == 1:
                         ci = [ColorInterp.gray]
