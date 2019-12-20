@@ -74,6 +74,9 @@ def test_cog_translate_valid(runner):
             assert has_mask_band(src)
         with rasterio.open("cogeo.tif", OVERVIEW_LEVEL=1) as src:
             assert src.block_shapes[0] == (64, 64)
+        with rasterio.open(raster_path_rgb) as src:
+            with rasterio.open("cogeo.tif") as dst:
+                assert(src.colorinterp == dst.colorinterp)
 
 
 def test_cog_translate_NodataLossyWarning(runner):
@@ -143,6 +146,10 @@ def test_cog_translate_validAlpha(runner):
             assert src.is_tiled
             assert src.compression.value == "WEBP"
             assert has_alpha_band(src)
+        
+        with rasterio.open(raster_path_rgba) as src:
+            with rasterio.open("cogeo.tif") as dst:
+                assert(src.colorinterp == dst.colorinterp)
 
 
 def test_cog_translate_valiNodataNan(runner):

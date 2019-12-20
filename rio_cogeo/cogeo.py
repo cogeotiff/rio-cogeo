@@ -14,7 +14,7 @@ from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.env import GDALVersion
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
-from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.enums import Resampling as ResamplingEnums, ColorInterp
 from rasterio.shutil import copy
 from rasterio.transform import Affine
 
@@ -242,6 +242,17 @@ def cog_translate(
                         rasterio.open(tmpfile.name, "w", **meta)
                     )
 
+                # Transfer color interpolation
+                ci = vrt_dst.colorinterp
+                if nodata is None and not alpha:
+                    ci = [c for c in ci if c != ColorInterp.alpha]
+                if indexes:
+                    if len(indexes) == 1:
+                        ci = [ColorInterp.gray]
+                    else:
+                        ci = [ci[i - 1] for i in indexes]
+                tmp_dst.colorinterp = ci
+                
                 wind = list(tmp_dst.block_windows(1))
 
                 if not quiet:
