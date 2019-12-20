@@ -115,6 +115,8 @@ def cog_translate(
         Mask processing steps.
 
     """
+    if isinstance(indexes, int):
+        indexes = (indexes,)
     config = config or {}
 
     with rasterio.Env(**config):
@@ -126,8 +128,6 @@ def cog_translate(
 
             meta = src_dst.meta
             indexes = indexes if indexes else src_dst.indexes
-            if isinstance(indexes, int):
-                indexes = (indexes,)
             nodata = nodata if nodata is not None else src_dst.nodata
             dtype = dtype if dtype else src_dst.dtypes[0]
             alpha = has_alpha_band(src_dst)
