@@ -245,13 +245,10 @@ def cog_translate(
                     )
 
                 # Transfer color interpolation
-                ci = vrt_dst.colorinterp
-                if indexes:
-                    if len(indexes) == 1:
-                        ci = [ColorInterp.gray]
-                    else:
-                        ci = [ci[i - 1] for i in indexes]
-                tmp_dst.colorinterp = ci
+                if len(indexes) == 1:
+                    tmp_dst.colorinterp = [ColorInterp.gray]
+                else:
+                    tmp_dst.colorinterp = [vrt_dst.colorinterp[b - 1] for b in indexes]
                 
                 wind = list(tmp_dst.block_windows(1))
 
