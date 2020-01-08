@@ -1,3 +1,8 @@
+1.1.8 (2020-01-08)
+------------------
+- Transfer color interpretation value to output COG (#113) - Thanks @pierotofy
+- Cast `dataset_mask` returned by rasterio to uint8 to overcome a bug in rasterio 1.1.2 (#115)
+
 1.1.7 (2019-12-02)
 ------------------
 - add `strict` option to cog_validate to treat warnings as error (#109) - Thanks @pierotofy
