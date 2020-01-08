@@ -14,7 +14,7 @@ from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.env import GDALVersion
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
-from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.enums import Resampling as ResamplingEnums, ColorInterp
 from rasterio.shutil import copy
 from rasterio.transform import Affine
 
@@ -82,7 +82,7 @@ def cog_translate(
         Will be opened in "w" mode.
     dst_kwargs: dict
         Output dataset creation options.
-    indexes : tuple, optional
+    indexes : tuple or int, optional
         Raster band indexes to copy.
     nodata, int, optional
         Overwrite nodata masking values for input dataset.
@@ -115,8 +115,10 @@ def cog_translate(
         Mask processing steps.
 
     """
-    config = config or {}
+    if isinstance(indexes, int):
+        indexes = (indexes,)
 
+    config = config or {}
     with rasterio.Env(**config):
         with ExitStack() as ctx:
             if isinstance(source, (DatasetReader, DatasetWriter, WarpedVRT)):
@@ -242,6 +244,12 @@ def cog_translate(
                         rasterio.open(tmpfile.name, "w", **meta)
                     )
 
+                # Transfer color interpolation
+                if len(indexes) == 1:
+                    tmp_dst.colorinterp = [ColorInterp.gray]
+                else:
+                    tmp_dst.colorinterp = [vrt_dst.colorinterp[b - 1] for b in indexes]
+
                 wind = list(tmp_dst.block_windows(1))
 
                 if not quiet:
@@ -255,7 +263,8 @@ def cog_translate(
                         tmp_dst.write(matrix, window=w)
 
                         if add_mask or mask:
-                            mask_value = vrt_dst.dataset_mask(window=w)
+                            # Cast mask to uint8 to fix rasterio 1.1.2 error (ref #115)
+                            mask_value = vrt_dst.dataset_mask(window=w).astype("uint8")
                             tmp_dst.write_mask(mask_value, window=w)
 
                 if overview_level is None:
