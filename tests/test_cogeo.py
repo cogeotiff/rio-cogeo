@@ -76,7 +76,7 @@ def test_cog_translate_valid(runner):
             assert src.block_shapes[0] == (64, 64)
         with rasterio.open(raster_path_rgb) as src:
             with rasterio.open("cogeo.tif") as dst:
-                assert(src.colorinterp == dst.colorinterp)
+                assert src.colorinterp == dst.colorinterp
 
 
 def test_cog_translate_NodataLossyWarning(runner):
@@ -134,6 +134,26 @@ def test_cog_translate_validRaw(runner):
             assert src.interleaving.value == "PIXEL"
 
 
+def test_cog_translate_validIndexes(runner):
+    """Should work as expected (create cogeo file)."""
+    with runner.isolated_filesystem():
+        cog_translate(raster_path_rgb, "cogeo.tif", raw_profile, indexes=1, quiet=True)
+        with rasterio.open("cogeo.tif") as src:
+            assert src.count == 1
+
+        cog_translate(
+            raster_path_rgb, "cogeo.tif", raw_profile, indexes=[1], quiet=True
+        )
+        with rasterio.open("cogeo.tif") as src:
+            assert src.count == 1
+
+        cog_translate(
+            raster_path_rgb, "cogeo.tif", raw_profile, indexes=(1,), quiet=True
+        )
+        with rasterio.open("cogeo.tif") as src:
+            assert src.count == 1
+
+
 @requires_webp
 def test_cog_translate_validAlpha(runner):
     """Should work as expected (create cogeo file with alpha band)."""
@@ -146,10 +166,10 @@ def test_cog_translate_validAlpha(runner):
             assert src.is_tiled
             assert src.compression.value == "WEBP"
             assert has_alpha_band(src)
-        
+
         with rasterio.open(raster_path_rgba) as src:
             with rasterio.open("cogeo.tif") as dst:
-                assert(src.colorinterp == dst.colorinterp)
+                assert src.colorinterp == dst.colorinterp
 
 
 def test_cog_translate_valiNodataNan(runner):

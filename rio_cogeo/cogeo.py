@@ -117,8 +117,8 @@ def cog_translate(
     """
     if isinstance(indexes, int):
         indexes = (indexes,)
-    config = config or {}
 
+    config = config or {}
     with rasterio.Env(**config):
         with ExitStack() as ctx:
             if isinstance(source, (DatasetReader, DatasetWriter, WarpedVRT)):
@@ -249,7 +249,7 @@ def cog_translate(
                     tmp_dst.colorinterp = [ColorInterp.gray]
                 else:
                     tmp_dst.colorinterp = [vrt_dst.colorinterp[b - 1] for b in indexes]
-                
+
                 wind = list(tmp_dst.block_windows(1))
 
                 if not quiet:
@@ -263,7 +263,8 @@ def cog_translate(
                         tmp_dst.write(matrix, window=w)
 
                         if add_mask or mask:
-                            mask_value = vrt_dst.dataset_mask(window=w)
+                            # Cast mask to uint8 to fix rasterio 1.1.2 error (ref #115)
+                            mask_value = vrt_dst.dataset_mask(window=w).astype("uint8")
                             tmp_dst.write_mask(mask_value, window=w)
 
                 if overview_level is None:
