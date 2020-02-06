@@ -293,6 +293,8 @@ def cog_translate(
                     )
                 )
                 tmp_dst.update_tags(**tags)
+                tmp_dst._set_all_scales([vrt_dst.scales[b - 1] for b in indexes])
+                tmp_dst._set_all_offsets([vrt_dst.offsets[b - 1] for b in indexes])
 
                 if not quiet:
                     click.echo("Writing output to: {}".format(dst_path), err=True)
