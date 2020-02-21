@@ -1,3 +1,7 @@
+1.1.10 (2020-02-21)
+------------------
+- Transfer colormap (#121)
+
 1.1.9 (2020-02-06)
 ------------------
 - Transfer scale and offset values to output COG (#118)
