@@ -245,10 +245,21 @@ def cog_translate(
                     )
 
                 # Transfer color interpolation
-                if len(indexes) == 1:
+                if len(indexes) == 1 and (
+                    vrt_dst.colorinterp[indexes[0] - 1] is not ColorInterp.palette
+                ):
                     tmp_dst.colorinterp = [ColorInterp.gray]
                 else:
                     tmp_dst.colorinterp = [vrt_dst.colorinterp[b - 1] for b in indexes]
+
+                if tmp_dst.colorinterp[0] is ColorInterp.palette:
+                    try:
+                        tmp_dst.write_colormap(1, vrt_dst.colormap(1))
+                    except ValueError:
+                        warnings.warn(
+                            "Dataset has `Palette` color interpretation"
+                            " but is missing colormap information"
+                        )
 
                 wind = list(tmp_dst.block_windows(1))
 
