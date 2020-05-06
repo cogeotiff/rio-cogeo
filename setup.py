@@ -1,7 +1,8 @@
 """Setup."""
 
 import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 with open("README.md") as f:
     readme = f.read()
@@ -14,9 +15,6 @@ inst_reqs = [
     "supermercado",
     "mercantile~=1.1",
 ]
-
-if sys.version_info < (3, 3):
-    inst_reqs.append("contextlib2")
 
 extra_reqs = {
     "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3"],

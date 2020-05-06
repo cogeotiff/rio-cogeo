@@ -3,17 +3,15 @@
 import os
 
 import numpy
-
 import pytest
-
 import rasterio
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
-from rio_cogeo.utils import has_mask_band, has_alpha_band
-from rio_cogeo.errors import LossyCompression, IncompatibleBlockRasterSize
+from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 from rio_cogeo.profiles import cog_profiles
+from rio_cogeo.utils import has_alpha_band, has_mask_band
 
 from .conftest import requires_webp
 

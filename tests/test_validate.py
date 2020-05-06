@@ -5,9 +5,8 @@ import os
 import pytest
 from click.testing import CliRunner
 
-from rio_cogeo.cogeo import cog_validate, cog_translate
+from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
-
 
 raster_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_external = os.path.join(

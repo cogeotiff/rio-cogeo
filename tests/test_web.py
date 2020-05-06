@@ -1,25 +1,20 @@
 """tests rio_cogeo web."""
 
 import os
-import sys
 import struct
-
-import pytest
-from click.testing import CliRunner
-
-import numpy
+import sys
 
 import mercantile
-
+import numpy
+import pytest
 import rasterio
+from click.testing import CliRunner
 from rasterio.warp import transform_bounds
-
-from rio_cogeo.utils import get_max_zoom
-from rio_cogeo.cogeo import cog_translate
-from rio_cogeo.profiles import cog_profiles
-
 from rio_tiler import reader as COGreader
 
+from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.profiles import cog_profiles
+from rio_cogeo.utils import get_max_zoom
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
 raster_path_north = os.path.join(

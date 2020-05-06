@@ -409,13 +409,21 @@ $ cd rio-cogeo
 $ pip install -e .[dev]
 ```
 
-**Python3.6 only**
+**Python >=3.7 only**
 
-This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black*
-("uncompromising Python code formatter") when commiting new code.
+This repo is set to use `pre-commit` to run *isort*, *flake8*, *pydocstring*, *black* ("uncompromising Python code formatter") and mypy when committing new code.
 
-```bash
+```
 $ pre-commit install
+
+$ git add .
+
+$ git commit -m'my change'
+isort....................................................................Passed
+black....................................................................Passed
+Flake8...................................................................Passed
+Verifying PEP257 Compliance..............................................Passed
+mypy.....................................................................Passed
 ```
 
 ## Extras

@@ -1,6 +1,7 @@
 """tests rio_cogeo.profiles."""
 
 import pytest
+
 from rio_cogeo.profiles import cog_profiles
 
 

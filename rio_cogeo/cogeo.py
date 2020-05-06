@@ -1,35 +1,34 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
+import math
 import os
 import sys
-import math
-import warnings
 import tempfile
-from contextlib import contextmanager, ExitStack
+import warnings
+from contextlib import ExitStack, contextmanager
 
 import click
-
+import mercantile
 import rasterio
-from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.crs import CRS
+from rasterio.enums import ColorInterp
+from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.env import GDALVersion
-from rasterio.vrt import WarpedVRT
-from rasterio.warp import transform_bounds
-from rasterio.enums import Resampling as ResamplingEnums, ColorInterp
+from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.shutil import copy
 from rasterio.transform import Affine
-
-import mercantile
+from rasterio.vrt import WarpedVRT
+from rasterio.warp import transform_bounds
 from supermercado.burntiles import tile_extrema
-from rio_cogeo.errors import LossyCompression, IncompatibleBlockRasterSize
+
+from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 from rio_cogeo.utils import (
+    _meters_per_pixel,
+    get_max_zoom,
     get_maximum_overview_level,
     has_alpha_band,
     has_mask_band,
-    get_max_zoom,
-    _meters_per_pixel,
 )
-
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 WEB_MERCATOR_CRS = CRS.from_epsg(3857)

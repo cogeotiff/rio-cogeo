@@ -2,8 +2,8 @@
 
 import math
 
+from rasterio.enums import ColorInterp, MaskFlags
 from rasterio.warp import calculate_default_transform
-from rasterio.enums import MaskFlags, ColorInterp
 
 
 def _meters_per_pixel(zoom, lat=0.0, tilesize=256):
