@@ -5,9 +5,8 @@ import warnings
 
 import click
 import numpy
-
-from rasterio.rio import options
 from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.rio import options
 
 from rio_cogeo import version as cogeo_version
 from rio_cogeo.cogeo import cog_translate, cog_validate

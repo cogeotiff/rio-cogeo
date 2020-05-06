@@ -3,12 +3,11 @@
 import os
 
 import pytest
-
 import rasterio
+
+from rio_cogeo.errors import LossyCompression
 from rio_cogeo.scripts.cli import cogeo
 from rio_cogeo.utils import has_mask_band
-from rio_cogeo.errors import LossyCompression
-
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
