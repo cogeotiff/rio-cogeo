@@ -26,13 +26,6 @@ common: &common
 
 
 jobs:
-  "python-2.7":
-    <<: *common
-    docker:
-      - image: circleci/python:2.7
-        environment:
-          - TOXENV=py27
-
   "python-3.6":
     <<: *common
     docker:
@@ -78,7 +71,6 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - "python-2.7"
       - "python-3.6"
       - "python-3.7":
           filters:  # required since `deploy` has tag filters AND requires `build`

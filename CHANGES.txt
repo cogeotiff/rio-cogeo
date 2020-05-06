@@ -1,3 +1,9 @@
+2.0a1 (TBD)
+------------------
+- Dropping python 2
+- use new mercantile xy_bounds for better web-optimized file
+- Allow temporary file on disk when using MemoryFile output
+
 1.1.10 (2020-02-21)
 ------------------
 - Transfer colormap (#121)
