@@ -5,7 +5,7 @@ import sys
 import math
 import warnings
 import tempfile
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 
 import click
 
@@ -30,10 +30,6 @@ from rio_cogeo.utils import (
     _meters_per_pixel,
 )
 
-try:
-    from contextlib import ExitStack
-except ImportError:
-    from contextlib2 import ExitStack
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 WEB_MERCATOR_CRS = CRS.from_epsg(3857)
@@ -43,9 +39,8 @@ WGS84_CRS = CRS.from_epsg(4326)
 @contextmanager
 def TemporaryRasterFile(dst_path, suffix=".tif"):
     """Create temporary file."""
-    fileobj = tempfile.NamedTemporaryFile(
-        dir=os.path.dirname(dst_path), suffix=suffix, delete=False
-    )
+    tmpdir = None if dst_path.startswith("/vsi") else os.path.dirname(dst_path)
+    fileobj = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=suffix, delete=False)
     fileobj.close()
     try:
         yield fileobj
