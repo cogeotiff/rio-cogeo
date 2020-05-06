@@ -11,6 +11,7 @@ import click
 
 import rasterio
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
+from rasterio.crs import CRS
 from rasterio.env import GDALVersion
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
@@ -35,6 +36,8 @@ except ImportError:
     from contextlib2 import ExitStack
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
+WEB_MERCATOR_CRS = CRS.from_epsg(3857)
+WGS84_CRS = CRS.from_epsg(4326)
 
 
 @contextmanager
@@ -180,8 +183,7 @@ def cog_translate(
             if web_optimized:
                 bounds = list(
                     transform_bounds(
-                        *[src_dst.crs, "epsg:4326"] + list(src_dst.bounds),
-                        densify_pts=21
+                        src_dst.crs, WGS84_CRS, *src_dst.bounds, densify_pts=21
                     )
                 )
                 center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
@@ -190,18 +192,19 @@ def cog_translate(
                 max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
 
                 extrema = tile_extrema(bounds, max_zoom)
-                w, n = mercantile.xy(
-                    *mercantile.ul(extrema["x"]["min"], extrema["y"]["min"], max_zoom)
+
+                left, _, _, top = mercantile.xy_bounds(
+                    extrema["x"]["min"], extrema["y"]["min"], max_zoom
                 )
                 vrt_res = _meters_per_pixel(max_zoom, 0, tilesize=tilesize)
-                vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)
+                vrt_transform = Affine(vrt_res, 0, left, 0, -vrt_res, top)
 
                 vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * tilesize
                 vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * tilesize
 
                 vrt_params.update(
                     dict(
-                        crs="epsg:3857",
+                        crs=WEB_MERCATOR_CRS,
                         transform=vrt_transform,
                         width=vrt_width,
                         height=vrt_height,
