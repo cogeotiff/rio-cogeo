@@ -12,15 +12,15 @@ inst_reqs = [
     "rasterio[s3]>=1.0.28",
     "numpy~=1.15",
     "supermercado",
-    "mercantile",
+    "mercantile~=1.1",
 ]
 
 if sys.version_info < (3, 3):
     inst_reqs.append("contextlib2")
 
 extra_reqs = {
-    "test": ["pytest", "pytest-cov", "rio-tiler"],
-    "dev": ["pytest", "pytest-cov", "rio-tiler", "pre-commit"],
+    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit"],
 }
 
 if sys.version_info >= (3, 6):
