@@ -174,6 +174,7 @@ class COGProfiles(dict):
 
     def get(self, key):
         """Like normal item access but error."""
+        key = key.lower()
         if key not in (self.keys()):
             raise KeyError("{} is not a valid COG profile name".format(key))
 

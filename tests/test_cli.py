@@ -458,3 +458,16 @@ def test_cogeo_validate(runner):
         assert "is NOT a valid cloud optimized GeoTIFF" in result.output
         assert not result.exception
         assert result.exit_code == 0
+
+
+def test_cogeo_validUpercaseProfile(monkeypatch, runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            ["create", raster_path_rgb, "output.tif", "--cog-profile", "DEFLATE"],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.compression.value == "DEFLATE"

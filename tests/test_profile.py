@@ -15,6 +15,9 @@ def test_profiles_jpeg():
     assert profile["photometric"] == "YCbCr"
     assert profile["interleave"] == "pixel"
 
+    profile = cog_profiles.get("JPEG")
+    assert profile["compress"] == "JPEG"
+
 
 def test_profiles_webp():
     """Should work as expected (return webp profile)."""
