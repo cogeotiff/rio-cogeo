@@ -234,6 +234,20 @@ def test_cogeo_overviewTilesize(monkeypatch, runner):
     with runner.isolated_filesystem():
         result = runner.invoke(
             cogeo,
+            ["create", raster_path_rgb, "output.tif", "--quiet", "--blocksize", "128"],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.is_tiled
+            assert src.overviews(1)
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (128, 128)
+
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
             [
                 "create",
                 raster_path_rgb,
