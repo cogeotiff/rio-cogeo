@@ -99,6 +99,7 @@ def cogeo():
     help="Force output dataset creation with an internal mask (convert alpha "
     "band or nodata to mask).",
 )
+@click.option("--blocksize", type=int, help="Overwrite profile's tile size.")
 @options.dtype_opt
 @click.option(
     "--overview-level",
@@ -176,6 +177,7 @@ def create(
     nodata,
     dtype,
     add_mask,
+    blocksize,
     overview_level,
     overview_resampling,
     overview_blocksize,
@@ -200,6 +202,10 @@ def create(
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
         output_profile.update(creation_options)
+
+    if blocksize:
+        output_profile["blockxsize"] = blocksize
+        output_profile["blockysize"] = blocksize
 
     config = dict(
         GDAL_NUM_THREADS=threads,
