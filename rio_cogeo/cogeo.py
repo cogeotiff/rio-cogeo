@@ -15,20 +15,15 @@ from rasterio.enums import ColorInterp
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.env import GDALVersion
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
+from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
 from rasterio.transform import Affine
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
 from supermercado.burntiles import tile_extrema
 
+from rio_cogeo import utils
 from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
-from rio_cogeo.utils import (
-    _meters_per_pixel,
-    get_max_zoom,
-    get_maximum_overview_level,
-    has_alpha_band,
-    has_mask_band,
-)
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 WEB_MERCATOR_CRS = CRS.from_epsg(3857)
@@ -127,8 +122,8 @@ def cog_translate(
             indexes = indexes if indexes else src_dst.indexes
             nodata = nodata if nodata is not None else src_dst.nodata
             dtype = dtype if dtype else src_dst.dtypes[0]
-            alpha = has_alpha_band(src_dst)
-            mask = has_mask_band(src_dst)
+            alpha = utils.has_alpha_band(src_dst)
+            mask = utils.has_mask_band(src_dst)
 
             if not add_mask and (
                 (nodata is not None or alpha)
@@ -183,14 +178,14 @@ def cog_translate(
                 center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
 
                 lat = 0 if latitude_adjustment else center[1]
-                max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
+                max_zoom = utils.get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
 
                 extrema = tile_extrema(bounds, max_zoom)
 
                 left, _, _, top = mercantile.xy_bounds(
                     extrema["x"]["min"], extrema["y"]["min"], max_zoom
                 )
-                vrt_res = _meters_per_pixel(max_zoom, 0, tilesize=tilesize)
+                vrt_res = utils._meters_per_pixel(max_zoom, 0, tilesize=tilesize)
                 vrt_transform = Affine(vrt_res, 0, left, 0, -vrt_res, top)
 
                 vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * tilesize
@@ -263,10 +258,8 @@ def cog_translate(
                 if not quiet:
                     click.echo("Reading input: {}".format(source), err=True)
                 fout = os.devnull if quiet else sys.stderr
-                with click.progressbar(
-                    wind, length=len(wind), file=fout, show_percent=True
-                ) as windows:
-                    for ij, w in windows:
+                with click.progressbar(wind, file=fout, show_percent=True) as windows:
+                    for _, w in windows:
                         matrix = vrt_dst.read(window=w, indexes=indexes)
                         tmp_dst.write(matrix, window=w)
 
@@ -276,7 +269,9 @@ def cog_translate(
                             tmp_dst.write_mask(mask_value, window=w)
 
                 if overview_level is None:
-                    overview_level = get_maximum_overview_level(vrt_dst, tilesize)
+                    overview_level = get_maximum_overview_level(
+                        vrt_dst.width, vrt_dst.height, minsize=tilesize
+                    )
 
                 if not quiet and overview_level:
                     click.echo("Adding overviews...", err=True)
