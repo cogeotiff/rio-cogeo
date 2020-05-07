@@ -83,7 +83,7 @@ def cogeo():
     "--cog-profile",
     "-p",
     "cogeo_profile",
-    type=click.Choice(cog_profiles.keys()),
+    type=click.Choice(cog_profiles.keys(), case_sensitive=False),
     default="deflate",
     help="CloudOptimized GeoTIFF profile (default: deflate).",
 )
