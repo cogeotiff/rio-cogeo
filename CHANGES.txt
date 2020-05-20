@@ -1,4 +1,8 @@
-2.0a1 (TBD)
+2.0a2 (2020-05-20)
+------------------
+- add `--config` CLI option to pass additional GDAL Configuration options (#135)
+
+2.0a1 (2020-05-07)
 ------------------
 - Dropping python 2 (#128)
 - use new mercantile xy_bounds for better web-optimized file (#126)

@@ -23,7 +23,7 @@ enforce several features:
 
 ```bash
 $ pip install -U pip
-$ pip install rio-cogeo
+$ pip install rio-cogeo --pre  # Version 2.0 currently in development
 ```
 
 Or install from source:
