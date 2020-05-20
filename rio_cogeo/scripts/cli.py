@@ -167,6 +167,14 @@ def cogeo():
 )
 @options.creation_options
 @click.option(
+    "--config",
+    "config",
+    metavar="NAME=VALUE",
+    multiple=True,
+    callback=options._cb_key_val,
+    help="GDAL configuration options.",
+)
+@click.option(
     "--quiet", "-q", help="Remove progressbar and other non-error output.", is_flag=True
 )
 def create(
@@ -189,6 +197,7 @@ def create(
     forward_band_tags,
     threads,
     creation_options,
+    config,
     quiet,
 ):
     """Create Cloud Optimized Geotiff."""
@@ -207,10 +216,12 @@ def create(
         output_profile["blockxsize"] = blocksize
         output_profile["blockysize"] = blocksize
 
-    config = dict(
-        GDAL_NUM_THREADS=threads,
-        GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-        GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
+    config.update(
+        dict(
+            GDAL_NUM_THREADS=threads,
+            GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
+            GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
+        )
     )
 
     cog_translate(
