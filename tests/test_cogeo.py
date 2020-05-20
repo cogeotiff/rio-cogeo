@@ -3,14 +3,15 @@
 import os
 
 import numpy
-
 import pytest
-
 import rasterio
+from rasterio.io import MemoryFile
+from rasterio.vrt import WarpedVRT
+
 from rio_cogeo.cogeo import cog_translate, cog_validate
-from rio_cogeo.utils import has_mask_band, has_alpha_band
-from rio_cogeo.errors import LossyCompression, IncompatibleBlockRasterSize
+from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 from rio_cogeo.profiles import cog_profiles
+from rio_cogeo.utils import has_alpha_band, has_mask_band
 
 from .conftest import requires_webp
 
@@ -315,8 +316,6 @@ def test_cog_translate_dataset(runner):
 
 def test_cog_translate_memfile(runner):
     """Should work as expected (create cogeo from an open memfile)."""
-    from rasterio.io import MemoryFile
-
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as dataset:
             data = dataset.read()
@@ -329,10 +328,26 @@ def test_cog_translate_memfile(runner):
             _validate_translated_rgb_jpeg(src)
 
 
+def test_cog_translate_to_memfile(runner):
+    """Create COG in memory and using in memory or in disk temp files."""
+    with runner.isolated_filesystem():
+        with rasterio.open(raster_path_rgb) as dataset:
+            with MemoryFile() as memfile:
+                cog_translate(dataset, memfile.name, deflate_profile, quiet=True)
+                with memfile.open() as src:
+                    assert src.width == dataset.width
+
+        with rasterio.open(raster_path_rgb) as dataset:
+            with MemoryFile() as memfile:
+                cog_translate(
+                    dataset, memfile.name, deflate_profile, in_memory=False, quiet=True
+                )
+                with memfile.open() as src:
+                    assert src.width == dataset.width
+
+
 def test_cog_translate_warpedvrt(runner):
     """Should work as expected (create cogeo from an open memfile)."""
-    from rasterio.vrt import WarpedVRT
-
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as dataset:
             with WarpedVRT(dataset) as vrt:
@@ -344,8 +359,6 @@ def test_cog_translate_warpedvrt(runner):
 
 def test_cog_translate_forward_tags(runner):
     """Should work as expected (create cogeo from an open memfile)."""
-    from rasterio.io import MemoryFile
-
     with runner.isolated_filesystem():
         with rasterio.open(raster_path_rgb) as dataset:
             data = dataset.read()

@@ -1,9 +1,12 @@
 """rio_cogeo.utils: Utility functions."""
 
 import math
+import warnings
 
+from rasterio.enums import ColorInterp, MaskFlags
 from rasterio.warp import calculate_default_transform
-from rasterio.enums import MaskFlags, ColorInterp
+
+from rio_cogeo.errors import DeprecationWarning
 
 
 def _meters_per_pixel(zoom, lat=0.0, tilesize=256):
@@ -109,6 +112,11 @@ def get_maximum_overview_level(src_dst, minsize=512):
         overview level.
 
     """
+    warnings.warn(
+        "rio_cogeo.utils.get_maximum_overview_level will be removed in version 2.0",
+        DeprecationWarning,
+    )
+
     nlevel = 0
     overview = 1
     while min(src_dst.width // overview, src_dst.height // overview) > minsize:

@@ -66,6 +66,7 @@ $ rio cogeo create --help
                                      CloudOptimized GeoTIFF profile (default: deflate).
     --nodata NUMBER|nan              Set nodata masking values for input dataset.
     --add-mask                       Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
+    --blocksize INTEGER             Overwrite profile's tile size.
     -t, --dtype [ubyte|uint8|uint16|int16|uint32|int32|float32|float64] Output data type.
     --overview-level INTEGER         Overview level (if not provided, appropriate overview level will be selected until the
                                      smallest overview is smaller than the value of the internal blocksize)
@@ -409,13 +410,21 @@ $ cd rio-cogeo
 $ pip install -e .[dev]
 ```
 
-**Python3.6 only**
+**Python >=3.7 only**
 
-This repo is set to use `pre-commit` to run *flake8*, *pydocstring* and *black*
-("uncompromising Python code formatter") when commiting new code.
+This repo is set to use `pre-commit` to run *isort*, *flake8*, *pydocstring*, *black* ("uncompromising Python code formatter") and mypy when committing new code.
 
-```bash
+```
 $ pre-commit install
+
+$ git add .
+
+$ git commit -m'my change'
+isort....................................................................Passed
+black....................................................................Passed
+Flake8...................................................................Passed
+Verifying PEP257 Compliance..............................................Passed
+mypy.....................................................................Passed
 ```
 
 ## Extras

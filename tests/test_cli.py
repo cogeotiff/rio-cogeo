@@ -3,12 +3,11 @@
 import os
 
 import pytest
-
 import rasterio
+
+from rio_cogeo.errors import LossyCompression
 from rio_cogeo.scripts.cli import cogeo
 from rio_cogeo.utils import has_mask_band
-from rio_cogeo.errors import LossyCompression
-
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
@@ -222,6 +221,20 @@ def test_cogeo_overviewTilesize(monkeypatch, runner):
                 "--co",
                 "BLOCKYSIZE=128",
             ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.is_tiled
+            assert src.overviews(1)
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
+            assert src.block_shapes[0] == (128, 128)
+
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            ["create", raster_path_rgb, "output.tif", "--quiet", "--blocksize", "128"],
         )
         assert not result.exception
         assert result.exit_code == 0
@@ -459,3 +472,16 @@ def test_cogeo_validate(runner):
         assert "is NOT a valid cloud optimized GeoTIFF" in result.output
         assert not result.exception
         assert result.exit_code == 0
+
+
+def test_cogeo_validUpercaseProfile(monkeypatch, runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            ["create", raster_path_rgb, "output.tif", "--cog-profile", "DEFLATE"],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert src.compression.value == "DEFLATE"

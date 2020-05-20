@@ -1,6 +1,7 @@
 """tests rio_cogeo.profiles."""
 
 import pytest
+
 from rio_cogeo.profiles import cog_profiles
 
 
@@ -13,6 +14,9 @@ def test_profiles_jpeg():
     assert profile["blockysize"] == 512
     assert profile["photometric"] == "YCbCr"
     assert profile["interleave"] == "pixel"
+
+    profile = cog_profiles.get("JPEG")
+    assert profile["compress"] == "JPEG"
 
 
 def test_profiles_webp():

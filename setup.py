@@ -1,7 +1,8 @@
 """Setup."""
 
 import sys
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 with open("README.md") as f:
     readme = f.read()
@@ -9,18 +10,15 @@ with open("README.md") as f:
 # Runtime requirements.
 inst_reqs = [
     "click",
-    "rasterio[s3]>=1.0.28",
+    "rasterio[s3]~=1.1",
     "numpy~=1.15",
     "supermercado",
-    "mercantile",
+    "mercantile~=1.1",
 ]
 
-if sys.version_info < (3, 3):
-    inst_reqs.append("contextlib2")
-
 extra_reqs = {
-    "test": ["pytest", "pytest-cov", "rio-tiler"],
-    "dev": ["pytest", "pytest-cov", "rio-tiler", "pre-commit"],
+    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit"],
 }
 
 if sys.version_info >= (3, 6):
@@ -29,7 +27,8 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="1.1.10",
+    version="2.0a1",
+    python_requires=">=3",
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",
