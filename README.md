@@ -84,6 +84,7 @@ $ rio cogeo create --help
     --forward-band-tags              Forward band tags to output bands.
     --threads THREADS                Number of worker threads for multi-threaded compression (default: ALL_CPUS)
     --co, --profile NAME=VALUE       Driver specific creation options. See the documentation for the selected output driver for more information.
+    --config NAME=VALUE              GDAL configuration options.
     -q, --quiet                      Remove progressbar and other non-error output.
     --help                           Show this message and exit.
 ```
