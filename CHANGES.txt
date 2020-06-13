@@ -1,3 +1,8 @@
+2.0a3 (2020-06-13)
+------------------
+- add `info` CLI (#134)
+
+
 2.0a2 (2020-05-20)
 ------------------
 - add `--config` CLI option to pass additional GDAL Configuration options (#135)

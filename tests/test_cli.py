@@ -485,3 +485,15 @@ def test_cogeo_validUpercaseProfile(monkeypatch, runner):
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
             assert src.compression.value == "DEFLATE"
+
+
+def test_cogeo_info(runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(cogeo, ["info", raster_path_rgb])
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(cogeo, ["info", raster_invalid_cog, "--json"])
+        assert not result.exception
+        assert result.exit_code == 0
