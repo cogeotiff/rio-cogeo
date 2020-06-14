@@ -151,6 +151,7 @@ Profile
     Alpha Band:       False
     Internal Mask:    False
     Interleave:       BAND
+    Colormap:         False
 
 Geo
     Crs:              EPSG:32634
