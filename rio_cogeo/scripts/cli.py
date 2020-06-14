@@ -274,6 +274,11 @@ def info(input, to_json):
             "ColorSpace": src_dst.photometric.value if src_dst.photometric else None,
         }
 
+        try:
+            colormap = src_dst.colormap(1)
+        except ValueError:
+            colormap = None
+
         profile = {
             "Bands": src_dst.count,
             "Width": src_dst.width,
@@ -285,6 +290,7 @@ def info(input, to_json):
             "Alpha Band": utils.has_alpha_band(src_dst),
             "Internal Mask": utils.has_mask_band(src_dst),
             "Nodata": src_dst.nodata,
+            "ColorMap": colormap is not None,
         }
         geo = {
             "CRS": f"EPSG:{src_dst.crs.to_epsg()}",
@@ -343,6 +349,7 @@ def info(input, to_json):
     {click.style("Alpha Band:", bold=True):<{sep}} {profile['Alpha Band']}
     {click.style("Internal Mask:", bold=True):<{sep}} {profile['Internal Mask']}
     {click.style("Interleave:", bold=True):<{sep}} {profile['Interleave']}
+    {click.style("ColorMap:", bold=True):<{sep}} {profile['ColorMap']}
 
 {click.style('Geo', bold=True)}
     {click.style("Crs:", bold=True):<{sep}} {geo['CRS']}
