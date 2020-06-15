@@ -61,6 +61,7 @@ def cog_translate(
     allow_intermediate_compression=False,
     forward_band_tags=False,
     quiet=False,
+    temporary_compression="DEFLATE",
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -106,6 +107,8 @@ def cog_translate(
         Ref: https://github.com/cogeotiff/rio-cogeo/issues/19
     quiet: bool, optional (default: False)
         Mask processing steps.
+    temporary_compression: str, optional
+        Compression used for the intermediate file, default is deflate.
 
     """
     if isinstance(indexes, int):
@@ -221,9 +224,11 @@ def cog_translate(
                     dst_kwargs["photometric"] = "MINISBLACK"
 
                 meta.update(**dst_kwargs)
-                if not allow_intermediate_compression:
-                    meta.pop("compress", None)
-                    meta.pop("photometric", None)
+                meta.pop("compress", None)
+                meta.pop("photometric", None)
+
+                if allow_intermediate_compression:
+                    meta["compress"] = temporary_compression
 
                 if in_memory is None:
                     in_memory = vrt_dst.width * vrt_dst.height < IN_MEMORY_THRESHOLD
