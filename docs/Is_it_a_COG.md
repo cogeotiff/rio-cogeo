@@ -1,6 +1,5 @@
-# Is it a COG ? 
 
-## How to recognize a COG and how to create a proper one! 
+# How to recognize a COG and how to create a proper one! 
 
 **Requirements**
 

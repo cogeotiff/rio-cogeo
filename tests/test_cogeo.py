@@ -29,6 +29,7 @@ raster_path_toosmall = os.path.join(FIXTURES_DIR, "image_51px.tif")
 raster_path_offsets = os.path.join(FIXTURES_DIR, "image_with_offsets.tif")
 raster_colormap = os.path.join(FIXTURES_DIR, "image_colormap.tif")
 raster_nocolormap = os.path.join(FIXTURES_DIR, "image_nocolormap.tif")
+raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -422,3 +423,14 @@ def test_cog_translate_forward_cmap(runner):
                 cog_translate(dataset, "cogeo.tif", deflate_profile, quiet=True)
                 with rasterio.open("cogeo.tif") as cog:
                     assert cog.colorinterp == dataset.colorinterp
+
+
+def test_output_size(runner):
+    """Validate fix for #140."""
+    with runner.isolated_filesystem():
+        with rasterio.open(raster_badoutputsize) as src_dst:
+            with MemoryFile() as memfile:
+                cog_translate(src_dst, memfile.name, deflate_profile, quiet=True)
+                with memfile.open() as dataset:
+                    assert src_dst.width == dataset.width
+                    assert src_dst.height == dataset.height

@@ -159,7 +159,12 @@ def cog_translate(
                     dst_kwargs["blockxsize"] = tilesize
                     dst_kwargs["blockysize"] = tilesize
 
-            vrt_params = dict(add_alpha=True, dtype=dtype)
+            vrt_params = {
+                "add_alpha": True,
+                "dtype": dtype,
+                "width": src_dst.width,
+                "height": src_dst.height,
+            }
 
             if nodata is not None:
                 vrt_params.update(
