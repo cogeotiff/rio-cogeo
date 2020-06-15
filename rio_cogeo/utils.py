@@ -2,9 +2,15 @@
 
 import math
 import warnings
+from typing import Dict
 
+import mercantile
+from rasterio.crs import CRS
 from rasterio.enums import ColorInterp, MaskFlags
-from rasterio.warp import calculate_default_transform
+from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.transform import Affine
+from rasterio.warp import calculate_default_transform, transform_bounds
+from supermercado.burntiles import tile_extrema
 
 from rio_cogeo.errors import DeprecationWarning
 
@@ -141,3 +147,41 @@ def has_mask_band(src_dst):
     if any([MaskFlags.per_dataset in flags for flags in src_dst.mask_flag_enums]):
         return True
     return False
+
+
+def get_web_optimized_params(
+    src_dst,
+    tilesize=256,
+    latitude_adjustment: bool = True,
+    warp_resampling: str = "nearest",
+    grid_crs=CRS.from_epsg(3857),
+) -> Dict:
+    """Return VRT parameters for a WebOptimized COG."""
+    bounds = list(
+        transform_bounds(
+            src_dst.crs, CRS.from_epsg(4326), *src_dst.bounds, densify_pts=21
+        )
+    )
+    center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
+
+    lat = 0 if latitude_adjustment else center[1]
+    max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
+
+    extrema = tile_extrema(bounds, max_zoom)
+
+    left, _, _, top = mercantile.xy_bounds(
+        extrema["x"]["min"], extrema["y"]["min"], max_zoom
+    )
+    vrt_res = _meters_per_pixel(max_zoom, 0, tilesize=tilesize)
+    vrt_transform = Affine(vrt_res, 0, left, 0, -vrt_res, top)
+
+    vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * tilesize
+    vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * tilesize
+
+    return dict(
+        crs=grid_crs,
+        transform=vrt_transform,
+        width=vrt_width,
+        height=vrt_height,
+        resampling=ResamplingEnums[warp_resampling],
+    )
