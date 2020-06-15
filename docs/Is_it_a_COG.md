@@ -182,7 +182,8 @@ Note:
 
 - JPEG compression is not lossless but **lossy**, meaning we will loose some information (change in pixel values) but if you need a COG for visual purposes the gain in size might be worth it.
 - WEBP compression has a configuration option to be lossless and will result is a file which will be ~50% smaller than the deflate version. Sadly WEBP is not provided by default in geospatial software.
-## 4. Visualize
+
+## 5. Visualize
 
 You can either load the COG in QGIS or use our plugin (rio-viz) to load it in a web browser.
  
@@ -191,6 +192,6 @@ $ pip install rio-viz
 $ rio viz HYP_50M_SR_COG.tif
 ```
 
-![](https://paper-attachments.dropbox.com/s_1994331A6E8DAC0B2C258CB007FEAED22F7C5F17118426112E242E714ED2FD4E_1591935344063_Capture+decran+le+2020-06-12+a+00.15.15.png)
+![](https://user-images.githubusercontent.com/10407788/84684622-ea130100-af06-11ea-8e13-e9d27fc43afc.png)
 
 
