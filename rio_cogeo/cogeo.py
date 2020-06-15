@@ -9,7 +9,6 @@ from contextlib import ExitStack, contextmanager
 from typing import Any, Dict
 
 import click
-import mercantile
 import rasterio
 from rasterio.crs import CRS
 from rasterio.enums import ColorInterp
@@ -18,10 +17,7 @@ from rasterio.env import GDALVersion
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
-from rasterio.transform import Affine
 from rasterio.vrt import WarpedVRT
-from rasterio.warp import transform_bounds
-from supermercado.burntiles import tile_extrema
 
 from rio_cogeo import utils
 from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
@@ -174,36 +170,13 @@ def cog_translate(
                 vrt_params.update(dict(add_alpha=False))
 
             if web_optimized:
-                bounds = list(
-                    transform_bounds(
-                        src_dst.crs, WGS84_CRS, *src_dst.bounds, densify_pts=21
-                    )
+                params = utils.get_web_optimized_params(
+                    src_dst,
+                    tilesize=tilesize,
+                    latitude_adjustment=latitude_adjustment,
+                    warp_resampling=resampling,
                 )
-                center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
-
-                lat = 0 if latitude_adjustment else center[1]
-                max_zoom = utils.get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
-
-                extrema = tile_extrema(bounds, max_zoom)
-
-                left, _, _, top = mercantile.xy_bounds(
-                    extrema["x"]["min"], extrema["y"]["min"], max_zoom
-                )
-                vrt_res = utils._meters_per_pixel(max_zoom, 0, tilesize=tilesize)
-                vrt_transform = Affine(vrt_res, 0, left, 0, -vrt_res, top)
-
-                vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * tilesize
-                vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * tilesize
-
-                vrt_params.update(
-                    dict(
-                        crs=WEB_MERCATOR_CRS,
-                        transform=vrt_transform,
-                        width=vrt_width,
-                        height=vrt_height,
-                        resampling=ResamplingEnums[resampling],
-                    )
-                )
+                vrt_params.update(**params)
 
             with WarpedVRT(src_dst, **vrt_params) as vrt_dst:
                 meta = vrt_dst.meta
