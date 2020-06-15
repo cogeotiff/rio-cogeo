@@ -1,13 +1,16 @@
 """Rio_cogeo.scripts.cli."""
 
+import json
 import os
 import warnings
 
 import click
 import numpy
+import rasterio
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.rio import options
 
+from rio_cogeo import utils
 from rio_cogeo import version as cogeo_version
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -254,3 +257,114 @@ def validate(input, strict):
         click.echo("{} is a valid cloud optimized GeoTIFF".format(input))
     else:
         click.echo("{} is NOT a valid cloud optimized GeoTIFF".format(input))
+
+
+@cogeo.command(short_help="Lists information about a raster dataset.")
+@options.file_in_arg
+@click.option(
+    "--json", "to_json", default=False, is_flag=True, help="Print as JSON.",
+)
+def info(input, to_json):
+    """Dataset info."""
+    with rasterio.open(input) as src_dst:
+        _info = {
+            "Path": input,
+            "Driver": src_dst.driver,
+            "Compression": src_dst.compression.value if src_dst.compression else None,
+            "ColorSpace": src_dst.photometric.value if src_dst.photometric else None,
+        }
+
+        try:
+            colormap = src_dst.colormap(1)
+        except ValueError:
+            colormap = None
+
+        profile = {
+            "Bands": src_dst.count,
+            "Width": src_dst.width,
+            "Height": src_dst.height,
+            "Count": src_dst.count,
+            "Tiled": src_dst.is_tiled,
+            "Dtype": src_dst.dtypes[0],
+            "Interleave": src_dst.interleaving.value,
+            "Alpha Band": utils.has_alpha_band(src_dst),
+            "Internal Mask": utils.has_mask_band(src_dst),
+            "Nodata": src_dst.nodata,
+            "ColorMap": colormap is not None,
+        }
+        geo = {
+            "CRS": f"EPSG:{src_dst.crs.to_epsg()}",
+            "BoundingBox": tuple(src_dst.bounds),
+            "Origin": (src_dst.transform.c, src_dst.transform.f),
+            "Resolution": (src_dst.transform.a, src_dst.transform.e),
+        }
+
+        ifd_raw = [
+            {
+                "Level": 0,
+                "Width": src_dst.width,
+                "Height": src_dst.height,
+                "Blocksize": src_dst.block_shapes[0],
+                "Decimation": 0,
+            }
+        ]
+        overviews = src_dst.overviews(1)
+
+    ifd_ovr = []
+    for ix, decim in enumerate(overviews):
+        with rasterio.open(input, OVERVIEW_LEVEL=ix) as ovr_dst:
+            ifd_ovr.append(
+                {
+                    "Level": ix + 1,
+                    "Width": ovr_dst.width,
+                    "Height": ovr_dst.height,
+                    "Blocksize": ovr_dst.block_shapes[0],
+                    "Decimation": decim,
+                }
+            )
+
+    ifds = ifd_raw + ifd_ovr
+
+    if to_json:
+        output = _info.copy()
+        output["Profile"] = profile
+        output["GEO"] = geo
+        output["IFD"] = ifds
+        click.echo(json.dumps(output))
+    else:
+        sep = 25
+        click.echo(
+            f"""{click.style('Driver:', bold=True)} {_info['Driver']}
+{click.style('File:', bold=True)} {_info['Path']}
+{click.style('Compression:', bold=True)} {_info['Compression']}
+{click.style('ColorSpace:', bold=True)} {_info['ColorSpace']}
+
+{click.style('Profile', bold=True)}
+    {click.style("Width:", bold=True):<{sep}} {profile['Width']}
+    {click.style("Height:", bold=True):<{sep}} {profile['Height']}
+    {click.style("Bands:", bold=True):<{sep}} {profile['Count']}
+    {click.style("Tiled:", bold=True):<{sep}} {profile['Tiled']}
+    {click.style("Dtype:", bold=True):<{sep}} {profile['Dtype']}
+    {click.style("NoData:", bold=True):<{sep}} {profile['Nodata']}
+    {click.style("Alpha Band:", bold=True):<{sep}} {profile['Alpha Band']}
+    {click.style("Internal Mask:", bold=True):<{sep}} {profile['Internal Mask']}
+    {click.style("Interleave:", bold=True):<{sep}} {profile['Interleave']}
+    {click.style("ColorMap:", bold=True):<{sep}} {profile['ColorMap']}
+
+{click.style('Geo', bold=True)}
+    {click.style("Crs:", bold=True):<{sep}} {geo['CRS']}
+    {click.style("Origin:", bold=True):<{sep}} {geo['Origin']}
+    {click.style("Resolution:", bold=True):<{sep}} {geo['Resolution']}
+    {click.style("BoundingBox:", bold=True):<{sep}} {geo['BoundingBox']}"""
+        )
+
+        click.echo(
+            f"""
+{click.style('IFD', bold=True)}
+    {click.style('Id', underline=True, bold=True):<20}{click.style('Size', underline=True, bold=True):<27}{click.style('BlockSize', underline=True, bold=True):<26}{click.style('Decimation', underline=True, bold=True):<33}"""
+        )
+
+        for ifd in ifds:
+            wh = f"{ifd['Width']}x{ifd['Height']}"
+            bl = f"{ifd['Blocksize'][1]}x{ifd['Blocksize'][0]}"
+            click.echo(f"""    {ifd['Level']:<8}{wh:<15}{bl:<14}{ifd['Decimation']}""")

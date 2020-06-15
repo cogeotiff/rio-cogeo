@@ -6,6 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
+from typing import Any, Dict
 
 import click
 import mercantile
@@ -304,7 +305,7 @@ def cog_translate(
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(src_path, strict=False):
+def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
     """
     Validate Cloud Optimized Geotiff.
 
@@ -314,6 +315,8 @@ def cog_validate(src_path, strict=False):
         A dataset path or URL. Will be opened in "r" mode.
     strict: bool
         Treat warnings as errors
+    quiet: bool
+        Remove standard outputs
 
     This script is the rasterio equivalent of
     https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
@@ -321,7 +324,7 @@ def cog_validate(src_path, strict=False):
     """
     errors = []
     warnings = []
-    details = {}
+    details: Dict[str, Any] = {}
 
     if not GDALVersion.runtime().at_least("2.2"):
         raise Exception("GDAL 2.2 or above required")
@@ -449,20 +452,18 @@ def cog_validate(src_path, strict=False):
                     if not ovr_dst.is_tiled:
                         errors.append("Overview of index {} is not tiled".format(ix))
 
-    if warnings:
+    if warnings and not quiet:
         click.secho("The following warnings were found:", fg="yellow", err=True)
         for w in warnings:
             click.echo("- " + w, err=True)
         click.echo(err=True)
 
-    if errors:
+    if errors and not quiet:
         click.secho("The following errors were found:", fg="red", err=True)
         for e in errors:
             click.echo("- " + e, err=True)
 
-        return False
-
-    if warnings and strict:
+    if errors or (warnings and strict):
         return False
 
     return True

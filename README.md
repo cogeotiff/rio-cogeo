@@ -45,14 +45,16 @@ $ rio cogeo --help
   Rasterio cogeo subcommands.
 
   Options:
-    --help  Show this message and exit.
+    --version  Show the version and exit.
+    --help     Show this message and exit.
 
   Commands:
     create    Create COGEO
+    info      Lists information about a raster dataset.
     validate  Validate COGEO
 ```
 
-- Create a Cloud Optimized Geotiff.
+### Create
 
 ```
 $ rio cogeo create --help
@@ -89,7 +91,7 @@ $ rio cogeo create --help
     --help                           Show this message and exit.
 ```
 
-- Check if a Cloud Optimized Geotiff is valid.
+### Validate
 
 ```
 $ rio cogeo validate --help
@@ -104,6 +106,22 @@ Options:
 
 The `strict` options will treat warnings (e.g missing overviews) as errors.
 
+
+### Info
+(extented version or `rio info`).
+
+```
+$ rio cogeo info --help
+Usage: rio cogeo info [OPTIONS] INPUT
+
+  Dataset info.
+
+Options:
+  --json  Print as JSON.
+  --help  Show this message and exit.
+```
+
+
 ### Examples
 
 ```bash
@@ -115,6 +133,39 @@ $ rio cogeo validate mydataset_jpeg.tif
 
 # Create a COGEO with JPEG profile and the first 3 bands of the data and add internal mask
 $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-profile jpeg
+
+# List Raster info
+$ rio cogeo info mydataset_jpeg.tif
+Driver: GTiff
+File: mydataset_jpeg.tif
+Compression: DEFLATE
+ColorSpace: None
+
+Profile
+    Width:            10980
+    Height:           10980
+    Bands:            1
+    Tiled:            True
+    Dtype:            uint16
+    NoData:           0.0
+    Alpha Band:       False
+    Internal Mask:    False
+    Interleave:       BAND
+    Colormap:         False
+
+Geo
+    Crs:              EPSG:32634
+    Origin:           (699960.0, 3600000.0)
+    Resolution:       (10.0, -10.0)
+    BoundingBox:      (699960.0, 3490200.0, 809760.0, 3600000.0)
+
+IFD
+    Id      Size           BlockSize     Decimation           
+    0       10980x10980    1024x1024     0
+    1       5490x5490      128x128       2
+    2       2745x2745      128x128       4
+    3       1373x1373      128x128       8
+    4       687x687        128x128       16
 ```
 
 ## Default COGEO profiles

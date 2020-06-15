@@ -37,7 +37,7 @@ def test_cog_validate_valid(monkeypatch):
     assert cog_validate(raster_rgb)
 
     # not tiled, no overview
-    assert not cog_validate(raster_big)
+    assert not cog_validate(raster_big, quiet=True)
 
     # external overview
     assert not cog_validate(raster_external)
