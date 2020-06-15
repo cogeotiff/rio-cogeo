@@ -1,7 +1,7 @@
-2.0a3 (TBD)
+2.0a3 (2020-06-15)
 ------------------
 - add `info` CLI (#134)
-
+- use `Deflate` as default temporary compression (#137)
 
 2.0a2 (2020-05-20)
 ------------------
