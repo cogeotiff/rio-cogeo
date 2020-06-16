@@ -99,6 +99,8 @@ As mentioned earlier, the validation script confirms the GeoTIFF is not internal
 
 ## 4. COG creation
 
+Creating a valid Cloud Optimized GeoTIFF, is not just about creating internal tiles and/or internal overviews. The file internal structure has to be specific and require a **complete** copy of a file, which is what rio-cogeo does internally.
+
 ```
 $ rio cogeo create HYP_50M_SR.tif HYP_50M_SR_COG.tif
 Reading input: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR.tif
@@ -106,6 +108,14 @@ Reading input: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR.tif
 Adding overviews...
 Updating dataset tags...
 Writing output to: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR_COG.tif
+```
+
+You could get the same COG with GDAL commands
+
+```
+$ gdal_translate HYP_50M_SR.tif tmp.tif -co TILED=YES -co COMPRESS=DEFLATE
+$ gdaladdo -r nearest tmp.tif 2 4 8 16 32
+$ gdal_translate tmp.tif HYP_50M_SR_COG.tif -co TILED=YES -co COMPRESS=DEFLATE -co COPY_SRC_OVERVIEWS=YES
 ```
 
 By default `rio-cogeo` will create a COG with 512x512 blocksize (for the raw resolution) and use DEFLATE compression to reduce file size.
@@ -192,5 +202,3 @@ $ rio viz HYP_50M_SR_COG.tif
 ```
 
 ![](https://user-images.githubusercontent.com/10407788/84684622-ea130100-af06-11ea-8e13-e9d27fc43afc.png)
-
-

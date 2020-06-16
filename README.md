@@ -416,14 +416,49 @@ print(overviews)
 [2, 4, 8]
 ```
 
-## GDAL Version
+## Band metadata
+By default rio cogeo DO NOT forward **band** metadata (e.g statistics) to the output dataset.
 
-It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
-create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
+```
+$ gdalinfo my_file.tif
+...
+Band 1 Block=576x1 Type=Float64, ColorInterp=Gray
+  NoData Value=999999986991104
+  Unit Type: mol mol-1
+  Metadata:
+    long_name=CO2 Dry-Air Column Average
+    missing_value=9.9999999e+14
+    NETCDF_DIM_time=0
+    NETCDF_VARNAME=XCO2MEAN
+    units=mol mol-1
+    _FillValue=9.9999999e+14
 
+$ rio cogeo my_file.tif my_cog.tif --blocksize 256
 
-More info in https://github.com/cogeotiff/rio-cogeo/issues/55
+$ gdalinfo my_cog.tif
+...
+Band 1 Block=256x256 Type=Float64, ColorInterp=Gray
+  NoData Value=999999986991104
+  Overviews: 288x181
+```
 
+You can use `--forward-band-tags` to forwards the band metadata to output dataset.
+
+```
+$ rio cogeo create my_file.tif my_cog.tif --blocksize 256 --forward-band-tags
+$ gdalinfo my_cog.tif
+...
+Band 1 Block=256x256 Type=Float64, ColorInterp=Gray
+  NoData Value=999999986991104
+  Overviews: 288x181
+  Metadata:
+    long_name=CO2 Dry-Air Column Average
+    missing_value=9.9999999e+14
+    NETCDF_DIM_time=0
+    NETCDF_VARNAME=XCO2MEAN
+    units=mol mol-1
+    _FillValue=9.9999999e+14
+```
 
 ## Nodata, Alpha and Mask
 
@@ -446,6 +481,14 @@ $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --a
 
 Using internal nodata value with lossy compression (`webp`, `jpeg`) is not
 recommanded. Please use internal masking (or alpha band if using webp).
+
+## GDAL Version
+
+It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
+create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
+
+
+More info in https://github.com/cogeotiff/rio-cogeo/issues/55
 
 ## Contribution & Development
 
