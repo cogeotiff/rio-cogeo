@@ -56,6 +56,18 @@ def test_cog_validate_valid(monkeypatch):
         cog_validate(raster_jpeg)
 
 
+def test_cog_validate_return():
+    resp = cog_validate(raster_rgb, return_errors=True)
+    assert resp["valid"]
+    assert not resp["warnings"]
+    assert not resp["errors"]
+
+    resp = cog_validate(raster_no_ovr, return_errors=True)
+    assert resp["valid"]
+    assert len(resp["warnings"]) == 1
+    assert not resp["errors"]
+
+
 def test_cog_validate_validCreatioValid(monkeypatch):
     """Should work as expected (validate cogeo file)."""
     runner = CliRunner()

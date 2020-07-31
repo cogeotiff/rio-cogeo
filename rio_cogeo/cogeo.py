@@ -288,7 +288,12 @@ def cog_translate(
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
+def cog_validate(
+    src_path: str,
+    strict: bool = False,
+    quiet: bool = False,
+    return_errors: bool = False,
+):
     """
     Validate Cloud Optimized Geotiff.
 
@@ -300,6 +305,8 @@ def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
         Treat warnings as errors
     quiet: bool
         Remove standard outputs
+    return_errors: bool
+        Return errors and warnings
 
     This script is the rasterio equivalent of
     https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
@@ -446,7 +453,10 @@ def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
         for e in errors:
             click.echo("- " + e, err=True)
 
+    is_valid = True
     if errors or (warnings and strict):
-        return False
+        is_valid = False
 
-    return True
+    if return_errors:
+        return {"errors": errors, "warnings": warnings, "valid": is_valid}
+    return is_valid
