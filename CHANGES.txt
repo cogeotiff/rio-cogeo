@@ -1,3 +1,8 @@
+Next (TBD)
+------------------
+- move most of the cogeo info code in rio_cogeo.cogeo.cog_info api
+- add cog_validation info in cogeo info result
+
 2.0a4 (2020-06-15)
 ------------------
 - Force output width and height (#140)
