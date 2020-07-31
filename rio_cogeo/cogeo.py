@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict
+from typing import Any, Dict, List, Tuple
 
 import click
 import rasterio
@@ -288,21 +288,32 @@ def cog_translate(
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
+def cog_validate(
+    src_path: str, strict: bool = False, quiet: bool = False
+) -> Tuple[bool, List[str], List[str]]:
     """
     Validate Cloud Optimized Geotiff.
 
+    This script is the rasterio equivalent of
+    https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
+
     Parameters
     ----------
-    src_path : str or PathLike object
+    src_path: str or PathLike object
         A dataset path or URL. Will be opened in "r" mode.
     strict: bool
         Treat warnings as errors
     quiet: bool
         Remove standard outputs
 
-    This script is the rasterio equivalent of
-    https://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/validate_cloud_optimized_geotiff.py
+    Returns
+    -------
+    is_valid: bool
+        True is src_path is a valid COG.
+    errors: list
+        List of validation errors.
+    warnings: list
+        List of validation warnings.
 
     """
     errors = []
@@ -446,23 +457,30 @@ def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
         for e in errors:
             click.echo("- " + e, err=True)
 
-    if errors or (warnings and strict):
-        return False
+    is_valid = False if errors or (warnings and strict) else True
 
-    return True
+    return is_valid, errors, warnings
 
 
 def cog_info(src_path: str, **kwargs: Any) -> Dict:
     """Get general info and validate Cloud Optimized Geotiff."""
-    is_valid_cog = cog_validate(src_path, **kwargs)
+    is_valid, validation_errors, validation_warnings = cog_validate(
+        src_path, quiet=True, **kwargs,
+    )
+
     with rasterio.open(src_path) as src_dst:
         _info = {
             "Path": src_path,
             "Driver": src_dst.driver,
-            "is_valid_COG": is_valid_cog,
+            "COG": is_valid,
             "Compression": src_dst.compression.value if src_dst.compression else None,
             "ColorSpace": src_dst.photometric.value if src_dst.photometric else None,
         }
+        if validation_errors:
+            _info["COG_errors"] = validation_errors
+
+        if validation_warnings:
+            _info["COG_warnings"] = validation_warnings
 
         try:
             colormap = src_dst.colormap(1)
@@ -482,8 +500,13 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             "Nodata": src_dst.nodata,
             "ColorMap": colormap is not None,
         }
+        crs = (
+            f"EPSG:{src_dst.crs.to_epsg()}"
+            if src_dst.crs.to_epsg()
+            else src_dst.crs.to_wkt()
+        )
         geo = {
-            "CRS": f"EPSG:{src_dst.crs.to_epsg()}",
+            "CRS": crs,
             "BoundingBox": tuple(src_dst.bounds),
             "Origin": (src_dst.transform.c, src_dst.transform.f),
             "Resolution": (src_dst.transform.a, src_dst.transform.e),

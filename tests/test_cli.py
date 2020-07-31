@@ -494,6 +494,10 @@ def test_cogeo_info(runner):
         assert not result.exception
         assert result.exit_code == 0
 
-        result = runner.invoke(cogeo, ["info", raster_invalid_cog, "--json"])
+        result = runner.invoke(cogeo, ["info", raster_path_rgb, "--json"])
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(cogeo, ["info", raster_invalid_cog])
         assert not result.exception
         assert result.exit_code == 0

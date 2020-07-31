@@ -34,26 +34,38 @@ jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 def test_cog_validate_valid(monkeypatch):
     """Should work as expected (validate cogeo file)."""
     # not tiled but 512x512
-    assert cog_validate(raster_rgb)
+    assert cog_validate(raster_rgb)[0]
 
     # not tiled, no overview
-    assert not cog_validate(raster_big, quiet=True)
+    assert not cog_validate(raster_big, quiet=True)[0]
 
     # external overview
-    assert not cog_validate(raster_external)
+    assert not cog_validate(raster_external)[0]
 
     # non-sorted overview
-    assert not cog_validate(raster_ovrsorted)
+    assert not cog_validate(raster_ovrsorted)[0]
 
     # invalid decimation
-    assert not cog_validate(raster_decim)
+    assert not cog_validate(raster_decim)[0]
 
     # no overview
-    assert cog_validate(raster_no_ovr)
-    assert not cog_validate(raster_no_ovr, strict=True)
+    assert cog_validate(raster_no_ovr)[0]
+    assert not cog_validate(raster_no_ovr, strict=True)[0]
 
     with pytest.raises(Exception):
         cog_validate(raster_jpeg)
+
+
+def test_cog_validate_return():
+    valid, err, warn = cog_validate(raster_rgb)
+    assert valid
+    assert not err
+    assert not warn
+
+    valid, err, warn = cog_validate(raster_no_ovr)
+    assert valid
+    assert len(warn) == 1
+    assert not err
 
 
 def test_cog_validate_validCreatioValid(monkeypatch):

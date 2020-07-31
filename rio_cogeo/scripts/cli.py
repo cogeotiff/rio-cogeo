@@ -251,7 +251,8 @@ def create(
 @click.option("--strict", default=False, is_flag=True, help="Treat warnings as errors.")
 def validate(input, strict):
     """Validate Cloud Optimized Geotiff."""
-    if cog_validate(input, strict=strict):
+    is_valid, _, _ = cog_validate(input, strict=strict)
+    if is_valid:
         click.echo("{} is a valid cloud optimized GeoTIFF".format(input))
     else:
         click.echo("{} is NOT a valid cloud optimized GeoTIFF".format(input))
@@ -273,7 +274,7 @@ def info(input, to_json):
         click.echo(
             f"""{click.style('Driver:', bold=True)} {metadata['Driver']}
 {click.style('File:', bold=True)} {metadata['Path']}
-{click.style('Is a Valid COG:', bold=True)} {metadata['is_valid_COG']}
+{click.style('COG:', bold=True)} {metadata['COG']}
 {click.style('Compression:', bold=True)} {metadata['Compression']}
 {click.style('ColorSpace:', bold=True)} {metadata['ColorSpace']}
 
@@ -306,3 +307,13 @@ def info(input, to_json):
             wh = f"{ifd['Width']}x{ifd['Height']}"
             bl = f"{ifd['Blocksize'][1]}x{ifd['Blocksize'][0]}"
             click.echo(f"""    {ifd['Level']:<8}{wh:<15}{bl:<14}{ifd['Decimation']}""")
+
+        if metadata.get("COG_errors") or metadata.get("COG_warnings"):
+            click.echo(
+                f"""
+{click.style('COG Validation info', bold=True)}"""
+            )
+            for error in metadata.get("COG_errors", []):
+                click.secho(f"""    - {error} (error)""", fg="red")
+            for warning in metadata.get("COG_warnings", []):
+                click.secho(f"""    - {warning} (warning)""", fg="yellow")

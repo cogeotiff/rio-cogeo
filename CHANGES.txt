@@ -1,7 +1,8 @@
-Next (TBD)
+2.0a5 (2020-07-31)
 ------------------
 - move most of the cogeo info code in rio_cogeo.cogeo.cog_info api
 - add cog_validation info in cogeo info result
+- cog_validate returns a tuple (is_valid, errors, warnings) (#142, co-author with @geospatial-jeff)
 
 2.0a4 (2020-06-15)
 ------------------
