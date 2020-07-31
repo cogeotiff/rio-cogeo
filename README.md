@@ -138,6 +138,7 @@ $ rio cogeo create mydataset.tif mydataset_jpeg.tif -b 1,2,3 --add-mask --cog-pr
 $ rio cogeo info mydataset_jpeg.tif
 Driver: GTiff
 File: mydataset_jpeg.tif
+COG: True
 Compression: DEFLATE
 ColorSpace: None
 
