@@ -450,3 +450,73 @@ def cog_validate(src_path: str, strict: bool = False, quiet: bool = False):
         return False
 
     return True
+
+
+def cog_info(src_path: str, **kwargs: Any) -> Dict:
+    """Get general info and validate Cloud Optimized Geotiff."""
+    is_valid_cog = cog_validate(src_path, **kwargs)
+    with rasterio.open(src_path) as src_dst:
+        _info = {
+            "Path": src_path,
+            "Driver": src_dst.driver,
+            "is_valid_COG": is_valid_cog,
+            "Compression": src_dst.compression.value if src_dst.compression else None,
+            "ColorSpace": src_dst.photometric.value if src_dst.photometric else None,
+        }
+
+        try:
+            colormap = src_dst.colormap(1)
+        except ValueError:
+            colormap = None
+
+        profile = {
+            "Bands": src_dst.count,
+            "Width": src_dst.width,
+            "Height": src_dst.height,
+            "Count": src_dst.count,
+            "Tiled": src_dst.is_tiled,
+            "Dtype": src_dst.dtypes[0],
+            "Interleave": src_dst.interleaving.value,
+            "Alpha Band": utils.has_alpha_band(src_dst),
+            "Internal Mask": utils.has_mask_band(src_dst),
+            "Nodata": src_dst.nodata,
+            "ColorMap": colormap is not None,
+        }
+        geo = {
+            "CRS": f"EPSG:{src_dst.crs.to_epsg()}",
+            "BoundingBox": tuple(src_dst.bounds),
+            "Origin": (src_dst.transform.c, src_dst.transform.f),
+            "Resolution": (src_dst.transform.a, src_dst.transform.e),
+        }
+
+        ifd_raw = [
+            {
+                "Level": 0,
+                "Width": src_dst.width,
+                "Height": src_dst.height,
+                "Blocksize": src_dst.block_shapes[0],
+                "Decimation": 0,
+            }
+        ]
+        overviews = src_dst.overviews(1)
+
+    ifd_ovr = []
+    for ix, decim in enumerate(overviews):
+        with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
+            ifd_ovr.append(
+                {
+                    "Level": ix + 1,
+                    "Width": ovr_dst.width,
+                    "Height": ovr_dst.height,
+                    "Blocksize": ovr_dst.block_shapes[0],
+                    "Decimation": decim,
+                }
+            )
+
+    ifds = ifd_raw + ifd_ovr
+    output = _info.copy()
+    output["Profile"] = profile
+    output["GEO"] = geo
+    output["IFD"] = ifds
+
+    return output
