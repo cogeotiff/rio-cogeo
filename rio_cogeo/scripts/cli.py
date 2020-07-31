@@ -253,7 +253,8 @@ def create(
 @click.option("--strict", default=False, is_flag=True, help="Treat warnings as errors.")
 def validate(input, strict):
     """Validate Cloud Optimized Geotiff."""
-    if cog_validate(input, strict=strict):
+    is_valid, _, _ = cog_validate(input, strict=strict)
+    if is_valid:
         click.echo("{} is a valid cloud optimized GeoTIFF".format(input))
     else:
         click.echo("{} is NOT a valid cloud optimized GeoTIFF".format(input))

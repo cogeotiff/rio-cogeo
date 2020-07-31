@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict
+from typing import Any, Dict, List, Tuple
 
 import click
 import rasterio
@@ -289,11 +289,8 @@ def cog_translate(
 
 
 def cog_validate(
-    src_path: str,
-    strict: bool = False,
-    quiet: bool = False,
-    return_errors: bool = False,
-):
+    src_path: str, strict: bool = False, quiet: bool = False
+) -> Tuple[bool, List[str], List[str]]:
     """
     Validate Cloud Optimized Geotiff.
 
@@ -453,10 +450,6 @@ def cog_validate(
         for e in errors:
             click.echo("- " + e, err=True)
 
-    is_valid = True
-    if errors or (warnings and strict):
-        is_valid = False
+    is_valid = False if errors or (warnings and strict) else True
 
-    if return_errors:
-        return {"errors": errors, "warnings": warnings, "valid": is_valid}
-    return is_valid
+    return is_valid, errors, warnings
