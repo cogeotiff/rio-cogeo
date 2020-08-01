@@ -500,6 +500,8 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             "Nodata": src_dst.nodata,
             "ColorInterp": tuple([color.name for color in src_dst.colorinterp]),
             "ColorMap": colormap is not None,
+            "Scales": src_dst.scales,
+            "Offsets": src_dst.offsets,
         }
         crs = (
             f"EPSG:{src_dst.crs.to_epsg()}"

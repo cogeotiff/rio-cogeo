@@ -303,6 +303,8 @@ def info(input, to_json):
     {click.style("Interleave:", bold=True):<{sep}} {metadata['Profile']['Interleave']}
     {click.style("ColorInterp:", bold=True):<{sep}} {metadata['Profile']['ColorInterp']}
     {click.style("ColorMap:", bold=True):<{sep}} {metadata['Profile']['ColorMap']}
+    {click.style("Scales:", bold=True):<{sep}} {metadata['Profile']['Scales']}
+    {click.style("Offsets:", bold=True):<{sep}} {metadata['Profile']['Offsets']}
 
 {click.style('Profile', bold=True)}
     {create_tag_table(metadata['Tags'], sep+5)}
