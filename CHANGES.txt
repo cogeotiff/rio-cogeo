@@ -3,6 +3,7 @@
 - move most of the cogeo info code in rio_cogeo.cogeo.cog_info api
 - add cog_validation info in cogeo info result
 - cog_validate returns a tuple (is_valid, errors, warnings) (#142, co-author with @geospatial-jeff)
+- add scale, offset, image tags and band color interpretation in cog_info (#145, #146 and #147)
 
 2.0a4 (2020-06-15)
 ------------------

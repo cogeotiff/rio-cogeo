@@ -27,7 +27,7 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="2.0a4",
+    version="2.0a5",
     python_requires=">=3",
     description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
