@@ -2,6 +2,7 @@
 
 import json
 import os
+import typing
 import warnings
 
 import click
@@ -14,6 +15,18 @@ from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
+
+
+def create_tag_table(tags: typing.Dict, sep: int) -> str:
+    """Helper method to create a table from dictionary of image tags -- used by info cli"""
+    table = ""
+    for idx, (k, v) in enumerate(tags.items()):
+        name = f"{k}:"
+        row = f"{click.style(name, bold=True):<{sep}} {v}"
+        if idx + 1 != len(tags):
+            row += "\n    "
+        table += row
+    return table
 
 
 class BdxParamType(click.ParamType):
@@ -290,6 +303,9 @@ def info(input, to_json):
     {click.style("Interleave:", bold=True):<{sep}} {metadata['Profile']['Interleave']}
     {click.style("ColorInterp:", bold=True):<{sep}} {metadata['Profile']['ColorInterp']}
     {click.style("ColorMap:", bold=True):<{sep}} {metadata['Profile']['ColorMap']}
+
+{click.style('Profile', bold=True)}
+    {create_tag_table(metadata['Tags'], sep+5)}
 
 {click.style('Geo', bold=True)}
     {click.style("Crs:", bold=True):<{sep}} {metadata['GEO']['CRS']}

@@ -523,6 +523,7 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             }
         ]
         overviews = src_dst.overviews(1)
+        tags = src_dst.tags()
 
     ifd_ovr = []
     for ix, decim in enumerate(overviews):
@@ -541,6 +542,7 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
     output = _info.copy()
     output["Profile"] = profile
     output["GEO"] = geo
+    output["Tags"] = tags
     output["IFD"] = ifds
 
     return output
