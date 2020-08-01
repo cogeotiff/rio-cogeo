@@ -498,6 +498,9 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             "Alpha Band": utils.has_alpha_band(src_dst),
             "Internal Mask": utils.has_mask_band(src_dst),
             "Nodata": src_dst.nodata,
+            "ColorInterp": tuple(
+                [src_dst.colorinterp[idx].name for idx in range(src_dst.count)]
+            ),
             "ColorMap": colormap is not None,
         }
         crs = (

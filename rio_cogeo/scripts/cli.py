@@ -288,6 +288,7 @@ def info(input, to_json):
     {click.style("Alpha Band:", bold=True):<{sep}} {metadata['Profile']['Alpha Band']}
     {click.style("Internal Mask:", bold=True):<{sep}} {metadata['Profile']['Internal Mask']}
     {click.style("Interleave:", bold=True):<{sep}} {metadata['Profile']['Interleave']}
+    {click.style("ColorInterp:", bold=True):<{sep}} {metadata['Profile']['ColorInterp']}
     {click.style("ColorMap:", bold=True):<{sep}} {metadata['Profile']['ColorMap']}
 
 {click.style('Geo', bold=True)}
