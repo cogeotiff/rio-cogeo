@@ -487,8 +487,6 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
         except ValueError:
             colormap = None
 
-        breakpoint()
-
         profile = {
             "Bands": src_dst.count,
             "Width": src_dst.width,
