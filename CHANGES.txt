@@ -1,3 +1,11 @@
+2.0a6 (2020-08-18)
+------------------
+- fix bug in cogeo.info when CRS in not set.
+- add minzoom/maxzoom in cogeo.info output.
+
+Breaking Changes:
+- rio_cogeo.utils.get_max_zoom renamed rio_cogeo.utils.get_zooms and now return min/max zoom.
+
 2.0a5 (2020-07-31)
 ------------------
 - move most of the cogeo info code in rio_cogeo.cogeo.cog_info api

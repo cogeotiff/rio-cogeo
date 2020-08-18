@@ -313,7 +313,9 @@ def info(input, to_json):
     {click.style("Crs:", bold=True):<{sep}} {metadata['GEO']['CRS']}
     {click.style("Origin:", bold=True):<{sep}} {metadata['GEO']['Origin']}
     {click.style("Resolution:", bold=True):<{sep}} {metadata['GEO']['Resolution']}
-    {click.style("BoundingBox:", bold=True):<{sep}} {metadata['GEO']['BoundingBox']}"""
+    {click.style("BoundingBox:", bold=True):<{sep}} {metadata['GEO']['BoundingBox']}
+    {click.style("MinZoom:", bold=True):<{sep}} {metadata['GEO']['MinZoom']}
+    {click.style("MaxZoom:", bold=True):<{sep}} {metadata['GEO']['MaxZoom']}"""
         )
 
         click.echo(

@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 import rasterio
@@ -503,16 +503,29 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             "Scales": src_dst.scales,
             "Offsets": src_dst.offsets,
         }
-        crs = (
-            f"EPSG:{src_dst.crs.to_epsg()}"
-            if src_dst.crs.to_epsg()
-            else src_dst.crs.to_wkt()
-        )
+        try:
+            crs = (
+                f"EPSG:{src_dst.crs.to_epsg()}"
+                if src_dst.crs.to_epsg()
+                else src_dst.crs.to_wkt()
+            )
+        except AttributeError:
+            crs = None
+
+        minzoom: Optional[int] = None
+        maxzoom: Optional[int] = None
+        try:
+            minzoom, maxzoom = utils.get_zooms(src_dst)
+        except Exception:
+            pass
+
         geo = {
             "CRS": crs,
             "BoundingBox": tuple(src_dst.bounds),
             "Origin": (src_dst.transform.c, src_dst.transform.f),
             "Resolution": (src_dst.transform.a, src_dst.transform.e),
+            "MinZoom": minzoom,
+            "MaxZoom": maxzoom,
         }
 
         ifd_raw = [

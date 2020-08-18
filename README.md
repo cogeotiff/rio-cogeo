@@ -159,6 +159,8 @@ Geo
     Origin:           (699960.0, 3600000.0)
     Resolution:       (10.0, -10.0)
     BoundingBox:      (699960.0, 3490200.0, 809760.0, 3600000.0)
+    MinZoom:          10
+    MaxZoom:          19
 
 IFD
     Id      Size           BlockSize     Decimation           
