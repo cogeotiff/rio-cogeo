@@ -21,6 +21,7 @@ raster_path_missingnodata = os.path.join(
 raster_invalid_cog = os.path.join(
     os.path.dirname(__file__), "fixtures", "validate", "image_dec.tif"
 )
+raster_path_gcps = os.path.join(os.path.dirname(__file__), "fixtures", "slc.tif")
 
 
 @pytest.fixture(autouse=True)
@@ -499,5 +500,9 @@ def test_cogeo_info(runner):
         assert result.exit_code == 0
 
         result = runner.invoke(cogeo, ["info", raster_invalid_cog])
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(cogeo, ["info", raster_path_gcps])
         assert not result.exception
         assert result.exit_code == 0

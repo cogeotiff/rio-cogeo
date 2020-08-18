@@ -2,7 +2,7 @@
 
 import math
 import warnings
-from typing import Dict
+from typing import Dict, Tuple
 
 import mercantile
 from rasterio.crs import CRS
@@ -66,7 +66,7 @@ def zoom_for_pixelsize(pixel_size, max_z=24, tilesize=256):
     return max_z - 1
 
 
-def get_max_zoom(src_dst, lat=0.0, tilesize=256):
+def get_zooms(src_dst, lat=0.0, tilesize=256) -> Tuple[int, int]:
     """
     Calculate raster max zoom level.
 
@@ -98,7 +98,11 @@ def get_max_zoom(src_dst, lat=0.0, tilesize=256):
     corrected_resolution = native_resolution * latitude_correction_factor
 
     max_zoom = zoom_for_pixelsize(corrected_resolution, tilesize=tilesize)
-    return max_zoom
+
+    ovr_resolution = corrected_resolution * max(h, w) / tilesize
+    min_zoom = zoom_for_pixelsize(ovr_resolution, tilesize=tilesize)
+
+    return (min_zoom, max_zoom)
 
 
 def get_maximum_overview_level(src_dst, minsize=512):
@@ -165,7 +169,7 @@ def get_web_optimized_params(
     center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2]
 
     lat = 0 if latitude_adjustment else center[1]
-    max_zoom = get_max_zoom(src_dst, lat=lat, tilesize=tilesize)
+    _, max_zoom = get_zooms(src_dst, lat=lat, tilesize=tilesize)
 
     extrema = tile_extrema(bounds, max_zoom)
 

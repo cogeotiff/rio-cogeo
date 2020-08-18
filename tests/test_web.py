@@ -14,7 +14,7 @@ from rio_tiler import reader as COGreader
 
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
-from rio_cogeo.utils import get_max_zoom
+from rio_cogeo.utils import get_zooms
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
 raster_path_north = os.path.join(
@@ -49,7 +49,8 @@ def test_cog_translate_webZooms():
             config=config,
         )
         with rasterio.open("cogeo.tif") as out_dst:
-            assert get_max_zoom(out_dst) == 8
+            _, maxzoom = get_zooms(out_dst)
+            assert maxzoom == 8
 
         cog_translate(
             raster_path_north,
@@ -61,7 +62,8 @@ def test_cog_translate_webZooms():
             config=config,
         )
         with rasterio.open("cogeo.tif") as out_dst:
-            assert get_max_zoom(out_dst) == 10
+            _, maxzoom = get_zooms(out_dst)
+            assert maxzoom == 10
 
 
 def test_cog_translate_web():
@@ -93,7 +95,7 @@ def test_cog_translate_web():
                 ts = blocks[0][0]
                 assert not out_dst.width % ts
                 assert not out_dst.height % ts
-                max_zoom = get_max_zoom(out_dst)
+                _, max_zoom = get_zooms(out_dst)
 
                 bounds = list(
                     transform_bounds(
@@ -150,7 +152,7 @@ def test_cog_translate_Internal():
                 ts = blocks[0][0]
                 assert not out_dst.width % ts
                 assert not out_dst.height % ts
-                max_zoom = get_max_zoom(out_dst)
+                _, max_zoom = get_zooms(out_dst)
 
                 bounds = list(
                     transform_bounds(
