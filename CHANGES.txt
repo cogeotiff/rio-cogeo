@@ -1,3 +1,9 @@
+2.0a7 (2020-09-23)
+------------------
+- remove duplicate `count` information in rio_cogeo.cogeo.cog_info output (#150)
+- allow COG with IFD offset up to 200 bytes to accomodate with GDAL 3.1 changes (#151)
+- fix zoom level calculation in rio_cogeo.cogeo.cog_info
+
 2.0a6 (2020-08-18)
 ------------------
 - fix bug in cogeo.info when CRS in not set.
@@ -74,7 +80,7 @@ Breaking Changes:
 
 - Add lzma/lerc/lerc_deflate/lerc_zstd profiles (#97)
 - Add warnings and notes for `non-standard` compression (#97)
-- fix THREADS definition for GDAL config 
+- fix THREADS definition for GDAL config
 
 1.1.2 (2019-09-12)
 ------------------

@@ -27,9 +27,9 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="2.0a6",
+    version="2.0a7",
     python_requires=">=3",
-    description=u"CloudOptimized GeoTIFF (COGEO) creation plugin for rasterio",
+    description=u"Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",
     classifiers=[
@@ -38,6 +38,7 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering :: GIS",
     ],
     keywords="COGEO CloudOptimized Geotiff rasterio",
