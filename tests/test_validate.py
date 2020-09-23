@@ -8,24 +8,21 @@ from click.testing import CliRunner
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
-raster_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
-raster_external = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "image_external.tif"
-)
-raster_no_ovr = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "image_no_overview.tif"
-)
-raster_ovrsorted = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "image_sorted.tif"
-)
-raster_decim = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "image_dec.tif"
-)
-raster_jpeg = os.path.join(
-    os.path.dirname(__file__), "fixtures", "validate", "nontiff.jpg"
-)
-raster_big = os.path.join(os.path.dirname(__file__), "fixtures", "image_2000px.tif")
+fixture_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 
+raster_rgb = os.path.join(fixture_dir, "image_rgb.tif")
+raster_external = os.path.join(fixture_dir, "validate", "image_external.tif")
+raster_no_ovr = os.path.join(fixture_dir, "validate", "image_no_overview.tif")
+raster_ovrsorted = os.path.join(fixture_dir, "validate", "image_sorted.tif")
+raster_decim = os.path.join(fixture_dir, "validate", "image_dec.tif")
+raster_jpeg = os.path.join(fixture_dir, "validate", "nontiff.jpg")
+raster_big = os.path.join(fixture_dir, "image_2000px.tif")
+
+# COG created with rio-cogeo but using gdal 3.1
+raster_rioCOGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
+
+# COG created using GDAL COG Driver
+raster_COGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
@@ -54,6 +51,10 @@ def test_cog_validate_valid(monkeypatch):
 
     with pytest.raises(Exception):
         cog_validate(raster_jpeg)
+
+    # COG created with GDAL 3.1
+    assert cog_validate(raster_rioCOGgdal31)[0]
+    assert cog_validate(raster_COGgdal31)[0]
 
 
 def test_cog_validate_return():

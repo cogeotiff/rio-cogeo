@@ -39,7 +39,7 @@ def TemporaryRasterFile(dst_path, suffix=".tif"):
         os.remove(fileobj.name)
 
 
-def cog_translate(
+def cog_translate(  # noqa: C901
     source,
     dst_path,
     dst_kwargs,
@@ -288,7 +288,7 @@ def cog_translate(
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
-def cog_validate(
+def cog_validate(  # noqa: C901
     src_path: str, strict: bool = False, quiet: bool = False
 ) -> Tuple[bool, List[str], List[str]]:
     """
@@ -350,13 +350,24 @@ def cog_validate(
                     )
 
             ifd_offset = int(src.get_tag_item("IFD_OFFSET", "TIFF", bidx=1))
-            ifd_offsets = [ifd_offset]
-            if ifd_offset not in (8, 16):
+            # Starting from GDAL 3.1, GeoTIFF and COG have ghost headers
+            # e.g:
+            # """
+            # GDAL_STRUCTURAL_METADATA_SIZE=000140 bytes
+            # LAYOUT=IFDS_BEFORE_DATA
+            # BLOCK_ORDER=ROW_MAJOR
+            # BLOCK_LEADER=SIZE_AS_UINT4
+            # BLOCK_TRAILER=LAST_4_BYTES_REPEATED
+            # KNOWN_INCOMPATIBLE_EDITION=NO
+            # """
+            #
+            # This header should be < 200bytes
+            if ifd_offset > 200:
                 errors.append(
-                    "The offset of the main IFD should be 8 for ClassicTIFF "
-                    "or 16 for BigTIFF. It is {} instead".format(ifd_offset)
+                    f"The offset of the main IFD should be < 200. It is {ifd_offset} instead"
                 )
 
+            ifd_offsets = [ifd_offset]
             details["ifd_offsets"] = {}
             details["ifd_offsets"]["main"] = ifd_offset
 
@@ -491,7 +502,6 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
             "Bands": src_dst.count,
             "Width": src_dst.width,
             "Height": src_dst.height,
-            "Count": src_dst.count,
             "Tiled": src_dst.is_tiled,
             "Dtype": src_dst.dtypes[0],
             "Interleave": src_dst.interleaving.value,

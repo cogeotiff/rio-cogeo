@@ -294,7 +294,7 @@ def info(input, to_json):
 {click.style('Profile', bold=True)}
     {click.style("Width:", bold=True):<{sep}} {metadata['Profile']['Width']}
     {click.style("Height:", bold=True):<{sep}} {metadata['Profile']['Height']}
-    {click.style("Bands:", bold=True):<{sep}} {metadata['Profile']['Count']}
+    {click.style("Bands:", bold=True):<{sep}} {metadata['Profile']['Bands']}
     {click.style("Tiled:", bold=True):<{sep}} {metadata['Profile']['Tiled']}
     {click.style("Dtype:", bold=True):<{sep}} {metadata['Profile']['Dtype']}
     {click.style("NoData:", bold=True):<{sep}} {metadata['Profile']['Nodata']}
