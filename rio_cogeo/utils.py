@@ -1,18 +1,16 @@
 """rio_cogeo.utils: Utility functions."""
 
 import math
-import warnings
 from typing import Dict, Tuple
 
 import mercantile
 from rasterio.crs import CRS
 from rasterio.enums import ColorInterp, MaskFlags
 from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.transform import Affine
 from rasterio.warp import calculate_default_transform, transform_bounds
 from supermercado.burntiles import tile_extrema
-
-from rio_cogeo.errors import DeprecationWarning
 
 
 def _meters_per_pixel(zoom, lat=0.0, tilesize=256):
@@ -98,42 +96,11 @@ def get_zooms(src_dst, lat=0.0, tilesize=256) -> Tuple[int, int]:
     corrected_resolution = native_resolution * latitude_correction_factor
 
     max_zoom = zoom_for_pixelsize(corrected_resolution, tilesize=tilesize)
-
-    ovr_resolution = corrected_resolution * max(h, w) / tilesize
+    overview_level = get_maximum_overview_level(w, h, minsize=tilesize) or 1
+    ovr_resolution = corrected_resolution * overview_level
     min_zoom = zoom_for_pixelsize(ovr_resolution, tilesize=tilesize)
 
     return (min_zoom, max_zoom)
-
-
-def get_maximum_overview_level(src_dst, minsize=512):
-    """
-    Calculate the maximum overview level.
-
-    Attributes
-    ----------
-    src_dst : rasterio.io.DatasetReader
-        Rasterio io.DatasetReader object.
-    minsize : int (default: 512)
-        Minimum overview size.
-
-    Returns
-    -------
-    nlevel: int
-        overview level.
-
-    """
-    warnings.warn(
-        "rio_cogeo.utils.get_maximum_overview_level will be removed in version 2.0",
-        DeprecationWarning,
-    )
-
-    nlevel = 0
-    overview = 1
-    while min(src_dst.width // overview, src_dst.height // overview) > minsize:
-        overview *= 2
-        nlevel += 1
-
-    return nlevel
 
 
 def has_alpha_band(src_dst):
