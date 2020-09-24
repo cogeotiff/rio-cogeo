@@ -96,8 +96,10 @@ def get_zooms(src_dst, lat=0.0, tilesize=256) -> Tuple[int, int]:
     corrected_resolution = native_resolution * latitude_correction_factor
 
     max_zoom = zoom_for_pixelsize(corrected_resolution, tilesize=tilesize)
-    overview_level = get_maximum_overview_level(w, h, minsize=tilesize) or 1
-    ovr_resolution = corrected_resolution * overview_level
+    overview_level = get_maximum_overview_level(w, h, minsize=tilesize)
+
+    ovr_resolution = corrected_resolution * (2 ** overview_level)
+
     min_zoom = zoom_for_pixelsize(ovr_resolution, tilesize=tilesize)
 
     return (min_zoom, max_zoom)

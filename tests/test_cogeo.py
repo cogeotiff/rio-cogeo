@@ -8,7 +8,7 @@ import rasterio
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
 
-from rio_cogeo.cogeo import cog_translate, cog_validate
+from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
 from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
@@ -30,6 +30,7 @@ raster_path_offsets = os.path.join(FIXTURES_DIR, "image_with_offsets.tif")
 raster_colormap = os.path.join(FIXTURES_DIR, "image_colormap.tif")
 raster_nocolormap = os.path.join(FIXTURES_DIR, "image_nocolormap.tif")
 raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
+raster_web_z5_z11 = os.path.join(FIXTURES_DIR, "image_web_z5_z11.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -434,3 +435,13 @@ def test_output_size(runner):
                 with memfile.open() as dataset:
                     assert src_dst.width == dataset.width
                     assert src_dst.height == dataset.height
+
+
+def test_cog_info():
+    """Test COGEO info."""
+    info = cog_info(raster_web_z5_z11)
+    assert info["COG"]
+    assert info["GEO"]["CRS"] == "EPSG:3857"
+    assert info["GEO"]["MinZoom"] == 5
+    assert info["GEO"]["MaxZoom"] == 11
+    assert len(info["IFD"]) == 6

@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import click
 import rasterio
@@ -40,24 +40,24 @@ def TemporaryRasterFile(dst_path, suffix=".tif"):
 
 
 def cog_translate(  # noqa: C901
-    source,
-    dst_path,
-    dst_kwargs,
-    indexes=None,
-    nodata=None,
-    dtype=None,
-    add_mask=None,
-    overview_level=None,
-    overview_resampling="nearest",
-    web_optimized=False,
-    latitude_adjustment=True,
-    resampling="nearest",
-    in_memory=None,
-    config=None,
-    allow_intermediate_compression=False,
-    forward_band_tags=False,
-    quiet=False,
-    temporary_compression="DEFLATE",
+    source: str,
+    dst_path: str,
+    dst_kwargs: Dict,
+    indexes: Sequence[int] = None,
+    nodata: Optional[Union[str, int, float]] = None,
+    dtype: Optional[str] = None,
+    add_mask: bool = False,
+    overview_level: Optional[int] = None,
+    overview_resampling: str = "nearest",
+    web_optimized: bool = False,
+    latitude_adjustment: bool = True,
+    resampling: str = "nearest",
+    in_memory: Optional[bool] = None,
+    config: Optional[Dict] = None,
+    allow_intermediate_compression: bool = False,
+    forward_band_tags: bool = False,
+    quiet: bool = False,
+    temporary_compression: str = "DEFLATE",
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -242,7 +242,7 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Reading input: {}".format(source), err=True)
                 fout = os.devnull if quiet else sys.stderr
-                with click.progressbar(wind, file=fout, show_percent=True) as windows:
+                with click.progressbar(wind, file=fout, show_percent=True) as windows:  # type: ignore
                     for _, w in windows:
                         matrix = vrt_dst.read(window=w, indexes=indexes)
                         tmp_dst.write(matrix, window=w)
