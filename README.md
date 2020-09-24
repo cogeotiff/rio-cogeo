@@ -1,7 +1,7 @@
 # rio-cogeo
 
 <p align="center">
-  <img src="https://www.cogeo.org/images/logo/Cog-02.png" style="max-width: 200px;" alt="rio-tiler"></a>
+  <img src="https://www.cogeo.org/images/logo/Cog-02.png" style="width: 200px;" alt="COG"></a>
 </p>
 <p align="center">
   <em>Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio.</em>
@@ -29,7 +29,7 @@
 
 ---
 
-**Documentation**: <a href="https://cogeotiff.github.io/rio-cogeo/" target="_blank">https://cogeotiff.github.io/rio-tiler/</a>
+**Documentation**: <a href="https://cogeotiff.github.io/rio-cogeo/" target="_blank">https://cogeotiff.github.io/rio-cogeo/</a>
 
 **Source Code**: <a href="https://github.com/cogeotiff/rio-cogeo" target="_blank">https://github.com/cogeotiff/rio-cogeo</a>
 
