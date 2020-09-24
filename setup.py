@@ -19,6 +19,7 @@ inst_reqs = [
 extra_reqs = {
     "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3"],
     "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit"],
+    "docs": ["mkdocs", "mkdocs-material"],
 }
 
 if sys.version_info >= (3, 6):
@@ -27,7 +28,7 @@ if sys.version_info >= (3, 6):
 
 setup(
     name="rio-cogeo",
-    version="2.0a7",
+    version="2.0a7.post1",
     python_requires=">=3",
     description=u"Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,

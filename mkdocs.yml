@@ -1,0 +1,63 @@
+site_name: rio-cogeo
+site_description: Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio.
+
+repo_name: 'cogeotiff/rio-cogeo'
+repo_url: 'https://github.com/cogeotiff/rio-cogeo'
+edit_uri: 'blob/master/docs/src/'
+site_url: 'https://cogeotiff.github.io/rio-cogeo/'
+
+extra:
+  social:
+    - icon: 'fontawesome/brands/github'
+      link: 'https://github.com/cogeotiff'
+    - icon: 'fontawesome/brands/twitter'
+      link: 'https://twitter.com/cogeotiff'
+    - icon: 'fontawesome/solid/globe'
+      link: 'https://www.cogeo.org/'
+
+nav:
+  - Home: "index.md"
+  - Command-line interface (CLI): "CLI.md"
+  - Application programming interface (API): "API.md"
+  - Advanced Topics: "Advanced.md"
+  - COG Profiles: "profile.md"
+  - How To: "Is_it_a_COG.md"
+  - Development - Contributing: "contributing.md"
+  - Release Notes: "release-notes.md"
+
+plugins:
+  - search
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    scheme: default
+
+# https://github.com/kylebarron/cogeo-mosaic/blob/mkdocs/mkdocs.yml#L50-L75
+markdown_extensions:
+  - admonition
+  - attr_list
+  - codehilite:
+      guess_lang: false
+  - def_list
+  - footnotes
+  - pymdownx.arithmatex
+  - pymdownx.betterem
+  - pymdownx.caret:
+      insert: false
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.escapeall:
+      hardbreak: true
+      nbsp: true
+  - pymdownx.magiclink:
+      hide_protocol: true
+      repo_url_shortener: true
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - toc:
+      permalink: true
