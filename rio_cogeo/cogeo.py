@@ -43,7 +43,7 @@ def cog_translate(  # noqa: C901
     source: str,
     dst_path: str,
     dst_kwargs: Dict,
-    indexes: Sequence[int] = None,
+    indexes: Optional[Sequence[int]] = None,
     nodata: Optional[Union[str, int, float]] = None,
     dtype: Optional[str] = None,
     add_mask: bool = False,
