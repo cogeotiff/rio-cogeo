@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.0a8 (2020-09-28)
+
+* Make sure Alpha band isn't considered as an internal mask by `utils.has_mask_band` (#156)
+
 ## 2.0a7.post1 (2020-09-23)
 
 * Fix wrong min-zoom calculation in `rio_cogeo.cogeo.cog_info`
