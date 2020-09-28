@@ -117,7 +117,12 @@ def has_alpha_band(src_dst):
 
 def has_mask_band(src_dst):
     """Check for mask band in source."""
-    if any([MaskFlags.per_dataset in flags for flags in src_dst.mask_flag_enums]):
+    if any(
+        [
+            (MaskFlags.per_dataset in flags and MaskFlags.alpha not in flags)
+            for flags in src_dst.mask_flag_enums
+        ]
+    ):
         return True
     return False
 
