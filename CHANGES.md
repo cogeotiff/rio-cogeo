@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.0a9 (2020-10-03)
+
+* Update max IFD offset to 300 bytes (https://github.com/cogeotiff/rio-cogeo/issues/158)
+
 ## 2.0a8 (2020-09-28)
 
 * Make sure Alpha band isn't considered as an internal mask by `utils.has_mask_band` (#156)

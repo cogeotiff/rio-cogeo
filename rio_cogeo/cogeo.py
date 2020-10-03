@@ -362,9 +362,9 @@ def cog_validate(  # noqa: C901
             # """
             #
             # This header should be < 200bytes
-            if ifd_offset > 200:
+            if ifd_offset > 300:
                 errors.append(
-                    f"The offset of the main IFD should be < 200. It is {ifd_offset} instead"
+                    f"The offset of the main IFD should be < 300. It is {ifd_offset} instead"
                 )
 
             ifd_offsets = [ifd_offset]
