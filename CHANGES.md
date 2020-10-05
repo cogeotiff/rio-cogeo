@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.0.0 (2020-10-05)
+
+There have been no changes since 2.0a9
+
 ## 2.0a9 (2020-10-03)
 
 * Update max IFD offset to 300 bytes (https://github.com/cogeotiff/rio-cogeo/issues/158)

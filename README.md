@@ -52,16 +52,14 @@ enforce several features:
 
 ```bash
 $ pip install -U pip
-$ pip install rio-cogeo --pre  # Version 2.0 currently in development
+$ pip install rio-cogeo
 ```
 
 Or install from source:
 
-```
-$ git clone https://github.com/cogeotiff/rio-cogeo.git
-$ cd rio-cogeo
+```bash
 $ pip install -U pip
-$ pip install -e .
+$ pip install git+https://github.com/cogeotiff/rio-cogeo.git
 ```
 
 ## GDAL Version
