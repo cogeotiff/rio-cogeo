@@ -1,5 +1,9 @@
 # Release Notes
 
+## 2.0.1 (2020-10-07)
+
+* remove `pkg_resources` (https://github.com/pypa/setuptools/issues/510)
+
 ## 2.0.0 (2020-10-05)
 
 There have been no changes since 2.0a9

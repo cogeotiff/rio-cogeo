@@ -10,7 +10,7 @@ import numpy
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.rio import options
 
-from rio_cogeo import version as cogeo_version
+from rio_cogeo import __version__ as cogeo_version
 from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
 
