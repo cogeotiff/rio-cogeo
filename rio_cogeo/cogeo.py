@@ -9,6 +9,7 @@ from contextlib import ExitStack, contextmanager
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import click
+import morecantile
 import rasterio
 from rasterio.enums import ColorInterp
 from rasterio.enums import Resampling as ResamplingEnums
@@ -47,6 +48,7 @@ def cog_translate(  # noqa: C901
     overview_level: Optional[int] = None,
     overview_resampling: str = "nearest",
     web_optimized: bool = False,
+    tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
     zoom_level_strategy: str = "auto",
     aligned_levels: Optional[int] = None,
     resampling: str = "nearest",
@@ -84,6 +86,8 @@ def cog_translate(  # noqa: C901
         Resampling algorithm for overviews
     web_optimized: bool, optional (default: False)
         Create web-optimized cogeo.
+    tms: morecantile.TileMatrixSet, optional (default: "WebMercatorQuad")
+        TileMatrixSet to use for reprojection, resolution and alignment.
     zoom_level_strategy: str, optional (default: auto)
         Strategy to determine zoom level (same as in GDAL 3.2).
         LOWER will select the zoom level immediately below the theoretical computed non-integral zoom level, leading to subsampling.
@@ -186,6 +190,7 @@ def cog_translate(  # noqa: C901
                     warp_resampling=resampling,
                     zoom_level_strategy=zoom_level_strategy,
                     aligned_levels=aligned_levels,
+                    tms=tms,
                 )
                 vrt_params.update(**params)
 
