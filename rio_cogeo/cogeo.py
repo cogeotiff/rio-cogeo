@@ -48,6 +48,7 @@ def cog_translate(  # noqa: C901
     overview_resampling: str = "nearest",
     web_optimized: bool = False,
     zoom_level_strategy: str = "auto",
+    aligned_levels: Optional[int] = None,
     resampling: str = "nearest",
     in_memory: Optional[bool] = None,
     config: Optional[Dict] = None,
@@ -81,14 +82,17 @@ def cog_translate(  # noqa: C901
         COGEO overview (decimation) level
     overview_resampling : str, optional (default: "nearest")
         Resampling algorithm for overviews
-    web_optimized: bool, option (default: False)
+    web_optimized: bool, optional (default: False)
         Create web-optimized cogeo.
-    zoom_level_strategy: str, option (default: auto)
+    zoom_level_strategy: str, optional (default: auto)
         Strategy to determine zoom level (same as in GDAL 3.2).
         LOWER will select the zoom level immediately below the theoretical computed non-integral zoom level, leading to subsampling.
         On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
         Defaults to AUTO which selects the closest zoom level.
         ref: https://gdal.org/drivers/raster/cog.html#raster-cog
+    aligned_levels: int, optional.
+        Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
+        Default is to use the maximum overview levels.
     resampling : str, optional (default: "nearest")
         Resampling algorithm.
     in_memory: bool, optional
@@ -181,6 +185,7 @@ def cog_translate(  # noqa: C901
                     tilesize=tilesize,
                     warp_resampling=resampling,
                     zoom_level_strategy=zoom_level_strategy,
+                    aligned_levels=aligned_levels,
                 )
                 vrt_params.update(**params)
 

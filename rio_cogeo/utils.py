@@ -1,6 +1,6 @@
 """rio_cogeo.utils: Utility functions."""
 
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import morecantile
 from rasterio.crs import CRS
@@ -67,6 +67,7 @@ def get_web_optimized_params(
     tilesize=256,
     warp_resampling: str = "nearest",
     zoom_level_strategy: str = "auto",
+    aligned_levels: Optional[int] = None,
     tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
 ) -> Dict:
     """Return VRT parameters for a WebOptimized COG."""
@@ -75,24 +76,34 @@ def get_web_optimized_params(
             src_dst.crs, CRS.from_epsg(4326), *src_dst.bounds, densify_pts=21
         )
     )
-    _, max_zoom = get_zooms(
+    min_zoom, max_zoom = get_zooms(
         src_dst, tilesize=tilesize, tms=tms, zoom_level_strategy=zoom_level_strategy,
     )
 
-    minimumTile = tms.tile(bounds[0], bounds[3], max_zoom)
-    maximumTile = tms.tile(bounds[2], bounds[1], max_zoom)
-    extrema = {
-        "x": {"min": minimumTile.x, "max": maximumTile.x + 1},
-        "y": {"min": minimumTile.y, "max": maximumTile.y + 1},
-    }
+    if aligned_levels is not None:
+        min_zoom = max_zoom - aligned_levels
 
-    left, _, _, top = tms.xy_bounds(extrema["x"]["min"], extrema["y"]["min"], max_zoom)
+    ul_tile = tms.tile(bounds[0], bounds[3], min_zoom)
+    left, _, _, top = tms.xy_bounds(ul_tile.x, ul_tile.y, ul_tile.z)
 
     vrt_res = tms._resolution(tms.matrix(max_zoom))
     vrt_transform = Affine(vrt_res, 0, left, 0, -vrt_res, top)
 
-    vrt_width = (extrema["x"]["max"] - extrema["x"]["min"]) * tilesize
-    vrt_height = (extrema["y"]["max"] - extrema["y"]["min"]) * tilesize
+    lr_tile = tms.tile(bounds[2], bounds[1], min_zoom)
+    extrema = {
+        "x": {"min": ul_tile.x, "max": lr_tile.x + 1},
+        "y": {"min": ul_tile.y, "max": lr_tile.y + 1},
+    }
+    vrt_width = (
+        (extrema["x"]["max"] - extrema["x"]["min"])
+        * tilesize
+        * 2 ** (max_zoom - min_zoom)
+    )
+    vrt_height = (
+        (extrema["y"]["max"] - extrema["y"]["min"])
+        * tilesize
+        * 2 ** (max_zoom - min_zoom)
+    )
 
     return dict(
         crs=tms.crs,

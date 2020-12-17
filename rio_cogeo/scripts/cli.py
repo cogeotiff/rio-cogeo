@@ -145,6 +145,11 @@ def cogeo():
     help="Strategy to determine zoom level. (default: auto).",
 )
 @click.option(
+    "--aligned-levels",
+    type=int,
+    help="Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.",
+)
+@click.option(
     "--resampling",
     "-r",
     help="Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.",
@@ -203,6 +208,7 @@ def create(
     overview_blocksize,
     web_optimized,
     zoom_level_strategy,
+    aligned_levels,
     resampling,
     in_memory,
     allow_intermediate_compression,
@@ -245,6 +251,7 @@ def create(
         overview_resampling=overview_resampling,
         web_optimized=web_optimized,
         zoom_level_strategy=zoom_level_strategy,
+        aligned_levels=aligned_levels,
         resampling=resampling,
         in_memory=in_memory,
         config=config,
