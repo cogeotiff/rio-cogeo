@@ -4,11 +4,13 @@
 
 * switch to `morecantile` and update the web-optimized creation method to better match GDAL 3.2.
 * add `zoom_level_strategy` options to match GDAL 3.2 COG driver.
+* add `aligned_levels` (cli and api) to select the level of overview to align with the TMS grid.
 
 **Breaking Changes:**
 * removed `--latitude-adjustment/--global-maxzoom` option in the CLI
 * removed `latitude_adjustment` option in `rio_cogeo.cogeo.cog_translate`
 * updated **overview blocksize** to match the blocksize of the high resolution data (instead of default to 128)
+* for web-optimized COG, the highest overview level will be aligned with the TMS grid.
 
 ## 2.0.1 (2020-10-07)
 
