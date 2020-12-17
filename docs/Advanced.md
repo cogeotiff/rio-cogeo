@@ -11,11 +11,7 @@ Output dataset features:
 
 **Important**
 
-Because the mercator projection does not respect the distance, when working with
-multiple images covering different latitudes, you may want to use the *--global-maxzoom* option
-to create output dataset having the same MAX_ZOOM (raw data resolution).
-
-Because it will certainly create a larger file, a nodata value or alpha band should
+Because it will certainly create a larger file (with padding tiles on the side of the file), a nodata value, an alpha band or an internal mask should
 be present in the input dataset. If not the original data will be surrounded by black (0) data.
 
 
@@ -26,22 +22,10 @@ This can be updated by passing `--co BLOCKXSIZE=64 --co BLOCKYSIZE=64` options.
 
 **Web tiling optimization**
 
-if the input dataset is aligned to web mercator grid, the internal tile size
-should be equal to the web map tile size (256 or 512px). Dataset should be compressed.
+Creating a Web-Optimized COG, means you'll get a file which is perfectly aligned (bounds and internal tiles) with the mercator grid and with resolution (for the raw data and overview) which map the mercator zoom level resolution. This enable to reduce the number of GET request a dynamic tiling service needs to do to create a map tile from your COG.
 
 if the input dataset is not aligned to web mercator grid, the tiler will need
-to fetch multiple internal tiles. Because GDAL can merge range request, using
-small internal tiles (e.g 128) will reduce the number of byte transfered and
-minimized the useless bytes transfered.
-
-
-GDAL configuration to merge consecutive range requests
-
-```
-GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
-GDAL_HTTP_MULTIPLEX=YES
-GDAL_HTTP_VERSION=2
-```
+to fetch multiple internal tiles.
 
 ## Overview levels
 

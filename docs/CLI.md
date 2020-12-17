@@ -25,32 +25,27 @@ $ rio cogeo create --help
     Create Cloud Optimized Geotiff.
 
   Options:
-    -b, --bidx BIDX                  Band indexes to copy.
-    -p, --cog-profile [jpeg|webp|zstd|lzw|deflate|packbits|lzma|lerc|lerc_deflate|lerc_zstd|raw]
-                                     CloudOptimized GeoTIFF profile (default: deflate).
-    --nodata NUMBER|nan              Set nodata masking values for input dataset.
-    --add-mask                       Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
-    --blocksize INTEGER             Overwrite profile's tile size.
-    -t, --dtype [ubyte|uint8|uint16|int16|uint32|int32|float32|float64] Output data type.
-    --overview-level INTEGER         Overview level (if not provided, appropriate overview level will be selected until the
-                                     smallest overview is smaller than the value of the internal blocksize)
-    --overview-resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss]
-                                     Overview creation resampling algorithm (default: nearest).
-    --overview-blocksize TEXT        Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
-    -w, --web-optimized              Create COGEO optimized for Web.
-    --latitude-adjustment / --global-maxzoom
-                                     Use dataset native mercator resolution for MAX_ZOOM calculation (linked to dataset
-                                     center latitude, default) or ensure MAX_ZOOM equality for multiple dataset accross latitudes.
-    -r, --resampling [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss]
-                                     Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.
-    --in-memory / --no-in-memory     Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
-    --allow-intermediate-compression Allow intermediate file compression to reduce memory/disk footprint.
-    --forward-band-tags              Forward band tags to output bands.
-    --threads THREADS                Number of worker threads for multi-threaded compression (default: ALL_CPUS)
-    --co, --profile NAME=VALUE       Driver specific creation options. See the documentation for the selected output driver for more information.
-    --config NAME=VALUE              GDAL configuration options.
-    -q, --quiet                      Remove progressbar and other non-error output.
-    --help                           Show this message and exit.
+    --bidx, -b                        Band indexes to copy.
+    --cog-profile, -p                 CloudOptimized GeoTIFF profile (default: deflate). [jpeg|webp|zstd|lzw|deflate|packbits|lzma|lerc|lerc_deflate|lerc_zstd|raw]
+    --nodata                          Set nodata masking values for input dataset.
+    --add-mask                        Force output dataset creation with an internal mask (convert alpha band or nodata to mask).
+    --blocksize                       Overwrite profile's tile size.
+    --dtype, -t                       Output data type. [ubyte|uint8|uint16|int16|uint32|int32|float32|float64]
+    --overview-level                  Overview level (if not provided, appropriate overview level will be selected until the smallest overview is smaller than the value of the internal blocksize)
+    --overview-resampling             Overview creation resampling algorithm (default: nearest).  [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss]
+    --overview-blocksize              Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
+    --web-optimized, -w               Create COGEO optimized for Web.
+    --zoom-level-strategy             Strategy to determine zoom level (default: auto).  [lower|upper|auto]
+    --aligned-levels                  Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
+    --resampling, -r                  Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.  [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|gauss]
+    --in-memory / --no-in-memory      Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
+    --allow-intermediate-compression  Allow intermediate file compression to reduce memory/disk footprint.
+    --forward-band-tags               Forward band tags to output bands.
+    --threads                         Number of worker threads for multi-threaded compression (default: ALL_CPUS)
+    --co, --profile                   Driver specific creation options. See the documentation for the selected output driver for more information.
+    --config                          GDAL configuration options.
+    --quiet, -q                       Remove progressbar and other non-error output.
+    --help                            Show this message and exit.
 ```
 
 ### Validate

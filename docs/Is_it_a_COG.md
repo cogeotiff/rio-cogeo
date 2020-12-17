@@ -1,20 +1,12 @@
 
-# How to recognize a COG and how to create a proper one! 
+# How to recognize a COG and how to create a proper one!
 
 **Requirements**
 
 - python 3.7
 - rio-cogeo
 
-`$ pip install rio-cogeo --pre`
-
-You can also use Docker
-
-    docker run \
-      --name dockerimage\
-      -p 8000:8000 \
-      --volume $(pwd)/:/local \
-      --rm -it lambgeo/lambda:gdal2.4-py3.7 bash
+`$ pip install rio-cogeo`
 
 The COG Specification is pretty basic
 
@@ -23,7 +15,7 @@ The COG Specification is pretty basic
 
 Ref: https://github.com/cogeotiff/cog-spec/blob/master/spec.md
 
-In Short, the specification just means you MUST create a GeoTIFF with internal block (tile) and the header must be ordered. 
+In Short, the specification just means you MUST create a GeoTIFF with internal block (tile) and the header must be ordered.
 
 *From a command line point of view, it just means you need to add `--co TILED=TRUE` in a gdal_translate command.*
 
@@ -35,7 +27,7 @@ Natural Earth web site host really neat raster and vector datasets. Let's downlo
     $ wget https://naciscdn.org/naturalearth/50m/raster/HYP_50M_SR.zip
 ## 2. Inspect the data
 
-Here is what we want to look at: 
+Here is what we want to look at:
 
 - the size in row x lines
 - the data type (byte, float, complex …)
@@ -68,11 +60,11 @@ Geo
     BoundingBox:      (-179.99999999999997, -89.99999999998201, 179.99999999996405, 90.0)
 
 IFD
-    Id      Size           BlockSize     Decimation           
+    Id      Size           BlockSize     Decimation
     0       10800x5400     10800x1       0
 ```
 
-What we can see from the rio cogeo info output: 
+What we can see from the rio cogeo info output:
 
 - The raster has 3 bands
 - The data type is Byte (0 → 255)
@@ -84,7 +76,7 @@ With those informations we already know the GeoTIFF is not a COG (no internal bl
 ## 3. COG validation
 
 ```
-$ rio cogeo validate HYP_50M_SR.tif 
+$ rio cogeo validate HYP_50M_SR.tif
 The following warnings were found:
 - The file is greater than 512xH or 512xW, it is recommended to include internal overviews
 
@@ -95,7 +87,7 @@ The following errors were found:
 /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR.tif is NOT a valid cloud optimized GeoTIFF
 ```
 
-As mentioned earlier, the validation script confirms the GeoTIFF is not internally tiled and doesn't have overviews. 
+As mentioned earlier, the validation script confirms the GeoTIFF is not internally tiled and doesn't have overviews.
 
 ## 4. COG creation
 
@@ -104,7 +96,7 @@ Creating a valid Cloud Optimized GeoTIFF, is not just about creating internal ti
 ```
 $ rio cogeo create HYP_50M_SR.tif HYP_50M_SR_COG.tif
 Reading input: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR.tif
-    [####################################]  100%          
+    [####################################]  100%
 Adding overviews...
 Updating dataset tags...
 Writing output to: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR_COG.tif
@@ -121,7 +113,7 @@ $ gdal_translate tmp.tif HYP_50M_SR_COG.tif -co TILED=YES -co COMPRESS=DEFLATE -
 By default `rio-cogeo` will create a COG with 512x512 blocksize (for the raw resolution) and use DEFLATE compression to reduce file size.
 
 ```
-$ rio cogeo info HYP_50M_SR_COG.tif 
+$ rio cogeo info HYP_50M_SR_COG.tif
 Driver: GTiff
 File: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR_COG.tif
 Compression: DEFLATE
@@ -146,7 +138,7 @@ Geo
     BoundingBox:      (-179.99999999999997, -89.99999999998204, 179.9999999999641, 90.0)
 
 IFD
-    Id      Size           BlockSize     Decimation           
+    Id      Size           BlockSize     Decimation
     0       10800x5400     512x512       0
     1       5400x2700      128x128       2
     2       2700x1350      128x128       4
@@ -163,7 +155,7 @@ $ ls -lah
 ```
 
 
-By using `rio-cogeo`, we are not only creating a valid COG with internal tiling but we are also adding internal overviews (which let us get previews of the raw resolution with few GET requests). 
+By using `rio-cogeo`, we are not only creating a valid COG with internal tiling but we are also adding internal overviews (which let us get previews of the raw resolution with few GET requests).
 
 Even with the addition of 4 levels of overviews (see **IFD** section in previous  `rio cogeo info` output), we managed to reduce the file size by 3 (167Mb → 58Mb), and this is because rio cogeo applies **Deflate** compression by default to the COG.
 
@@ -172,9 +164,9 @@ Even with the addition of 4 levels of overviews (see **IFD** section in previous
 As seen in the first `rio cogeo info` output, the data has 3 bands (RGB) and is of Uint8 data type. Because of this configuration, we can use even more efficient compression like JPEG or WEBP.
 
 ```
-$ rio cogeo create HYP_50M_SR.tif HYP_50M_SR_COG_jpeg.tif -p jpeg          
+$ rio cogeo create HYP_50M_SR.tif HYP_50M_SR_COG_jpeg.tif -p jpeg
 Reading input: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR.tif
-    [####################################]  100%          
+    [####################################]  100%
 Adding overviews...
 Updating dataset tags...
 Writing output to: /Users/vincentsarago/Downloads/HYP_50M_SR/HYP_50M_SR_COG_jpeg.tif
@@ -187,7 +179,7 @@ $ ls -lah
 
 Now, our output file is only **4.8Mb,** which is only ~3% of the original size 😱.
 
-Note: 
+Note:
 
 - JPEG compression is not lossless but **lossy**, meaning we will loose some information (change in pixel values) but if you need a COG for visual purposes the gain in size might be worth it.
 - WEBP compression has a configuration option to be lossless and will result is a file which will be ~50% smaller than the deflate version. Sadly WEBP is not provided by default in geospatial software.
@@ -195,7 +187,7 @@ Note:
 ## 5. Visualize
 
 You can either load the COG in QGIS or use our plugin (rio-viz) to load it in a web browser.
- 
+
 ```
 $ pip install rio-viz
 $ rio viz HYP_50M_SR_COG.tif
