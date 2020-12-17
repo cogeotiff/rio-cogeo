@@ -291,23 +291,22 @@ def test_cogeo_overviewTilesize(monkeypatch, runner):
 def test_cogeo_web(runner):
     """Should work as expected."""
     with runner.isolated_filesystem():
-        with pytest.warns(UserWarning):
-            result = runner.invoke(
-                cogeo,
-                ["create", raster_path_rgb, "output.tif", "--latitude-adjustment"],
-            )
-            assert not result.exception
-            assert result.exit_code == 0
-
-        with pytest.warns(UserWarning):
-            result = runner.invoke(
-                cogeo, ["create", raster_path_rgb, "output.tif", "--global-maxzoom"]
-            )
-            assert not result.exception
-            assert result.exit_code == 0
-
         result = runner.invoke(
             cogeo, ["create", raster_path_rgb, "output.tif", "--web-optimized"]
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--web-optimized",
+                "--zoom-level-strategy",
+                "lower",
+            ],
         )
         assert not result.exception
         assert result.exit_code == 0

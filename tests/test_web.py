@@ -4,13 +4,13 @@ import os
 import struct
 import sys
 
-import mercantile
+import morecantile
 import numpy
 import pytest
 import rasterio
 from click.testing import CliRunner
 from rasterio.warp import transform_bounds
-from rio_tiler import reader as COGreader
+from rio_tiler.io import COGReader
 
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
@@ -33,7 +33,6 @@ def test_cog_translate_webZooms():
     - Test overview internal tiles are equal to mercator tile using
       cogdumper and rio-tiler
     """
-
     runner = CliRunner()
     with runner.isolated_filesystem():
         web_profile = cog_profiles.get("raw")
@@ -50,7 +49,7 @@ def test_cog_translate_webZooms():
         )
         with rasterio.open("cogeo.tif") as out_dst:
             _, maxzoom = get_zooms(out_dst)
-            assert maxzoom == 8
+            assert maxzoom == 9
 
         cog_translate(
             raster_path_north,
@@ -58,12 +57,12 @@ def test_cog_translate_webZooms():
             web_profile,
             quiet=True,
             web_optimized=True,
-            latitude_adjustment=False,
+            zoom_level_strategy="lower",
             config=config,
         )
         with rasterio.open("cogeo.tif") as out_dst:
             _, maxzoom = get_zooms(out_dst)
-            assert maxzoom == 10
+            assert maxzoom == 8
 
 
 def test_cog_translate_web():
@@ -73,6 +72,8 @@ def test_cog_translate_web():
     - Test COG size is a multiple of 256 (mercator tile size)
     - Test COG bounds are aligned with mercator grid at max zoom
     """
+    tms = morecantile.tms.get("WebMercatorQuad")
+
     runner = CliRunner()
     with runner.isolated_filesystem():
 
@@ -102,15 +103,11 @@ def test_cog_translate_web():
                         src_dst.crs, "epsg:4326", *src_dst.bounds, densify_pts=21
                     )
                 )
-                ulTile = mercantile.xy_bounds(
-                    mercantile.tile(bounds[0], bounds[3], max_zoom)
-                )
+                ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom))
                 assert out_dst.bounds.left == ulTile.left
                 assert out_dst.bounds.top == ulTile.top
 
-                lrTile = mercantile.xy_bounds(
-                    mercantile.tile(bounds[2], bounds[1], max_zoom)
-                )
+                lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom))
                 assert out_dst.bounds.right == lrTile.right
                 assert round(out_dst.bounds.bottom, 6) == round(lrTile.bottom, 6)
 
@@ -130,6 +127,8 @@ def test_cog_translate_Internal():
     from cogdumper.cog_tiles import COGTiff
     from cogdumper.filedumper import Reader as FileReader
 
+    tms = morecantile.tms.get("WebMercatorQuad")
+
     runner = CliRunner()
     with runner.isolated_filesystem():
 
@@ -160,8 +159,8 @@ def test_cog_translate_Internal():
                     )
                 )
 
-                minimumTile = mercantile.tile(bounds[0], bounds[3], max_zoom)
-                maximumTile = mercantile.tile(bounds[2], bounds[1], max_zoom)
+                minimumTile = tms.tile(bounds[0], bounds[3], max_zoom)
+                maximumTile = tms.tile(bounds[2], bounds[1], max_zoom)
 
                 with open("cogeo.tif", "rb") as out_body:
                     reader = FileReader(out_body)
@@ -175,9 +174,9 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, *minimumTile, resampling_method="nearest"
+                    with COGReader("cogeo.tif") as src_dst:
+                        data, _ = src_dst.tile(
+                            *minimumTile, resampling_method="nearest"
                         )
                     numpy.testing.assert_array_equal(data, arr)
 
@@ -188,9 +187,9 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, *maximumTile, resampling_method="nearest"
+                    with COGReader("cogeo.tif") as src_dst:
+                        data, _ = src_dst.tile(
+                            *maximumTile, resampling_method="nearest"
                         )
                     numpy.testing.assert_array_equal(data, arr)
 
@@ -213,9 +212,9 @@ def test_cog_translate_Internal():
                     arr2 = numpy.transpose(arr2, [2, 0, 1])
                     arr = numpy.dstack((arr1, arr2))
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, 118594, 60034, 17, resampling_method="nearest"
+                    with COGReader("cogeo.tif") as src_dst:
+                        data, _ = src_dst.tile(
+                            118594, 60034, 17, resampling_method="nearest"
                         )
 
                     data = data[:, 128:, :]

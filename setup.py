@@ -12,8 +12,7 @@ inst_reqs = [
     "click",
     "rasterio~=1.1",
     "numpy~=1.15",
-    "supermercado",
-    "mercantile~=1.1",
+    "morecantile~=2.1",
 ]
 
 extra_reqs = {

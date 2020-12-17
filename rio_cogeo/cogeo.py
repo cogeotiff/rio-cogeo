@@ -10,7 +10,6 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import click
 import rasterio
-from rasterio.crs import CRS
 from rasterio.enums import ColorInterp
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.env import GDALVersion
@@ -23,8 +22,6 @@ from rio_cogeo import utils
 from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
-WEB_MERCATOR_CRS = CRS.from_epsg(3857)
-WGS84_CRS = CRS.from_epsg(4326)
 
 
 @contextmanager
@@ -50,7 +47,7 @@ def cog_translate(  # noqa: C901
     overview_level: Optional[int] = None,
     overview_resampling: str = "nearest",
     web_optimized: bool = False,
-    latitude_adjustment: bool = True,
+    zoom_level_strategy: str = "auto",
     resampling: str = "nearest",
     in_memory: Optional[bool] = None,
     config: Optional[Dict] = None,
@@ -86,8 +83,12 @@ def cog_translate(  # noqa: C901
         Resampling algorithm for overviews
     web_optimized: bool, option (default: False)
         Create web-optimized cogeo.
-    latitude_adjustment: bool, option (default: True)
-        Use mercator meters for zoom calculation or ensure max zoom equality.
+    zoom_level_strategy: str, option (default: auto)
+        Strategy to determine zoom level (same as in GDAL 3.2).
+        LOWER will select the zoom level immediately below the theoretical computed non-integral zoom level, leading to subsampling.
+        On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
+        Defaults to AUTO which selects the closest zoom level.
+        ref: https://gdal.org/drivers/raster/cog.html#raster-cog
     resampling : str, optional (default: "nearest")
         Resampling algorithm.
     in_memory: bool, optional
@@ -178,8 +179,8 @@ def cog_translate(  # noqa: C901
                 params = utils.get_web_optimized_params(
                     src_dst,
                     tilesize=tilesize,
-                    latitude_adjustment=latitude_adjustment,
                     warp_resampling=resampling,
+                    zoom_level_strategy=zoom_level_strategy,
                 )
                 vrt_params.update(**params)
 
