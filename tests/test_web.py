@@ -4,13 +4,13 @@ import os
 import struct
 import sys
 
-import mercantile
+import morecantile
 import numpy
 import pytest
 import rasterio
 from click.testing import CliRunner
 from rasterio.warp import transform_bounds
-from rio_tiler import reader as COGreader
+from rio_tiler.io import COGReader
 
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
@@ -33,12 +33,11 @@ def test_cog_translate_webZooms():
     - Test overview internal tiles are equal to mercator tile using
       cogdumper and rio-tiler
     """
-
     runner = CliRunner()
     with runner.isolated_filesystem():
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="128")
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
 
         cog_translate(
             raster_path_north,
@@ -46,24 +45,24 @@ def test_cog_translate_webZooms():
             web_profile,
             quiet=True,
             web_optimized=True,
+            config=config,
+        )
+        with rasterio.open("cogeo.tif") as out_dst:
+            _, maxzoom = get_zooms(out_dst)
+            assert maxzoom == 9
+
+        cog_translate(
+            raster_path_north,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            zoom_level_strategy="lower",
             config=config,
         )
         with rasterio.open("cogeo.tif") as out_dst:
             _, maxzoom = get_zooms(out_dst)
             assert maxzoom == 8
-
-        cog_translate(
-            raster_path_north,
-            "cogeo.tif",
-            web_profile,
-            quiet=True,
-            web_optimized=True,
-            latitude_adjustment=False,
-            config=config,
-        )
-        with rasterio.open("cogeo.tif") as out_dst:
-            _, maxzoom = get_zooms(out_dst)
-            assert maxzoom == 10
 
 
 def test_cog_translate_web():
@@ -73,12 +72,14 @@ def test_cog_translate_web():
     - Test COG size is a multiple of 256 (mercator tile size)
     - Test COG bounds are aligned with mercator grid at max zoom
     """
+    tms = morecantile.tms.get("WebMercatorQuad")
+
     runner = CliRunner()
     with runner.isolated_filesystem():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="128")
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
 
         cog_translate(
             raster_path_web,
@@ -87,6 +88,7 @@ def test_cog_translate_web():
             quiet=True,
             web_optimized=True,
             config=config,
+            aligned_levels=0,
         )
         with rasterio.open(raster_path_web) as src_dst:
             with rasterio.open("cogeo.tif") as out_dst:
@@ -102,15 +104,11 @@ def test_cog_translate_web():
                         src_dst.crs, "epsg:4326", *src_dst.bounds, densify_pts=21
                     )
                 )
-                ulTile = mercantile.xy_bounds(
-                    mercantile.tile(bounds[0], bounds[3], max_zoom)
-                )
+                ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom))
                 assert out_dst.bounds.left == ulTile.left
                 assert out_dst.bounds.top == ulTile.top
 
-                lrTile = mercantile.xy_bounds(
-                    mercantile.tile(bounds[2], bounds[1], max_zoom)
-                )
+                lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom))
                 assert out_dst.bounds.right == lrTile.right
                 assert round(out_dst.bounds.bottom, 6) == round(lrTile.bottom, 6)
 
@@ -130,12 +128,14 @@ def test_cog_translate_Internal():
     from cogdumper.cog_tiles import COGTiff
     from cogdumper.filedumper import Reader as FileReader
 
+    tms = morecantile.tms.get("WebMercatorQuad")
+
     runner = CliRunner()
     with runner.isolated_filesystem():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="128")
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
 
         cog_translate(
             raster_path_web,
@@ -144,6 +144,7 @@ def test_cog_translate_Internal():
             quiet=True,
             web_optimized=True,
             config=config,
+            aligned_levels=0,
         )
         with rasterio.open(raster_path_web) as src_dst:
             with rasterio.open("cogeo.tif") as out_dst:
@@ -160,8 +161,8 @@ def test_cog_translate_Internal():
                     )
                 )
 
-                minimumTile = mercantile.tile(bounds[0], bounds[3], max_zoom)
-                maximumTile = mercantile.tile(bounds[2], bounds[1], max_zoom)
+                minimumTile = tms.tile(bounds[0], bounds[3], max_zoom)
+                maximumTile = tms.tile(bounds[2], bounds[1], max_zoom)
 
                 with open("cogeo.tif", "rb") as out_body:
                     reader = FileReader(out_body)
@@ -175,9 +176,9 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, *minimumTile, resampling_method="nearest"
+                    with COGReader("cogeo.tif") as src_dst:
+                        data, _ = src_dst.tile(
+                            *minimumTile, resampling_method="nearest"
                         )
                     numpy.testing.assert_array_equal(data, arr)
 
@@ -188,35 +189,70 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, *maximumTile, resampling_method="nearest"
+                    with COGReader("cogeo.tif") as src_dst:
+                        data, _ = src_dst.tile(
+                            *maximumTile, resampling_method="nearest"
                         )
                     numpy.testing.assert_array_equal(data, arr)
 
-                    # Low resolution (overview 1)
-                    # Top Left tile
-                    # NOTE: overview internal tile size is 128px
-                    # We need to stack two internal tiles to compare with
-                    # the 256px mercator tile fetched by rio-tiler
-                    # ref: https://github.com/cogeotiff/rio-cogeo/issues/60
-                    _, tile = cog.get_tile(1, 0, 1)
-                    tile_length = 128 * 128 * 3
-                    t = struct.unpack_from("{}b".format(tile_length), tile)
-                    arr1 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
-                    arr1 = numpy.transpose(arr1, [2, 0, 1])
 
-                    _, tile = cog.get_tile(2, 0, 1)
-                    tile_length = 128 * 128 * 3
-                    t = struct.unpack_from("{}b".format(tile_length), tile)
-                    arr2 = numpy.array(t).reshape(128, 128, 3).astype(numpy.uint8)
-                    arr2 = numpy.transpose(arr2, [2, 0, 1])
-                    arr = numpy.dstack((arr1, arr2))
+def test_cog_translate_web_align():
+    """
+    Test Web-Optimized COG.
 
-                    with rasterio.open("cogeo.tif") as src_dst:
-                        data, _ = COGreader.tile(
-                            src_dst, 118594, 60034, 17, resampling_method="nearest"
-                        )
+    - Test COG bounds (thus block) is aligned with Zoom levels
 
-                    data = data[:, 128:, :]
-                    numpy.testing.assert_array_equal(data, arr)
+    """
+    tms = morecantile.tms.get("WebMercatorQuad")
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+
+        with rasterio.open(raster_path_web) as src_dst:
+            _, max_zoom = get_zooms(src_dst)
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            aligned_levels=2,
+        )
+        with COGReader(raster_path_web) as src_dst:
+            bounds = src_dst.bounds
+            with COGReader("cogeo.tif") as cog:
+                _, max_zoom = get_zooms(cog.dataset)
+                ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom - 2))
+                assert round(cog.dataset.bounds[0], 5) == round(ulTile.left, 5)
+                assert round(cog.dataset.bounds[3], 5) == round(ulTile.top, 5)
+
+                lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom - 2))
+                assert round(cog.dataset.bounds[2], 5) == round(lrTile.right, 5)
+                assert round(cog.dataset.bounds[1], 5) == round(lrTile.bottom, 5)
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            aligned_levels=3,
+        )
+        with COGReader(raster_path_web) as src_dst:
+            bounds = src_dst.bounds
+            with COGReader("cogeo.tif") as cog_dst:
+                _, max_zoom = get_zooms(cog_dst.dataset)
+                ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom - 3))
+                assert round(cog_dst.dataset.bounds[0], 5) == round(ulTile.left, 5)
+                assert round(cog_dst.dataset.bounds[3], 5) == round(ulTile.top, 5)
+
+                lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom - 3))
+                assert round(cog_dst.dataset.bounds[2], 5) == round(lrTile.right, 5)
+                assert round(cog_dst.dataset.bounds[1], 5) == round(lrTile.bottom, 5)

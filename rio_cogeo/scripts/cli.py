@@ -3,7 +3,6 @@
 import json
 import os
 import typing
-import warnings
 
 import click
 import numpy
@@ -140,11 +139,15 @@ def cogeo():
     "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
 )
 @click.option(
-    "--latitude-adjustment/--global-maxzoom",
-    default=None,
-    help="Use dataset native mercator resolution for MAX_ZOOM calculation "
-    "(linked to dataset center latitude, default) or ensure MAX_ZOOM equality for multiple "
-    "dataset accross latitudes.",
+    "--zoom-level-strategy",
+    type=click.Choice(["lower", "upper", "auto"], case_sensitive=False),
+    default="auto",
+    help="Strategy to determine zoom level. (default: auto).",
+)
+@click.option(
+    "--aligned-levels",
+    type=int,
+    help="Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.",
 )
 @click.option(
     "--resampling",
@@ -204,7 +207,8 @@ def create(
     overview_resampling,
     overview_blocksize,
     web_optimized,
-    latitude_adjustment,
+    zoom_level_strategy,
+    aligned_levels,
     resampling,
     in_memory,
     allow_intermediate_compression,
@@ -215,12 +219,6 @@ def create(
     quiet,
 ):
     """Create Cloud Optimized Geotiff."""
-    if latitude_adjustment is not None and not web_optimized:
-        warnings.warn(
-            "'latitude_adjustment' option has to be used with --web-optimized options. "
-            "Will be ignored."
-        )
-
     output_profile = cog_profiles.get(cogeo_profile)
     output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
     if creation_options:
@@ -229,6 +227,9 @@ def create(
     if blocksize:
         output_profile["blockxsize"] = blocksize
         output_profile["blockysize"] = blocksize
+
+    if web_optimized:
+        overview_blocksize = blocksize or 512
 
     config.update(
         dict(
@@ -249,7 +250,8 @@ def create(
         overview_level=overview_level,
         overview_resampling=overview_resampling,
         web_optimized=web_optimized,
-        latitude_adjustment=latitude_adjustment,
+        zoom_level_strategy=zoom_level_strategy,
+        aligned_levels=aligned_levels,
         resampling=resampling,
         in_memory=in_memory,
         config=config,
