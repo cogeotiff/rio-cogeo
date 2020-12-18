@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2.1.0 (TBD)
+## 2.1.0 (2020-12-18)
 
 * switch to `morecantile` and update the web-optimized creation method to better match GDAL 3.2.
 * add `zoom_level_strategy` options to match GDAL 3.2 COG driver.
