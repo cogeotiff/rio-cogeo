@@ -51,7 +51,7 @@ from rio_cogeo.profiles import cog_profiles
 
 # Create GeoTIFF profile
 bounds = mercantile.bounds(mercantile.Tile(0,0,0))
-src_transform = from_bounds(*bounds, 1024 1024)
+src_transform = from_bounds(*bounds, 1024, 1024)
 
 src_profile = dict(
     driver="GTiff",
@@ -63,7 +63,7 @@ src_profile = dict(
     transform=dst_transform,
 )
 
-img_array = tile = numpy.random.rand(3, 1024, 1024)
+img_array = tile = numpy.random.rand(3, 1024, 1024).astype(numpy.float32)
 
 with MemoryFile() as memfile:
     with memfile.open(**src_profile) as mem:
