@@ -80,8 +80,8 @@ def cog_translate(  # noqa: C901
         Overwrite output data type. Default will be the input data type.
     add_mask, bool, optional
         Force output dataset creation with a mask.
-    overview_level : int, optional (default: 6)
-        COGEO overview (decimation) level
+    overview_level : int, optional (default: None)
+        COGEO overview (decimation) level. By default, inferred from data size.
     overview_resampling : str, optional (default: "nearest")
         Resampling algorithm for overviews
     web_optimized: bool, optional (default: False)
