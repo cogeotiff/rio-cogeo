@@ -7,7 +7,7 @@ e.g:
 ```python
 from rio_cogeo.cogeo import cog_translate
 
-def _translate(src_path, dst_path, profile="webp", profile_options={}, **options):
+def cog_translate(src_path, dst_path, profile="webp", profile_options={}, **options):
     """Convert image to COG."""
     # Format creation option (see gdalwarp `-co` option)
     output_profile = cog_profiles.get(profile)
