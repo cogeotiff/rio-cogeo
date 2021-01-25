@@ -401,7 +401,11 @@ def test_cog_translate_forward_scales(runner):
             offs = dataset.offsets
             scls = dataset.scales
             cog_translate(
-                dataset, "cogeo.tif", jpeg_profile, forward_band_tags=True, quiet=True
+                dataset,
+                "cogeo.tif",
+                deflate_profile,
+                forward_band_tags=True,
+                quiet=True,
             )
 
         with rasterio.open("cogeo.tif") as src:
