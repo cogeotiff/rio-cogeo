@@ -1,5 +1,10 @@
 # Release Notes
 
+# Next (TBD)
+
+* drop support for Python 3.5 (https://github.com/cogeotiff/rio-cogeo/issues/173)
+* allow pathlib.PurePath object as input and output (https://github.com/cogeotiff/rio-cogeo/issues/173)
+
 ## 2.1.0 (2020-12-18)
 
 * switch to `morecantile` and update the web-optimized creation method to better match GDAL 3.2.

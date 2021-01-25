@@ -9,6 +9,8 @@ import numpy
 import pytest
 import rasterio
 from click.testing import CliRunner
+from cogdumper.cog_tiles import COGTiff
+from cogdumper.filedumper import Reader as FileReader
 from rasterio.warp import transform_bounds
 from rio_tiler.io import COGReader
 
@@ -125,9 +127,6 @@ def test_cog_translate_Internal():
     - Test overview internal tiles are equal to mercator tile using
       cogdumper and rio-tiler
     """
-    from cogdumper.cog_tiles import COGTiff
-    from cogdumper.filedumper import Reader as FileReader
-
     tms = morecantile.tms.get("WebMercatorQuad")
 
     runner = CliRunner()

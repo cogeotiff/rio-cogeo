@@ -2,6 +2,7 @@
 
 import math
 import os
+import pathlib
 import sys
 import tempfile
 import warnings
@@ -26,9 +27,12 @@ IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
 
 @contextmanager
-def TemporaryRasterFile(dst_path, suffix=".tif"):
+def TemporaryRasterFile(dst_path: Union[str, pathlib.PurePath], suffix: str = ".tif"):
     """Create temporary file."""
-    tmpdir = None if dst_path.startswith("/vsi") else os.path.dirname(dst_path)
+    if isinstance(dst_path, str):
+        dst_path = pathlib.Path(dst_path)
+
+    tmpdir = None if str(dst_path).startswith("/vsi") else dst_path.parent
     fileobj = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=suffix, delete=False)
     fileobj.close()
     try:
@@ -38,8 +42,8 @@ def TemporaryRasterFile(dst_path, suffix=".tif"):
 
 
 def cog_translate(  # noqa: C901
-    source: str,
-    dst_path: str,
+    source: Union[str, pathlib.PurePath, DatasetReader, DatasetWriter, WarpedVRT],
+    dst_path: Union[str, pathlib.PurePath],
     dst_kwargs: Dict,
     indexes: Optional[Sequence[int]] = None,
     nodata: Optional[Union[str, int, float]] = None,
@@ -67,7 +71,7 @@ def cog_translate(  # noqa: C901
     source : str, PathLike object or rasterio.io.DatasetReader
         A dataset path, URL or rasterio.io.DatasetReader object.
         Will be opened in "r" mode.
-    dst_path : str or Path-like object
+    dst_path : str or PathLike object
         An output dataset path or or PathLike object.
         Will be opened in "w" mode.
     dst_kwargs: dict
@@ -300,7 +304,7 @@ def cog_translate(  # noqa: C901
 
 
 def cog_validate(  # noqa: C901
-    src_path: str, strict: bool = False, quiet: bool = False
+    src_path: Union[str, pathlib.PurePath], strict: bool = False, quiet: bool = False
 ) -> Tuple[bool, List[str], List[str]]:
     """
     Validate Cloud Optimized Geotiff.
@@ -327,6 +331,9 @@ def cog_validate(  # noqa: C901
         List of validation warnings.
 
     """
+    if isinstance(src_path, str):
+        src_path = pathlib.Path(src_path)
+
     errors = []
     warnings = []
     details: Dict[str, Any] = {}
@@ -340,9 +347,8 @@ def cog_validate(  # noqa: C901
             if not src.driver == "GTiff":
                 raise Exception("The file is not a GeoTIFF")
 
-            filelist = [os.path.basename(f) for f in src.files]
-            src_bname = os.path.basename(src_path)
-            if len(filelist) > 1 and src_bname + ".ovr" in filelist:
+            filelist = [pathlib.Path(f).name for f in src.files]
+            if len(filelist) > 1 and f"{src_path.name}.ovr" in filelist:
                 errors.append(
                     "Overviews found in external .ovr file. They should be internal"
                 )
@@ -484,7 +490,7 @@ def cog_validate(  # noqa: C901
     return is_valid, errors, warnings
 
 
-def cog_info(src_path: str, **kwargs: Any) -> Dict:
+def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> Dict:
     """Get general info and validate Cloud Optimized Geotiff."""
     is_valid, validation_errors, validation_warnings = cog_validate(
         src_path, quiet=True, **kwargs,
@@ -492,7 +498,7 @@ def cog_info(src_path: str, **kwargs: Any) -> Dict:
 
     with rasterio.open(src_path) as src_dst:
         _info = {
-            "Path": src_path,
+            "Path": str(src_path),
             "Driver": src_dst.driver,
             "COG": is_valid,
             "Compression": src_dst.compression.value if src_dst.compression else None,
