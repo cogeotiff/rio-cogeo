@@ -1,5 +1,18 @@
 # Release Notes
 
+## Next (TBD)
+
+* add top-level exports (https://github.com/cogeotiff/rio-cogeo/issues/169)
+
+```python
+# before
+from rio_cogeo.cogeo import cog_translate, cog_validate, cog_info
+from rio_cogeo.profiles import cog_profiles
+
+# now
+from rio_cogeo import cog_translate, cog_validate, cog_info, cog_profiles
+```
+
 ## 2.1.0 (2020-12-18)
 
 * switch to `morecantile` and update the web-optimized creation method to better match GDAL 3.2.
