@@ -1,7 +1,9 @@
 # Release Notes
 
-## Next (TBD)
+# Next (TBD)
 
+* drop support for Python 3.5 (https://github.com/cogeotiff/rio-cogeo/issues/173)
+* allow pathlib.PurePath object as input and output (https://github.com/cogeotiff/rio-cogeo/issues/173)
 * add top-level exports (https://github.com/cogeotiff/rio-cogeo/issues/169)
 
 ```python

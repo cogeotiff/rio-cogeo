@@ -1,7 +1,5 @@
 """Setup."""
 
-import sys
-
 from setuptools import find_packages, setup
 
 with open("README.md") as f:
@@ -16,19 +14,15 @@ inst_reqs = [
 ]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3"],
-    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit"],
+    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "cogdumper"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit", "cogdumper"],
     "docs": ["mkdocs", "mkdocs-material"],
 }
-
-if sys.version_info >= (3, 6):
-    extra_reqs["test"].append("cogdumper")
-    extra_reqs["dev"].append("cogdumper")
 
 setup(
     name="rio-cogeo",
     version="2.1.0",
-    python_requires=">=3",
+    python_requires=">=3.6",
     description=u"Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",
