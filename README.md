@@ -38,10 +38,10 @@
 
 ## Cloud Optimized GeoTIFF
 
-This plugin aim to facilitate the creation and validation of Cloud Optimized
+This plugin aims to facilitate the creation and validation of Cloud Optimized
 GeoTIFF (COG or COGEO). While it respects the
 [COG specifications](https://github.com/cogeotiff/cog-spec/blob/master/spec.md), this plugin also
-enforce several features:
+enforces several features:
 
 - **Internal overviews** (User can remove overview with option `--overview-level 0`)
 - **Internal tiles** (default profiles have 512x512 internal tiles)
@@ -64,7 +64,7 @@ $ pip install git+https://github.com/cogeotiff/rio-cogeo.git
 
 ## GDAL Version
 
-It is recommanded to use GDAL > 2.3.2. Previous version might not be able to
+It is recommanded to use GDAL > 2.3.2. Previous versions might not be able to
 create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
 
 
