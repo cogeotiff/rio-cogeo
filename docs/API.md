@@ -51,7 +51,7 @@ from rio_cogeo.profiles import cog_profiles
 
 # Create GeoTIFF profile
 bounds = mercantile.bounds(mercantile.Tile(0,0,0))
-src_transform = from_bounds(*bounds, 1024, 1024)
+src_transform = from_bounds(*bounds, width=1024, height=1024)
 
 src_profile = dict(
     driver="GTiff",
@@ -60,7 +60,7 @@ src_profile = dict(
     height=1024,
     width=1024,
     crs="epsg:4326",
-    transform=dst_transform,
+    transform=src_transform,
 )
 
 img_array = tile = numpy.random.rand(3, 1024, 1024).astype(numpy.float32)
@@ -93,7 +93,7 @@ dst_profile = cog_profiles.get("deflate")
 
 with MemoryFile() as mem_dst:
     # Important, we pass `mem_dst.name` as output dataset path
-    cog_translate("my-input-file.tif", mem_dst.name, profile, in_memory=True)
+    cog_translate("my-input-file.tif", mem_dst.name, dst_profile, in_memory=True)
 
     # You can then use the memoryfile to do something else like
     # upload to AWS S3
