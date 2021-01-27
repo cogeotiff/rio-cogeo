@@ -1,6 +1,6 @@
 # Release Notes
 
-# Next (TBD)
+# 2.1.1 (2021-01-27)
 
 * drop support for Python 3.5 (https://github.com/cogeotiff/rio-cogeo/issues/173)
 * allow pathlib.PurePath object as input and output (https://github.com/cogeotiff/rio-cogeo/issues/173)

@@ -10,7 +10,7 @@ inst_reqs = [
     "click",
     "rasterio~=1.1",
     "numpy~=1.15",
-    "morecantile~=2.1",
+    "morecantile>=2.1,<2.2",
 ]
 
 extra_reqs = {
