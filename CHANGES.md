@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.1.2 (2021-02-10)
+
+* remove useless path translation to pathlib and avoid side effect when using a URL (https://github.com/cogeotiff/rio-cogeo/issues/178)
+
 # 2.1.1 (2021-01-27)
 
 * drop support for Python 3.5 (https://github.com/cogeotiff/rio-cogeo/issues/173)

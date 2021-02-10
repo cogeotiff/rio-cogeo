@@ -1,6 +1,7 @@
 """tests rio_cogeo.cogeo."""
 
 import os
+import pathlib
 
 import numpy
 import pytest
@@ -8,7 +9,7 @@ import rasterio
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
 
-from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
+from rio_cogeo.cogeo import TemporaryRasterFile, cog_info, cog_translate, cog_validate
 from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
@@ -449,3 +450,19 @@ def test_cog_info():
     assert info["GEO"]["MinZoom"] == 5
     assert info["GEO"]["MaxZoom"] == 11
     assert len(info["IFD"]) == 6
+
+
+@pytest.mark.parametrize(
+    "fname",
+    [
+        "mytif.tif",
+        pathlib.Path("mytif.tif"),
+        "s3://abucket/adirectory/afile.tif",
+        "https://ahost/adirectory/afile.tif",
+    ],
+)
+def test_temporaryRaster(fname):
+    """Test TemporaryRasterFile class with vsi and pathlib."""
+    with TemporaryRasterFile(fname) as f:
+        pass
+    assert not os.path.exists(f.name)
