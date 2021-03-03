@@ -6,11 +6,16 @@ import pathlib
 import numpy
 import pytest
 import rasterio
+from rasterio.enums import ColorInterp
 from rasterio.io import MemoryFile
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo.cogeo import TemporaryRasterFile, cog_info, cog_translate, cog_validate
-from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
+from rio_cogeo.errors import (
+    IncompatibleBlockRasterSize,
+    IncompatibleOptions,
+    LossyCompression,
+)
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
 
@@ -270,6 +275,17 @@ def test_cog_translate_tags(runner):
             assert src.descriptions[2] == "third band"
 
         cog_translate(
+            raster_path_tags,
+            "cogeo.tif",
+            jpeg_profile,
+            quiet=True,
+            additional_cog_metadata={"comment": "it should work"},
+        )
+        with rasterio.open("cogeo.tif") as src:
+            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+            assert src.tags()["comment"] == "it should work"
+
+        cog_translate(
             raster_path_tags, "cogeo.tif", raw_profile, indexes=[2], quiet=True
         )
         with rasterio.open("cogeo.tif") as src:
@@ -424,6 +440,44 @@ def test_cog_translate_forward_cmap(runner):
                 assert cog.colormap(1) == dataset.colormap(1)
                 assert cog.colorinterp == dataset.colorinterp
 
+        # add an external colormap
+        cmap = {0: (0, 0, 0, 0), 1: (1, 2, 3, 255)}
+        with rasterio.open(raster_nocolormap) as dataset:
+            cog_translate(
+                dataset, "cogeo.tif", deflate_profile, quiet=True, colormap=cmap
+            )
+            with rasterio.open("cogeo.tif") as cog:
+                assert cog.colormap(1)[1] == cmap[1]
+                assert cog.colorinterp == (ColorInterp.palette,)
+
+        with pytest.raises(IncompatibleOptions):
+            with rasterio.open(raster_nocolormap) as dataset:
+                cog_translate(
+                    dataset,
+                    "cogeo.tif",
+                    deflate_profile,
+                    quiet=True,
+                    colormap=cmap,
+                    indexes=(1, 1, 1),
+                )
+
+        # add an external colormap (warns of wrong colorinterp)
+        with pytest.warns(UserWarning):
+            with rasterio.open(raster_path_rgb) as dataset:
+                cog_translate(
+                    dataset,
+                    "cogeo.tif",
+                    deflate_profile,
+                    quiet=True,
+                    colormap=cmap,
+                    indexes=(1,),
+                )
+                with rasterio.open("cogeo.tif") as cog:
+                    assert cog.colormap(1)[1] == cmap[1]
+                    assert cog.colorinterp == (ColorInterp.palette,)
+                    assert not cog.colorinterp[0] == dataset.colorinterp[0]
+
+        # Input dataset has colorinterp set to `Palette` but no colormap
         with pytest.warns(UserWarning):
             with rasterio.open(raster_nocolormap) as dataset:
                 cog_translate(dataset, "cogeo.tif", deflate_profile, quiet=True)

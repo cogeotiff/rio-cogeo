@@ -1,5 +1,29 @@
 # Release Notes
 
+# 2.1.3 (2021-03-03)
+
+* add **colormap** options in `cog_translate` to allow a user to set or update a colormap
+
+```python
+cmap = {0: (0, 0, 0, 0), 1: (1, 2, 3, 255)}
+cog_translate("boring.tif", "cogeo.tif", deflate_profile, colormap=cmap)
+with rasterio.open("cogeo.tif") as cog:
+    print(cog.colormap(1)[1])
+
+>>> (1, 2, 3, 255)
+```
+
+* add **additional_cog_metadata** options in `cog_translate` to allow the user to add more dataset metadatas
+
+```python
+cog_translate("boring.tif", "cogeo.tif", deflate_profile, additional_cog_metadata={"comments": "I made this tiff with rio-cogeo"})
+
+with rasterio.open("cogeo.tif") as cog:
+    print(cog.tags()["comment"])
+
+>>> "I made this tiff with rio-cogeo"
+```
+
 # 2.1.2 (2021-02-10)
 
 * remove useless path translation to pathlib and avoid side effect when using a URL (https://github.com/cogeotiff/rio-cogeo/issues/178)
