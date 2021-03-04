@@ -22,7 +22,11 @@ from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import utils
-from rio_cogeo.errors import IncompatibleBlockRasterSize, LossyCompression
+from rio_cogeo.errors import (
+    IncompatibleBlockRasterSize,
+    IncompatibleOptions,
+    LossyCompression,
+)
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -64,6 +68,8 @@ def cog_translate(  # noqa: C901
     forward_band_tags: bool = False,
     quiet: bool = False,
     temporary_compression: str = "DEFLATE",
+    colormap: Optional[Dict] = None,
+    additional_cog_metadata: Optional[Dict] = None,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -120,6 +126,10 @@ def cog_translate(  # noqa: C901
         Mask processing steps.
     temporary_compression: str, optional
         Compression used for the intermediate file, default is deflate.
+    colormap: dict, optional
+        Overwrite or add a colormap to the output COG.
+    additional_cog_metadata: dict, optional
+        Additional dataset metadata to add to the COG.
 
     """
     if isinstance(indexes, int):
@@ -139,6 +149,11 @@ def cog_translate(  # noqa: C901
             dtype = dtype if dtype else src_dst.dtypes[0]
             alpha = utils.has_alpha_band(src_dst)
             mask = utils.has_mask_band(src_dst)
+
+            if colormap and len(indexes) > 1:
+                raise IncompatibleOptions(
+                    "Cannot add a colormap for multiple bands data."
+                )
 
             if not add_mask and (
                 (nodata is not None or alpha)
@@ -245,7 +260,15 @@ def cog_translate(  # noqa: C901
                 else:
                     tmp_dst.colorinterp = [vrt_dst.colorinterp[b - 1] for b in indexes]
 
-                if tmp_dst.colorinterp[0] is ColorInterp.palette:
+                if colormap:
+                    if tmp_dst.colorinterp[0] is not ColorInterp.palette:
+                        tmp_dst.colorinterp = [ColorInterp.palette]
+                        warnings.warn(
+                            "Dataset color interpretation was set to `Palette`"
+                        )
+                    tmp_dst.write_colormap(1, colormap)
+
+                elif tmp_dst.colorinterp[0] is ColorInterp.palette:
                     try:
                         tmp_dst.write_colormap(1, vrt_dst.colormap(1))
                     except ValueError:
@@ -296,12 +319,16 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
+                if additional_cog_metadata:
+                    tags.update(**additional_cog_metadata)
+
                 tmp_dst.update_tags(**tags)
                 tmp_dst._set_all_scales([vrt_dst.scales[b - 1] for b in indexes])
                 tmp_dst._set_all_offsets([vrt_dst.offsets[b - 1] for b in indexes])
 
                 if not quiet:
                     click.echo("Writing output to: {}".format(dst_path), err=True)
+
                 copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
