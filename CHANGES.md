@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.1.4 (2021-03-31)
+
+* fix issue in validation when BLOCK_OFFSET_0 is None (https://github.com/cogeotiff/rio-cogeo/issues/182)
+
 # 2.1.3 (2021-03-03)
 
 * add **colormap** options in `cog_translate` to allow a user to set or update a colormap
