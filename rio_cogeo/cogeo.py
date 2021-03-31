@@ -453,23 +453,22 @@ def cog_validate(  # noqa: C901
                             )
                         )
 
-            block_offset = int(src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1))
-            if not block_offset:
-                errors.append("Missing BLOCK_OFFSET_0_0")
+            block_offset = src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1)
 
-            data_offset = int(block_offset) if block_offset else None
+            data_offset = int(block_offset) if block_offset else 0
             data_offsets = [data_offset]
             details["data_offsets"] = {}
             details["data_offsets"]["main"] = data_offset
 
             for ix, dec in enumerate(overviews):
-                data_offset = int(
-                    src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1, ovr=ix)
+                block_offset = src.get_tag_item(
+                    "BLOCK_OFFSET_0_0", "TIFF", bidx=1, ovr=ix
                 )
+                data_offset = int(block_offset) if block_offset else 0
                 data_offsets.append(data_offset)
                 details["data_offsets"]["overview_{}".format(ix)] = data_offset
 
-            if data_offsets[-1] < ifd_offsets[-1]:
+            if data_offsets[-1] != 0 and data_offsets[-1] < ifd_offsets[-1]:
                 if len(overviews) > 0:
                     errors.append(
                         "The offset of the first block of the smallest overview "

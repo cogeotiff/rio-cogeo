@@ -4,6 +4,7 @@ import os
 
 import pytest
 from click.testing import CliRunner
+from rasterio.errors import NotGeoreferencedWarning
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -17,6 +18,7 @@ raster_ovrsorted = os.path.join(fixture_dir, "validate", "image_sorted.tif")
 raster_decim = os.path.join(fixture_dir, "validate", "image_dec.tif")
 raster_jpeg = os.path.join(fixture_dir, "validate", "nontiff.jpg")
 raster_big = os.path.join(fixture_dir, "image_2000px.tif")
+raster_zero_offset = os.path.join(fixture_dir, "validate", "cog_no_offest.tif")
 
 # COG created with rio-cogeo but using gdal 3.1
 raster_rioCOGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
@@ -55,6 +57,9 @@ def test_cog_validate_valid(monkeypatch):
     # COG created with GDAL 3.1
     assert cog_validate(raster_rioCOGgdal31)[0]
     assert cog_validate(raster_COGgdal31)[0]
+
+    with pytest.warns(NotGeoreferencedWarning):
+        assert cog_validate(raster_zero_offset)
 
 
 def test_cog_validate_return():
