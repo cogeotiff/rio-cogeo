@@ -51,19 +51,26 @@ from rio_cogeo.profiles import cog_profiles
 
 # Create GeoTIFF profile
 bounds = mercantile.bounds(mercantile.Tile(0,0,0))
-src_transform = from_bounds(*bounds, width=1024, height=1024)
+
+# Rasterio uses numpy array of shape of `(bands, height, width)`
+width = 1024
+height = 1024
+nbands = 3
+
+img_array = tile = numpy.random.rand(nbands, height, width).astype(numpy.float32)
+
+src_transform = from_bounds(*bounds, width=width, height=height)
 
 src_profile = dict(
     driver="GTiff",
     dtype="float32",
-    count=3,
-    height=1024,
-    width=1024,
+    count=nbands,
+    height=height,
+    width=width,
     crs="epsg:4326",
     transform=src_transform,
 )
 
-img_array = tile = numpy.random.rand(3, 1024, 1024).astype(numpy.float32)
 
 with MemoryFile() as memfile:
     with memfile.open(**src_profile) as mem:
