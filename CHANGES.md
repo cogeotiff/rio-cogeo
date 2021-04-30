@@ -1,5 +1,26 @@
 # Release Notes
 
+# 2.2.0 (TBD)
+
+* add pydantic models for `info` output (https://github.com/cogeotiff/rio-cogeo/issues/191)
+
+**Breaking Changes:**
+
+* `rio_cogeo.cogeo.cog_info` now returns a pydantic model
+
+```python
+from rio_cogeo.cogeo import cog_info
+
+# before
+info = cog_info("my.tif")
+assert isinstance(info, dict)
+assert info["GEO"]["CRS"]
+
+# now
+assert isinstance(info, rio_cogeo.models.Info)
+assert info.GEO.CRS
+```
+
 # 2.1.4 (2021-03-31)
 
 * fix issue in validation when BLOCK_OFFSET_0 is None (https://github.com/cogeotiff/rio-cogeo/issues/182)
