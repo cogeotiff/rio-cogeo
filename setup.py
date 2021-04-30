@@ -8,14 +8,14 @@ with open("README.md") as f:
 # Runtime requirements.
 inst_reqs = [
     "click",
-    "rasterio~=1.1",
+    "rasterio>=1.1",
     "numpy~=1.15",
     "morecantile>=2.1,<2.2",
 ]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "cogdumper"],
-    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0a3", "pre-commit", "cogdumper"],
+    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0", "cogdumper"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0", "pre-commit", "cogdumper"],
     "docs": ["mkdocs", "mkdocs-material"],
 }
 
@@ -33,6 +33,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering :: GIS",
     ],
     keywords="COGEO CloudOptimized Geotiff rasterio",
