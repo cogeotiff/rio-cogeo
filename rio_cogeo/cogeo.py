@@ -21,7 +21,7 @@ from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
-from rio_cogeo import utils
+from rio_cogeo import models, utils
 from rio_cogeo.errors import (
     IncompatibleBlockRasterSize,
     IncompatibleOptions,
@@ -520,46 +520,40 @@ def cog_validate(  # noqa: C901
     return is_valid, errors, warnings
 
 
-def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> Dict:
+def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.Info:
     """Get general info and validate Cloud Optimized Geotiff."""
     is_valid, validation_errors, validation_warnings = cog_validate(
         src_path, quiet=True, **kwargs,
     )
 
     with rasterio.open(src_path) as src_dst:
-        _info = {
-            "Path": str(src_path),
-            "Driver": src_dst.driver,
-            "COG": is_valid,
-            "Compression": src_dst.compression.value if src_dst.compression else None,
-            "ColorSpace": src_dst.photometric.value if src_dst.photometric else None,
-        }
-        if validation_errors:
-            _info["COG_errors"] = validation_errors
-
-        if validation_warnings:
-            _info["COG_warnings"] = validation_warnings
+        driver = src_dst.driver
+        compression = src_dst.compression.value if src_dst.compression else None
+        colorspace = src_dst.photometric.value if src_dst.photometric else None
+        overviews = src_dst.overviews(1)
+        tags = src_dst.tags()
 
         try:
             colormap = src_dst.colormap(1)
         except ValueError:
             colormap = None
 
-        profile = {
-            "Bands": src_dst.count,
-            "Width": src_dst.width,
-            "Height": src_dst.height,
-            "Tiled": src_dst.is_tiled,
-            "Dtype": src_dst.dtypes[0],
-            "Interleave": src_dst.interleaving.value,
-            "Alpha Band": utils.has_alpha_band(src_dst),
-            "Internal Mask": utils.has_mask_band(src_dst),
-            "Nodata": src_dst.nodata,
-            "ColorInterp": tuple([color.name for color in src_dst.colorinterp]),
-            "ColorMap": colormap is not None,
-            "Scales": src_dst.scales,
-            "Offsets": src_dst.offsets,
-        }
+        profile = models.Profile(
+            Bands=src_dst.count,
+            Width=src_dst.width,
+            Height=src_dst.height,
+            Tiled=src_dst.is_tiled,
+            Dtype=src_dst.dtypes[0],
+            Interleave=src_dst.interleaving.value,
+            AlphaBand=utils.has_alpha_band(src_dst),
+            InternalMask=utils.has_mask_band(src_dst),
+            Nodata=src_dst.nodata,
+            ColorInterp=tuple([color.name for color in src_dst.colorinterp]),
+            ColorMap=colormap is not None,
+            Scales=src_dst.scales,
+            Offsets=src_dst.offsets,
+        )
+
         try:
             crs = (
                 f"EPSG:{src_dst.crs.to_epsg()}"
@@ -576,45 +570,47 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> Dict:
         except Exception:
             pass
 
-        geo = {
-            "CRS": crs,
-            "BoundingBox": tuple(src_dst.bounds),
-            "Origin": (src_dst.transform.c, src_dst.transform.f),
-            "Resolution": (src_dst.transform.a, src_dst.transform.e),
-            "MinZoom": minzoom,
-            "MaxZoom": maxzoom,
-        }
+        geo = models.Geo(
+            CRS=crs,
+            BoundingBox=tuple(src_dst.bounds),
+            Origin=(src_dst.transform.c, src_dst.transform.f),
+            Resolution=(src_dst.transform.a, src_dst.transform.e),
+            MinZoom=minzoom,
+            MaxZoom=maxzoom,
+        )
 
-        ifd_raw = [
-            {
-                "Level": 0,
-                "Width": src_dst.width,
-                "Height": src_dst.height,
-                "Blocksize": src_dst.block_shapes[0],
-                "Decimation": 0,
-            }
+        ifds = [
+            models.IFD(
+                Level=0,
+                Width=src_dst.width,
+                Height=src_dst.height,
+                Blocksize=src_dst.block_shapes[0],
+                Decimation=0,
+            )
         ]
-        overviews = src_dst.overviews(1)
-        tags = src_dst.tags()
 
-    ifd_ovr = []
     for ix, decim in enumerate(overviews):
         with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
-            ifd_ovr.append(
-                {
-                    "Level": ix + 1,
-                    "Width": ovr_dst.width,
-                    "Height": ovr_dst.height,
-                    "Blocksize": ovr_dst.block_shapes[0],
-                    "Decimation": decim,
-                }
+            ifds.append(
+                models.IFD(
+                    Level=ix + 1,
+                    Width=ovr_dst.width,
+                    Height=ovr_dst.height,
+                    Blocksize=ovr_dst.block_shapes[0],
+                    Decimation=decim,
+                )
             )
 
-    ifds = ifd_raw + ifd_ovr
-    output = _info.copy()
-    output["Profile"] = profile
-    output["GEO"] = geo
-    output["Tags"] = tags
-    output["IFD"] = ifds
-
-    return output
+    return models.Info(
+        Path=str(src_path),
+        Driver=driver,
+        COG=is_valid,
+        Compression=compression,
+        ColorSpace=colorspace,
+        COG_errors=validation_errors or None,
+        COG_warnings=validation_warnings or None,
+        Profile=profile,
+        GEO=geo,
+        Tags=tags,
+        IFD=ifds,
+    )
