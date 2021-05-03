@@ -1,6 +1,5 @@
 """Rio_cogeo.scripts.cli."""
 
-import json
 import os
 import typing
 
@@ -281,43 +280,43 @@ def validate(input, strict):
 def info(input, to_json):
     """Dataset info."""
     metadata = cog_info(input)
-
     if to_json:
-        click.echo(json.dumps(metadata))
+        click.echo(metadata.json(exclude_none=True))
     else:
+
         sep = 25
         click.echo(
-            f"""{click.style('Driver:', bold=True)} {metadata['Driver']}
-{click.style('File:', bold=True)} {metadata['Path']}
-{click.style('COG:', bold=True)} {metadata['COG']}
-{click.style('Compression:', bold=True)} {metadata['Compression']}
-{click.style('ColorSpace:', bold=True)} {metadata['ColorSpace']}
+            f"""{click.style('Driver:', bold=True)} {metadata.Driver}
+{click.style('File:', bold=True)} {metadata.Path}
+{click.style('COG:', bold=True)} {metadata.COG}
+{click.style('Compression:', bold=True)} {metadata.Compression}
+{click.style('ColorSpace:', bold=True)} {metadata.ColorSpace}
 
 {click.style('Profile', bold=True)}
-    {click.style("Width:", bold=True):<{sep}} {metadata['Profile']['Width']}
-    {click.style("Height:", bold=True):<{sep}} {metadata['Profile']['Height']}
-    {click.style("Bands:", bold=True):<{sep}} {metadata['Profile']['Bands']}
-    {click.style("Tiled:", bold=True):<{sep}} {metadata['Profile']['Tiled']}
-    {click.style("Dtype:", bold=True):<{sep}} {metadata['Profile']['Dtype']}
-    {click.style("NoData:", bold=True):<{sep}} {metadata['Profile']['Nodata']}
-    {click.style("Alpha Band:", bold=True):<{sep}} {metadata['Profile']['Alpha Band']}
-    {click.style("Internal Mask:", bold=True):<{sep}} {metadata['Profile']['Internal Mask']}
-    {click.style("Interleave:", bold=True):<{sep}} {metadata['Profile']['Interleave']}
-    {click.style("ColorMap:", bold=True):<{sep}} {metadata['Profile']['ColorMap']}
-    {click.style("ColorInterp:", bold=True):<{sep}} {metadata['Profile']['ColorInterp']}
-    {click.style("Scales:", bold=True):<{sep}} {metadata['Profile']['Scales']}
-    {click.style("Offsets:", bold=True):<{sep}} {metadata['Profile']['Offsets']}
+    {click.style("Width:", bold=True):<{sep}} {metadata.Profile.Width}
+    {click.style("Height:", bold=True):<{sep}} {metadata.Profile.Height}
+    {click.style("Bands:", bold=True):<{sep}} {metadata.Profile.Bands}
+    {click.style("Tiled:", bold=True):<{sep}} {metadata.Profile.Tiled}
+    {click.style("Dtype:", bold=True):<{sep}} {metadata.Profile.Dtype}
+    {click.style("NoData:", bold=True):<{sep}} {metadata.Profile.Nodata}
+    {click.style("Alpha Band:", bold=True):<{sep}} {metadata.Profile.AlphaBand}
+    {click.style("Internal Mask:", bold=True):<{sep}} {metadata.Profile.InternalMask}
+    {click.style("Interleave:", bold=True):<{sep}} {metadata.Profile.Interleave}
+    {click.style("ColorMap:", bold=True):<{sep}} {metadata.Profile.ColorMap}
+    {click.style("ColorInterp:", bold=True):<{sep}} {metadata.Profile.ColorInterp}
+    {click.style("Scales:", bold=True):<{sep}} {metadata.Profile.Scales}
+    {click.style("Offsets:", bold=True):<{sep}} {metadata.Profile.Offsets}
 
 {click.style('Image Metadata', bold=True)}
-    {create_tag_table(metadata['Tags'], sep+5)}
+    {create_tag_table(metadata.Tags, sep+5)}
 
 {click.style('Geo', bold=True)}
-    {click.style("Crs:", bold=True):<{sep}} {metadata['GEO']['CRS']}
-    {click.style("Origin:", bold=True):<{sep}} {metadata['GEO']['Origin']}
-    {click.style("Resolution:", bold=True):<{sep}} {metadata['GEO']['Resolution']}
-    {click.style("BoundingBox:", bold=True):<{sep}} {metadata['GEO']['BoundingBox']}
-    {click.style("MinZoom:", bold=True):<{sep}} {metadata['GEO']['MinZoom']}
-    {click.style("MaxZoom:", bold=True):<{sep}} {metadata['GEO']['MaxZoom']}"""
+    {click.style("Crs:", bold=True):<{sep}} {metadata.GEO.CRS}
+    {click.style("Origin:", bold=True):<{sep}} {metadata.GEO.Origin}
+    {click.style("Resolution:", bold=True):<{sep}} {metadata.GEO.Resolution}
+    {click.style("BoundingBox:", bold=True):<{sep}} {metadata.GEO.BoundingBox}
+    {click.style("MinZoom:", bold=True):<{sep}} {metadata.GEO.MinZoom}
+    {click.style("MaxZoom:", bold=True):<{sep}} {metadata.GEO.MaxZoom}"""
         )
 
         click.echo(
@@ -326,17 +325,17 @@ def info(input, to_json):
     {click.style('Id', underline=True, bold=True):<20}{click.style('Size', underline=True, bold=True):<27}{click.style('BlockSize', underline=True, bold=True):<26}{click.style('Decimation', underline=True, bold=True):<33}"""
         )
 
-        for ifd in metadata["IFD"]:
-            wh = f"{ifd['Width']}x{ifd['Height']}"
-            bl = f"{ifd['Blocksize'][1]}x{ifd['Blocksize'][0]}"
-            click.echo(f"""    {ifd['Level']:<8}{wh:<15}{bl:<14}{ifd['Decimation']}""")
+        for ifd in metadata.IFD:
+            wh = f"{ifd.Width}x{ifd.Height}"
+            bl = f"{ifd.Blocksize[1]}x{ifd.Blocksize[0]}"
+            click.echo(f"""    {ifd.Level:<8}{wh:<15}{bl:<14}{ifd.Decimation}""")
 
-        if metadata.get("COG_errors") or metadata.get("COG_warnings"):
+        if metadata.COG_errors or metadata.COG_warnings:
             click.echo(
                 f"""
 {click.style('COG Validation info', bold=True)}"""
             )
-            for error in metadata.get("COG_errors", []):
+            for error in metadata.COG_errors or []:
                 click.secho(f"""    - {error} (error)""", fg="red")
-            for warning in metadata.get("COG_warnings", []):
+            for warning in metadata.COG_warnings or []:
                 click.secho(f"""    - {warning} (warning)""", fg="yellow")

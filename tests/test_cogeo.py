@@ -499,11 +499,11 @@ def test_output_size(runner):
 def test_cog_info():
     """Test COGEO info."""
     info = cog_info(raster_web_z5_z11)
-    assert info["COG"]
-    assert info["GEO"]["CRS"] == "EPSG:3857"
-    assert info["GEO"]["MinZoom"] == 5
-    assert info["GEO"]["MaxZoom"] == 11
-    assert len(info["IFD"]) == 6
+    assert info.COG
+    assert info.GEO.CRS == "EPSG:3857"
+    assert info.GEO.MinZoom == 5
+    assert info.GEO.MaxZoom == 11
+    assert len(info.IFD) == 6
 
 
 @pytest.mark.parametrize(

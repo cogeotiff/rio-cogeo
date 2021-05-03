@@ -11,6 +11,7 @@ inst_reqs = [
     "rasterio>=1.1",
     "numpy~=1.15",
     "morecantile>=2.1,<2.2",
+    "pydantic",
 ]
 
 extra_reqs = {
