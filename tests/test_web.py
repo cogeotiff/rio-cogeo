@@ -113,6 +113,7 @@ def test_cog_translate_web():
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom))
                 assert out_dst.bounds.right == lrTile.right
                 assert round(out_dst.bounds.bottom, 6) == round(lrTile.bottom, 6)
+                assert out_dst.tags()["TILING_SCHEME"] == "WebMercatorQuad"
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")

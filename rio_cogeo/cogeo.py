@@ -319,6 +319,9 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
+                if web_optimized:
+                    tags.update(dict(TILING_SCHEME="WebMercatorQuad"))
+
                 if additional_cog_metadata:
                     tags.update(**additional_cog_metadata)
 
