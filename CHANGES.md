@@ -21,6 +21,28 @@ assert isinstance(info, rio_cogeo.models.Info)
 assert info.GEO.CRS
 ```
 
+* add `TILING_SCHEME` in COG metadata (https://github.com/cogeotiff/rio-cogeo/pull/192)
+
+```python
+# before
+$ rio cogeo create in.tif out.tif -w
+$ rio cogeo info out.tif | jq .Tags
+
+>>> {
+  "AREA_OR_POINT": "Area",
+  "OVR_RESAMPLING_ALG": "NEAREST"
+}
+
+# now
+$ rio cogeo create in.tif out.tif -w
+$ rio cogeo info out.tif | jq .Tags
+>> {
+  "AREA_OR_POINT": "Area",
+  "OVR_RESAMPLING_ALG": "NEAREST",
+  "TILING_SCHEME": "WebMercatorQuad"
+}
+```
+
 # 2.1.4 (2021-03-31)
 
 * fix issue in validation when BLOCK_OFFSET_0 is None (https://github.com/cogeotiff/rio-cogeo/issues/182)
