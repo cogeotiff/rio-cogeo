@@ -21,7 +21,7 @@ assert isinstance(info, rio_cogeo.models.Info)
 assert info.GEO.CRS
 ```
 
-* add `TILING_SCHEME` in COG metadata (https://github.com/cogeotiff/rio-cogeo/pull/192)
+* add `TILING_SCHEME` in COG metadata when creating WebOptimized COG (https://github.com/cogeotiff/rio-cogeo/pull/192)
 
 ```python
 # before
