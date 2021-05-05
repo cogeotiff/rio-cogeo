@@ -70,6 +70,7 @@ def cog_translate(  # noqa: C901
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
+    use_cog_driver: bool = False,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -130,6 +131,8 @@ def cog_translate(  # noqa: C901
         Overwrite or add a colormap to the output COG.
     additional_cog_metadata: dict, optional
         Additional dataset metadata to add to the COG.
+    use_cog_driver: bool, optional (default: False)
+        Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
     """
     if isinstance(indexes, int):
@@ -205,7 +208,7 @@ def cog_translate(  # noqa: C901
             if alpha:
                 vrt_params.update(dict(add_alpha=False))
 
-            if web_optimized:
+            if web_optimized and not use_cog_driver:
                 params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
@@ -318,7 +321,7 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
-                if web_optimized:
+                if web_optimized and not use_cog_driver:
                     tags.update(dict(TILING_SCHEME="WebMercatorQuad"))
 
                 if additional_cog_metadata:
@@ -331,7 +334,32 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Writing output to: {}".format(dst_path), err=True)
 
-                copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
+                if use_cog_driver:
+                    dst_kwargs["driver"] = "COG"
+                    if web_optimized:
+                        dst_kwargs["TILING_SCHEME"] = (
+                            "GoogleMapsCompatible"
+                            if tms.identifier == "WebMercatorQuad"
+                            else tms.identifier
+                        )
+
+                    dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
+                    dst_kwargs["overview_resampling"] = overview_resampling
+                    dst_kwargs["warp_resampling"] = resampling
+                    if aligned_levels is not None:
+                        dst_kwargs["aligned_levels"] = aligned_levels
+
+                    dst_kwargs["blocksize"] = tilesize
+                    dst_kwargs.pop("blockxsize", None)
+                    dst_kwargs.pop("blockysize", None)
+                    dst_kwargs.pop("tiled", None)
+                    dst_kwargs.pop("interleave", None)
+                    dst_kwargs.pop("photometric", None)
+
+                    copy(tmp_dst, dst_path, **dst_kwargs)
+
+                else:
+                    copy(tmp_dst, dst_path, copy_src_overviews=True, **dst_kwargs)
 
 
 def cog_validate(  # noqa: C901

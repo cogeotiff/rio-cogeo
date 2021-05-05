@@ -3,6 +3,7 @@
 # 2.2.0 (TBD)
 
 * add pydantic models for `info` output (https://github.com/cogeotiff/rio-cogeo/issues/191)
+* add `use_cog_driver` option to create COG using new GDAL COG Driver (https://github.com/cogeotiff/rio-cogeo/pull/194)
 
 **Breaking Changes:**
 

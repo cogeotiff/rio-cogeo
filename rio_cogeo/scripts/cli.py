@@ -181,6 +181,12 @@ def cogeo():
     default="ALL_CPUS",
     help="Number of worker threads for multi-threaded compression (default: ALL_CPUS)",
 )
+@click.option(
+    "--use-cog-driver",
+    help="Use GDAL COG Driver (require GDAL>=3.1).",
+    is_flag=True,
+    default=False,
+)
 @options.creation_options
 @click.option(
     "--config",
@@ -213,6 +219,7 @@ def create(
     allow_intermediate_compression,
     forward_band_tags,
     threads,
+    use_cog_driver,
     creation_options,
     config,
     quiet,
@@ -256,6 +263,7 @@ def create(
         config=config,
         allow_intermediate_compression=allow_intermediate_compression,
         forward_band_tags=forward_band_tags,
+        use_cog_driver=use_cog_driver,
         quiet=quiet,
     )
 
