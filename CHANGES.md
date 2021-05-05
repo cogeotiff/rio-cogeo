@@ -43,6 +43,12 @@ $ rio cogeo info out.tif | jq .Tags
 }
 ```
 
+* update `Web-Optimized` configuration to match GDAL COG Driver (https://github.com/cogeotiff/rio-cogeo/pull/193)
+
+  By default only the `raw` data will be aligned to the grid. To align overviews, the `aligned_levels` option can be used (wasn't really working in previous version).
+
+* `rio_cogeo.utils.get_web_optimized_params` has been refactored (https://github.com/cogeotiff/rio-cogeo/pull/193)
+
 # 2.1.4 (2021-03-31)
 
 * fix issue in validation when BLOCK_OFFSET_0 is None (https://github.com/cogeotiff/rio-cogeo/issues/182)
