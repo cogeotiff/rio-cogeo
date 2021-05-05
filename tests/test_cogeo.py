@@ -8,6 +8,7 @@ import pytest
 import rasterio
 from rasterio.enums import ColorInterp
 from rasterio.io import MemoryFile
+from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo.cogeo import TemporaryRasterFile, cog_info, cog_translate, cog_validate
@@ -520,3 +521,87 @@ def test_temporaryRaster(fname):
     with TemporaryRasterFile(fname) as f:
         pass
     assert not os.path.exists(f.name)
+
+
+@pytest.mark.parametrize(
+    "src_path",
+    [
+        raster_path_rgba,
+        raster_path_rgb,
+        raster_path_nan,
+        raster_path_nodata,
+        raster_path_float,
+    ],
+)
+def test_gdal_cog(src_path, runner):
+    """Test GDAL COG."""
+    with runner.isolated_filesystem():
+        cog_translate(
+            src_path, "cogeo.tif", cog_profiles.get("raw"), quiet=True, gdal_cog=True
+        )
+        assert cog_validate("cogeo.tif")
+
+
+def test_gdal_cog_compare(runner):
+    """Test GDAL COG."""
+    with runner.isolated_filesystem():
+        profile = cog_profiles.get("jpeg")
+        profile["blockxsize"] = 256
+        profile["blockysize"] = 256
+
+        # rio cogeo GDAL COG
+        cog_translate(
+            raster_path_rgba, "gdalcogeo.tif", profile.copy(), quiet=True, gdal_cog=True
+        )
+
+        # pure COG
+        copy(raster_path_rgba, "cog.tif", driver="COG", blocksize=256, compress="JPEG")
+
+        # rio cogeo cog
+        cog_translate(
+            raster_path_rgba,
+            "riocogeo.tif",
+            profile.copy(),
+            indexes=(1, 2, 3,),
+            add_mask=True,
+            quiet=True,
+        )
+
+        with rasterio.open("riocogeo.tif") as riocogeo, rasterio.open(
+            "gdalcogeo.tif"
+        ) as gdalcogeo, rasterio.open("cog.tif") as cog:
+            assert cog.profile == gdalcogeo.profile == riocogeo.profile
+            assert cog.overviews(1) == gdalcogeo.overviews(1) == riocogeo.overviews(1)
+
+
+def test_gdal_cog_compareWeb(runner):
+    """Test GDAL COG."""
+    with runner.isolated_filesystem():
+        profile = cog_profiles.get("jpeg")
+        profile["blockxsize"] = 256
+        profile["blockysize"] = 256
+
+        # rio cogeo GDAL COG
+        cog_translate(
+            raster_path_rgba,
+            "gdalcogeo.tif",
+            profile.copy(),
+            quiet=True,
+            gdal_cog=True,
+            web_optimized=True,
+        )
+
+        # pure COG
+        copy(
+            raster_path_rgba,
+            "cog.tif",
+            driver="COG",
+            blocksize=256,
+            compress="JPEG",
+            TILING_SCHEME="GoogleMapsCompatible",
+        )
+
+        with rasterio.open("gdalcogeo.tif") as gdalcogeo, rasterio.open(
+            "cog.tif"
+        ) as cog:
+            assert cog.meta == gdalcogeo.meta
