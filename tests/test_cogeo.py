@@ -537,7 +537,11 @@ def test_gdal_cog(src_path, runner):
     """Test GDAL COG."""
     with runner.isolated_filesystem():
         cog_translate(
-            src_path, "cogeo.tif", cog_profiles.get("raw"), quiet=True, use_gdal=True
+            src_path,
+            "cogeo.tif",
+            cog_profiles.get("raw"),
+            quiet=True,
+            use_cog_driver=True,
         )
         assert cog_validate("cogeo.tif")
 
@@ -551,7 +555,11 @@ def test_gdal_cog_compare(runner):
 
         # rio cogeo GDAL COG
         cog_translate(
-            raster_path_rgba, "gdalcogeo.tif", profile.copy(), quiet=True, use_gdal=True
+            raster_path_rgba,
+            "gdalcogeo.tif",
+            profile.copy(),
+            quiet=True,
+            use_cog_driver=True,
         )
 
         # pure COG
@@ -587,7 +595,7 @@ def test_gdal_cog_compareWeb(runner):
             "gdalcogeo.tif",
             profile.copy(),
             quiet=True,
-            use_gdal=True,
+            use_cog_driver=True,
             web_optimized=True,
         )
 

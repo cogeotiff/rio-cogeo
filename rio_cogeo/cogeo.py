@@ -70,7 +70,7 @@ def cog_translate(  # noqa: C901
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
-    use_gdal: bool = False,
+    use_cog_driver: bool = False,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -131,6 +131,8 @@ def cog_translate(  # noqa: C901
         Overwrite or add a colormap to the output COG.
     additional_cog_metadata: dict, optional
         Additional dataset metadata to add to the COG.
+    use_cog_driver: bool, optional (default: False)
+        Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
     """
     if isinstance(indexes, int):
@@ -206,7 +208,7 @@ def cog_translate(  # noqa: C901
             if alpha:
                 vrt_params.update(dict(add_alpha=False))
 
-            if web_optimized and not use_gdal:
+            if web_optimized and not use_cog_driver:
                 params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
@@ -319,7 +321,7 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
-                if web_optimized and not use_gdal:
+                if web_optimized and not use_cog_driver:
                     tags.update(dict(TILING_SCHEME="WebMercatorQuad"))
 
                 if additional_cog_metadata:
@@ -332,7 +334,7 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Writing output to: {}".format(dst_path), err=True)
 
-                if use_gdal:
+                if use_cog_driver:
                     dst_kwargs["driver"] = "COG"
                     if web_optimized:
                         dst_kwargs["TILING_SCHEME"] = (
@@ -353,6 +355,7 @@ def cog_translate(  # noqa: C901
                     dst_kwargs.pop("tiled", None)
                     dst_kwargs.pop("interleave", None)
                     dst_kwargs.pop("photometric", None)
+
                     copy(tmp_dst, dst_path, **dst_kwargs)
 
                 else:
