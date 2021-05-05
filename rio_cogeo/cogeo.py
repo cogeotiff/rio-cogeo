@@ -70,7 +70,7 @@ def cog_translate(  # noqa: C901
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
-    gdal_cog: bool = False,
+    use_gdal: bool = False,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -206,7 +206,7 @@ def cog_translate(  # noqa: C901
             if alpha:
                 vrt_params.update(dict(add_alpha=False))
 
-            if web_optimized and not gdal_cog:
+            if web_optimized and not use_gdal:
                 params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
@@ -319,7 +319,7 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
-                if web_optimized and not gdal_cog:
+                if web_optimized and not use_gdal:
                     tags.update(dict(TILING_SCHEME="WebMercatorQuad"))
 
                 if additional_cog_metadata:
@@ -332,7 +332,7 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Writing output to: {}".format(dst_path), err=True)
 
-                if gdal_cog:
+                if use_gdal:
                     dst_kwargs["driver"] = "COG"
                     if web_optimized:
                         dst_kwargs["TILING_SCHEME"] = (
