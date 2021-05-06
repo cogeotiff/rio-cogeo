@@ -46,7 +46,7 @@ enforces several features:
 - **Internal overviews** (User can remove overview with option `--overview-level 0`)
 - **Internal tiles** (default profiles have 512x512 internal tiles)
 
-**Important**: Starting from GDAL 3.1 a new COG generator driver will be added ([doc](https://gdal.org/drivers/raster/cog.html), [discussion](https://lists.osgeo.org/pipermail/gdal-dev/2019-May/050169.html)) and will make `rio-cogeo` kinda obsolete.
+**Important**: in GDAL 3.1 a new COG driver has been added ([doc](https://gdal.org/drivers/raster/cog.html), [discussion](https://lists.osgeo.org/pipermail/gdal-dev/2019-May/050169.html)), starting with `rio-cogeo` version 2.2, `--use-cog-driver` option was added to create COG using the `COG` driver.
 
 ## Install
 
