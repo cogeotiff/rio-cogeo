@@ -572,7 +572,13 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.In
         compression = src_dst.compression.value if src_dst.compression else None
         colorspace = src_dst.photometric.value if src_dst.photometric else None
         overviews = src_dst.overviews(1)
-        tags = src_dst.tags()
+
+        tags = {"Image Metadata": src_dst.tags()}
+        namespaces = src_dst.tag_namespaces()
+        for ns in namespaces:
+            if ns in ["DERIVED_SUBDATASETS"]:
+                continue
+            tags.update({str.title(ns).replace("_", " "): src_dst.tags(ns=ns)})
 
         try:
             colormap = src_dst.colormap(1)

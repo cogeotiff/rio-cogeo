@@ -313,11 +313,11 @@ def info(input, to_json):
     {click.style("ColorMap:", bold=True):<{sep}} {metadata.Profile.ColorMap}
     {click.style("ColorInterp:", bold=True):<{sep}} {metadata.Profile.ColorInterp}
     {click.style("Scales:", bold=True):<{sep}} {metadata.Profile.Scales}
-    {click.style("Offsets:", bold=True):<{sep}} {metadata.Profile.Offsets}
+    {click.style("Offsets:", bold=True):<{sep}} {metadata.Profile.Offsets}"""
+        )
 
-{click.style('Image Metadata', bold=True)}
-    {create_tag_table(metadata.Tags, sep+5)}
-
+        click.echo(
+            f"""
 {click.style('Geo', bold=True)}
     {click.style("Crs:", bold=True):<{sep}} {metadata.GEO.CRS}
     {click.style("Origin:", bold=True):<{sep}} {metadata.GEO.Origin}
@@ -326,6 +326,16 @@ def info(input, to_json):
     {click.style("MinZoom:", bold=True):<{sep}} {metadata.GEO.MinZoom}
     {click.style("MaxZoom:", bold=True):<{sep}} {metadata.GEO.MaxZoom}"""
         )
+
+        for ns, values in metadata.Tags.items():
+            click.echo(
+                f"""
+{click.style(ns, bold=True)}"""
+            )
+            for key, val in values.items():
+                click.echo(
+                    f"""    {click.style(key, underline=True, bold=True)}: {val}"""
+                )
 
         click.echo(
             f"""

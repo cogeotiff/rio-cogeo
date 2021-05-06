@@ -62,5 +62,5 @@ class Info(BaseModel):
     COG_warnings: Optional[Sequence[str]]
     Profile: Profile
     GEO: Geo
-    Tags: Dict[str, Any]
+    Tags: Dict[str, Dict]
     IFD: Sequence[IFD]

@@ -505,6 +505,8 @@ def test_cog_info():
     assert info.GEO.MinZoom == 5
     assert info.GEO.MaxZoom == 11
     assert len(info.IFD) == 6
+    assert info.Tags["Image Metadata"]
+    assert info.Tags["Image Structure"]
 
 
 @pytest.mark.parametrize(
