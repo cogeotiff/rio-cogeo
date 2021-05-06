@@ -22,7 +22,8 @@ assert isinstance(info, rio_cogeo.models.Info)
 assert info.GEO.CRS
 ```
 
-* add `TILING_SCHEME` in COG metadata when creating WebOptimized COG (https://github.com/cogeotiff/rio-cogeo/pull/192)
+* add `TILING SCHEME` in dataset namespaced metadata when creating WebOptimized COG (https://github.com/cogeotiff/rio-cogeo/pull/193)
+* add more info in rio cogeo info `Tags` (https://github.com/cogeotiff/rio-cogeo/pull/193)
 
 ```python
 # before
@@ -38,9 +39,20 @@ $ rio cogeo info out.tif | jq .Tags
 $ rio cogeo create in.tif out.tif -w
 $ rio cogeo info out.tif | jq .Tags
 >> {
-  "AREA_OR_POINT": "Area",
-  "OVR_RESAMPLING_ALG": "NEAREST",
-  "TILING_SCHEME": "WebMercatorQuad"
+  "Image Metadata": {
+    "AREA_OR_POINT": "Area",
+    "DataType": "Generic",
+    "OVR_RESAMPLING_ALG": "NEAREST"
+  },
+  "Image Structure": {
+    "COMPRESSION": "DEFLATE",
+    "INTERLEAVE": "BAND",
+    "LAYOUT": "COG"
+  },
+  "Tiling Scheme": {
+    "NAME": "WEBMERCATORQUAD",
+    "ZOOM_LEVEL": "17"
+  }
 }
 ```
 
