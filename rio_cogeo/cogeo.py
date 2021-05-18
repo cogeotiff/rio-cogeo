@@ -321,11 +321,25 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     )
                 )
-                if web_optimized and not use_cog_driver:
-                    tags.update(dict(TILING_SCHEME="WebMercatorQuad"))
-
                 if additional_cog_metadata:
                     tags.update(**additional_cog_metadata)
+
+                if web_optimized and not use_cog_driver:
+                    dst_kwargs.update(
+                        {
+                            "@TILING_SCHEME_NAME": "WebMercatorQuad",
+                            "@TILING_SCHEME_ZOOM_LEVEL": tms.zoom_for_res(
+                                max(tmp_dst.res),
+                                max_z=30,
+                                zoom_level_strategy=zoom_level_strategy,
+                            ),
+                        }
+                    )
+
+                    if aligned_levels:
+                        dst_kwargs.update(
+                            {"@TILING_SCHEME_ALIGNED_LEVELS": aligned_levels}
+                        )
 
                 tmp_dst.update_tags(**tags)
                 tmp_dst._set_all_scales([vrt_dst.scales[b - 1] for b in indexes])
@@ -558,7 +572,13 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.In
         compression = src_dst.compression.value if src_dst.compression else None
         colorspace = src_dst.photometric.value if src_dst.photometric else None
         overviews = src_dst.overviews(1)
-        tags = src_dst.tags()
+
+        tags = {"Image Metadata": src_dst.tags()}
+        namespaces = src_dst.tag_namespaces()
+        for ns in namespaces:
+            if ns in ["DERIVED_SUBDATASETS"]:
+                continue
+            tags.update({str.title(ns).replace("_", " "): src_dst.tags(ns=ns)})
 
         try:
             colormap = src_dst.colormap(1)

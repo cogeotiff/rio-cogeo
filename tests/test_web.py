@@ -113,7 +113,23 @@ def test_cog_translate_web():
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom))
                 assert out_dst.bounds.right == lrTile.right
                 assert round(out_dst.bounds.bottom, 6) == round(lrTile.bottom, 6)
-                assert out_dst.tags()["TILING_SCHEME"] == "WebMercatorQuad"
+                assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
+                assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"]
+                assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            aligned_levels=4,
+        )
+        with rasterio.open("cogeo.tif") as out_dst:
+            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
+            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"]
+            assert out_dst.tags(ns="TILING_SCHEME")["ALIGNED_LEVELS"] == "4"
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")
