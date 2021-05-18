@@ -12,11 +12,7 @@ from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo.cogeo import TemporaryRasterFile, cog_info, cog_translate, cog_validate
-from rio_cogeo.errors import (
-    IncompatibleBlockRasterSize,
-    IncompatibleOptions,
-    LossyCompression,
-)
+from rio_cogeo.errors import IncompatibleBlockRasterSize, IncompatibleOptions
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
 
@@ -93,29 +89,16 @@ def test_cog_translate_valid(runner):
 
 
 def test_cog_translate_NodataLossyWarning(runner):
-    """Should work as expected (create cogeo file but warns no lossy compression)."""
-    with runner.isolated_filesystem():
-        with pytest.warns(LossyCompression):
-            cog_translate(
-                raster_path_rgb, "cogeo.tif", jpeg_profile, nodata=0, quiet=True
-            )
-            with rasterio.open("cogeo.tif") as src:
-                assert src.nodata == 0
-                assert src.compression.value == "JPEG"
-                assert not has_mask_band(src)
-
-
-def test_cog_translate_optionWarnings(runner):
-    """Should work as expected but warns about invalid options."""
+    """Should work as expected (create cogeo file but warns about mask creation)."""
     with runner.isolated_filesystem():
         with pytest.warns(UserWarning):
             cog_translate(
                 raster_path_rgb, "cogeo.tif", jpeg_profile, nodata=0, quiet=True
             )
             with rasterio.open("cogeo.tif") as src:
-                assert src.nodata == 0
+                assert not src.nodata
                 assert src.compression.value == "JPEG"
-                assert not has_mask_band(src)
+                assert has_mask_band(src)
 
 
 def test_cog_translate_NodataMask(runner):
@@ -183,6 +166,33 @@ def test_cog_translate_validAlpha(runner):
         with rasterio.open(raster_path_rgba) as src:
             with rasterio.open("cogeo.tif") as dst:
                 assert src.colorinterp == dst.colorinterp
+
+        with pytest.warns(UserWarning):
+            cog_translate(raster_path_rgba, "cogeo.tif", jpeg_profile, quiet=True)
+            with rasterio.open("cogeo.tif") as src:
+                assert src.count == 3
+
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgba,
+                "cogeo.tif",
+                jpeg_profile,
+                indexes=(1, 2, 3, 4),
+                quiet=True,
+            )
+            with rasterio.open("cogeo.tif") as src:
+                assert src.count == 3
+                assert src.compression.value == "JPEG"
+                assert has_mask_band(src)
+
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgba, "cogeo.tif", jpeg_profile, indexes=(1,), quiet=True
+            )
+            with rasterio.open("cogeo.tif") as src:
+                assert src.count == 1
+                assert src.compression.value == "JPEG"
+                assert has_mask_band(src)
 
 
 def test_cog_translate_valiNodataNan(runner):

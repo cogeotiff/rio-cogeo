@@ -1,16 +1,18 @@
 """rio_cogeo.utils: Utility functions."""
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import morecantile
 from rasterio.crs import CRS
 from rasterio.enums import ColorInterp, MaskFlags
+from rasterio.io import DatasetReader, DatasetWriter
 from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.transform import Affine
+from rasterio.vrt import WarpedVRT
 from rasterio.warp import calculate_default_transform, transform_bounds
 
 
-def has_alpha_band(src_dst):
+def has_alpha_band(src_dst: Union[DatasetReader, DatasetWriter, WarpedVRT]):
     """Check for alpha band or mask in source."""
     if (
         any([MaskFlags.alpha in flags for flags in src_dst.mask_flag_enums])
@@ -32,8 +34,20 @@ def has_mask_band(src_dst):
     return False
 
 
+def non_alpha_indexes(src_dst: Union[DatasetReader, DatasetWriter, WarpedVRT]) -> Tuple:
+    """Return indexes of non-alpha bands."""
+    return tuple(
+        b
+        for ix, b in enumerate(src_dst.indexes)
+        if (
+            src_dst.mask_flag_enums[ix] is not MaskFlags.alpha
+            and src_dst.colorinterp[ix] is not ColorInterp.alpha
+        )
+    )
+
+
 def get_zooms(
-    src_dst,
+    src_dst: Union[DatasetReader, DatasetWriter, WarpedVRT],
     tilesize: int = 256,
     tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
     zoom_level_strategy: str = "auto",

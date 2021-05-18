@@ -5,7 +5,6 @@ import os
 import pytest
 import rasterio
 
-from rio_cogeo.errors import LossyCompression
 from rio_cogeo.scripts.cli import cogeo
 from rio_cogeo.utils import has_mask_band
 
@@ -124,7 +123,7 @@ def test_cogeo_invalidThread(runner):
 def test_cogeo_validnodata(runner):
     """Should work as expected."""
     with runner.isolated_filesystem():
-        with pytest.warns(LossyCompression):
+        with pytest.warns(UserWarning):
             result = runner.invoke(
                 cogeo,
                 [
@@ -140,8 +139,8 @@ def test_cogeo_validnodata(runner):
             assert not result.exception
             assert result.exit_code == 0
             with rasterio.open("output.tif") as src:
-                assert src.nodata == 0
-                assert not has_mask_band(src)
+                assert not src.nodata
+                assert has_mask_band(src)
 
         result = runner.invoke(
             cogeo,
