@@ -131,6 +131,8 @@ def cog_translate(  # noqa: C901
         Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
     """
+    dst_kwargs = dst_kwargs.copy()
+
     if isinstance(indexes, int):
         indexes = (indexes,)
 
