@@ -22,11 +22,7 @@ from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import models, utils
-from rio_cogeo.errors import (
-    IncompatibleBlockRasterSize,
-    IncompatibleOptions,
-    LossyCompression,
-)
+from rio_cogeo.errors import IncompatibleBlockRasterSize, IncompatibleOptions
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -135,6 +131,8 @@ def cog_translate(  # noqa: C901
         Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
     """
+    dst_kwargs = dst_kwargs.copy()
+
     if isinstance(indexes, int):
         indexes = (indexes,)
 
@@ -160,12 +158,16 @@ def cog_translate(  # noqa: C901
 
             if not add_mask and (
                 (nodata is not None or alpha)
-                and dst_kwargs.get("compress") in ["JPEG", "jpeg"]
+                and dst_kwargs.get("compress", "").lower() == "jpeg"
             ):
                 warnings.warn(
-                    "Using lossy compression with Nodata or Alpha band "
-                    "can results in unwanted artefacts.",
-                    LossyCompression,
+                    "Nodata/Alpha band will be translated to an internal mask band.",
+                )
+                add_mask = True
+                indexes = (
+                    utils.non_alpha_indexes(src_dst)
+                    if len(indexes) not in [1, 3]
+                    else indexes
                 )
 
             tilesize = min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))

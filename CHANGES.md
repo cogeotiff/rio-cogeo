@@ -1,6 +1,6 @@
 # Release Notes
 
-# 2.2.0 (TBD)
+# 2.2.0 (2021-05-18)
 
 * add pydantic models for `info` output (https://github.com/cogeotiff/rio-cogeo/issues/191)
 * add `use_cog_driver` option to create COG using new GDAL COG Driver (https://github.com/cogeotiff/rio-cogeo/pull/194)
@@ -61,6 +61,25 @@ $ rio cogeo info out.tif | jq .Tags
   By default only the `raw` data will be aligned to the grid. To align overviews, the `aligned_levels` option can be used (wasn't really working in previous version).
 
 * `rio_cogeo.utils.get_web_optimized_params` has been refactored (https://github.com/cogeotiff/rio-cogeo/pull/193)
+
+* `cog_translate` will now materialize **Nodata or Alpha band** to an internal **mask** automatically for JPEG compresssed output (https://github.com/cogeotiff/rio-cogeo/pull/196)
+
+```python
+# before
+cog_translate(raster_path_rgba, "cogeo.tif", jpeg_profile)
+with rasterio.open("cogeo.tif") as src:
+    assert src.count == 4
+    assert src.compression.value == "JPEG"
+    assert has_alpha_band(src)
+    assert not has_mask_band(src)
+
+# now
+cog_translate(raster_path_rgba, "cogeo.tif", jpeg_profile)
+with rasterio.open("cogeo.tif") as src:
+    assert src.count == 3
+    assert src.compression.value == "JPEG"
+    assert has_mask_band(src)
+```
 
 # 2.1.4 (2021-03-31)
 
