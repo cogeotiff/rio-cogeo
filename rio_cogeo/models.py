@@ -3,7 +3,8 @@
 from typing import Any, Dict, Optional, Sequence, Tuple
 
 from pydantic import BaseModel
-from rio_tiler.constants import BBox
+
+BBox = Tuple[float, float, float, float]
 
 
 class IFD(BaseModel):

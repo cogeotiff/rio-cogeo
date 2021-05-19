@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.2.1 (2021-05-19)
+
+* replace missing rio-tiler dependencies with a custom BBox type definition (https://github.com/cogeotiff/rio-cogeo/pull/198)
+
 # 2.2.0 (2021-05-18)
 
 * add pydantic models for `info` output (https://github.com/cogeotiff/rio-cogeo/issues/191)
