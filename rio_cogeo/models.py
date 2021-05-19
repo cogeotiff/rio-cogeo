@@ -1,4 +1,4 @@
-"""Titiler Metadta models."""
+"""rio-cogeo models."""
 
 from typing import Any, Dict, Optional, Sequence, Tuple
 
