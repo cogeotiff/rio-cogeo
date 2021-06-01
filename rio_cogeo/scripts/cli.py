@@ -153,7 +153,7 @@ def cogeo():
     "-r",
     help="Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.",
     type=click.Choice(
-        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
+        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6]]
     ),
     default="nearest",
 )
