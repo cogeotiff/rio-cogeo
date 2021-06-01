@@ -7,7 +7,15 @@ from pydantic import BaseModel
 BBox = Tuple[float, float, float, float]
 
 
-class IFD(BaseModel):
+class DictLike:
+    """Provides dictionary access for pydantic models, for backwards compatability with rio-cogeo<2.2.0."""
+
+    def __getitem__(self, item):
+        """Dictionary access."""
+        return self.__dict__[item]
+
+
+class IFD(DictLike, BaseModel):
     """ImageFileDirectory info."""
 
     Level: int
@@ -17,7 +25,7 @@ class IFD(BaseModel):
     Decimation: int
 
 
-class Geo(BaseModel):
+class Geo(DictLike, BaseModel):
     """rio-cogeo validation GEO information."""
 
     CRS: Optional[str]
@@ -28,7 +36,7 @@ class Geo(BaseModel):
     MaxZoom: Optional[int]
 
 
-class Profile(BaseModel):
+class Profile(DictLike, BaseModel):
     """rio-cogeo validation Profile information."""
 
     Bands: int
@@ -51,7 +59,7 @@ class Profile(BaseModel):
         extra = "ignore"
 
 
-class Info(BaseModel):
+class Info(DictLike, BaseModel):
     """rio-cogeo Info."""
 
     Path: str

@@ -519,6 +519,18 @@ def test_cog_info():
     assert info.Tags["Image Structure"]
 
 
+def test_cog_info_dict_access():
+    """Test dictionary access to COGEO info."""
+    info = cog_info(raster_web_z5_z11)
+    assert info["COG"]
+    assert info["GEO"]["CRS"] == "EPSG:3857"
+    assert info["GEO"]["MinZoom"] == 5
+    assert info["GEO"]["MaxZoom"] == 11
+    assert len(info["IFD"]) == 6
+    assert info["Tags"]["Image Metadata"]
+    assert info["Tags"]["Image Structure"]
+
+
 @pytest.mark.parametrize(
     "fname",
     [
