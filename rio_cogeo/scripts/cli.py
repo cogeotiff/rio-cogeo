@@ -6,11 +6,17 @@ import typing
 import click
 import numpy
 from rasterio.enums import Resampling as ResamplingEnums
+from rasterio.env import GDALVersion
 from rasterio.rio import options
+from rasterio.warp import SUPPORTED_RESAMPLING as WarpResampling
 
 from rio_cogeo import __version__ as cogeo_version
 from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
+
+OverviewResampling = [r for r in ResamplingEnums if r.value < 8]
+if GDALVersion.runtime().at_least("3.3"):
+    OverviewResampling.append(ResamplingEnums.rms)
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -123,9 +129,7 @@ def cogeo():
 @click.option(
     "--overview-resampling",
     help="Overview creation resampling algorithm (default: nearest).",
-    type=click.Choice(
-        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6, 7]]
-    ),
+    type=click.Choice([it.name for it in OverviewResampling]),
     default="nearest",
 )
 @click.option(
@@ -152,9 +156,7 @@ def cogeo():
     "--resampling",
     "-r",
     help="Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.",
-    type=click.Choice(
-        [it.name for it in ResamplingEnums if it.value in [0, 1, 2, 3, 4, 5, 6]]
-    ),
+    type=click.Choice([it.name for it in WarpResampling]),
     default="nearest",
 )
 @click.option(
