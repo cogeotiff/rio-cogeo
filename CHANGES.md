@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.2.2 (2021-06-01)
+
+* Add dictionary access to `Info` model (author @geospatial-jeff, https://github.com/cogeotiff/rio-cogeo/pull/201)
+
 # 2.2.1 (2021-05-19)
 
 * replace missing rio-tiler dependencies with a custom BBox type definition (https://github.com/cogeotiff/rio-cogeo/pull/198)
