@@ -456,6 +456,30 @@ def test_cogeo_validCompress(monkeypatch, runner):
         assert result.exit_code == 0
 
 
+def test_cogeo_invalidresampling(runner):
+    """Should exit with invalid resampling."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo, ["create", raster_path_rgb, "output.tif", "-r", "gauss", "-w"]
+        )
+        assert result.exception
+        assert result.exit_code == 2
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--overview-resampling",
+                "max",
+                "-w",
+            ],
+        )
+        assert result.exception
+        assert result.exit_code == 2
+
+
 def test_cogeo_validate(runner):
     """Should work as expected."""
     with runner.isolated_filesystem():
