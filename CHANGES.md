@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.2.4 (TBD)
+
+* add `overview_internal` boolean parameter to `cog_validate`-function (https://github.com/cogeotiff/rio-cogeo/pull/205)
+
 # 2.2.3 (2021-06-18)
 
 * use opened file for click progressbar (https://github.com/cogeotiff/rio-cogeo/pull/204)

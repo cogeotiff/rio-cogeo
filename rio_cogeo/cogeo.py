@@ -380,7 +380,7 @@ def cog_translate(  # noqa: C901
 
 
 def cog_validate(  # noqa: C901
-    src_path: Union[str, pathlib.PurePath], strict: bool = False, quiet: bool = False
+    src_path: Union[str, pathlib.PurePath], strict: bool = False, quiet: bool = False, overview_internal: bool = False
 ) -> Tuple[bool, List[str], List[str]]:
     """
     Validate Cloud Optimized Geotiff.
@@ -396,6 +396,8 @@ def cog_validate(  # noqa: C901
         Treat warnings as errors
     quiet: bool
         Remove standard outputs
+    overview_internal: bool
+        Speed up validation when overviews are not in external .ovr-files
 
     Returns
     -------
@@ -414,7 +416,7 @@ def cog_validate(  # noqa: C901
     if not GDALVersion.runtime().at_least("2.2"):
         raise Exception("GDAL 2.2 or above required")
 
-    config = dict(GDAL_DISABLE_READDIR_ON_OPEN="FALSE")
+    config = dict(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR" if overview_internal else "FALSE")
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src:
             if not src.driver == "GTiff":
