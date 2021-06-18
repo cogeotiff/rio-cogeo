@@ -58,12 +58,14 @@ Usage: rio cogeo validate [OPTIONS] INPUT
   Validate Cloud Optimized Geotiff.
 
 Options:
-  --strict  Treat warnings as errors.
-  --help    Show this message and exit.
+  --strict             Treat warnings as errors.
+  --config NAME=VALUE  GDAL configuration options.
+  --help               Show this message and exit.
 ```
 
 The `strict` options will treat warnings (e.g missing overviews) as errors.
 
+Using the `--config` option can be useful to restrict GDAL environement. By default GDAL will check for external files (such as overviews), which could make a COG invalid. To force GDAL to only consider the input file you can use `--config GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR.
 
 ### Info
 (extented version or `rio info`).
