@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.2.3 (2021-06-18)
+
+* use opened file for click progressbar (https://github.com/cogeotiff/rio-cogeo/pull/204)
+
 # 2.2.2 (2021-06-01)
 
 * Add dictionary access to `Info` model (author @geospatial-jeff, https://github.com/cogeotiff/rio-cogeo/pull/201)

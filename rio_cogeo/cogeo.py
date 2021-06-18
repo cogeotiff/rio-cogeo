@@ -285,7 +285,8 @@ def cog_translate(  # noqa: C901
 
                 if not quiet:
                     click.echo("Reading input: {}".format(source), err=True)
-                fout = os.devnull if quiet else sys.stderr
+
+                fout = ctx.enter_context(open(os.devnull, "w")) if quiet else sys.stderr
                 with click.progressbar(wind, file=fout, show_percent=True) as windows:  # type: ignore
                     for _, w in windows:
                         matrix = vrt_dst.read(window=w, indexes=indexes)
