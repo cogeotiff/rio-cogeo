@@ -1,5 +1,20 @@
 # Release Notes
 
+# 2.3.0 (TBD)
+
+* allow external configuration (GDAL Env) for `cog_validate` (https://github.com/cogeotiff/rio-cogeo/pull/206)
+
+  ```python
+  from rio_cogeo import cog_validate
+
+  assert cog_validate("cog.tif", congig={"GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR"})[0]
+  ```
+
+  In previous version we were forcing `GDAL_DISABLE_READDIR_ON_OPEN=FALSE` in `cog_validate` function to check for external overviews.
+
+  Starting with version 2.3, it's up to the user to set the wanted GDAL configuration (e.g `EMPTY_DIR`: no external file check, `FALSE`: check for external files)
+
+
 # 2.2.3 (2021-06-18)
 
 * use opened file for click progressbar (https://github.com/cogeotiff/rio-cogeo/pull/204)

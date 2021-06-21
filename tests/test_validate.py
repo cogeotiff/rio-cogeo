@@ -32,43 +32,50 @@ jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 
 def test_cog_validate_valid(monkeypatch):
     """Should work as expected (validate cogeo file)."""
+    config = {"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+
     # not tiled but 512x512
-    assert cog_validate(raster_rgb)[0]
+    assert cog_validate(raster_rgb, config=config)[0]
 
     # not tiled, no overview
-    assert not cog_validate(raster_big, quiet=True)[0]
+    assert not cog_validate(raster_big, quiet=True, config=config)[0]
 
     # external overview
-    assert not cog_validate(raster_external)[0]
+    assert not cog_validate(raster_external, config=config)[0]
 
     # non-sorted overview
-    assert not cog_validate(raster_ovrsorted)[0]
+    assert not cog_validate(raster_ovrsorted, config=config)[0]
 
     # invalid decimation
-    assert not cog_validate(raster_decim)[0]
+    assert not cog_validate(raster_decim, config=config)[0]
 
     # no overview
-    assert cog_validate(raster_no_ovr)[0]
-    assert not cog_validate(raster_no_ovr, strict=True)[0]
+    assert cog_validate(raster_no_ovr, config=config)[0]
+    assert not cog_validate(raster_no_ovr, strict=True, config=config)[0]
 
     with pytest.raises(Exception):
-        cog_validate(raster_jpeg)
+        cog_validate(raster_jpeg, config=config)
 
     # COG created with GDAL 3.1
-    assert cog_validate(raster_rioCOGgdal31)[0]
-    assert cog_validate(raster_COGgdal31)[0]
+    assert cog_validate(raster_rioCOGgdal31, config=config)[0]
+    assert cog_validate(raster_COGgdal31, config=config)[0]
 
     with pytest.warns(NotGeoreferencedWarning):
-        assert cog_validate(raster_zero_offset)
+        assert cog_validate(raster_zero_offset, config=config)
 
 
 def test_cog_validate_return():
-    valid, err, warn = cog_validate(raster_rgb)
+    """Checkout returned values."""
+    valid, err, warn = cog_validate(
+        raster_rgb, config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+    )
     assert valid
     assert not err
     assert not warn
 
-    valid, err, warn = cog_validate(raster_no_ovr)
+    valid, err, warn = cog_validate(
+        raster_no_ovr, config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+    )
     assert valid
     assert len(warn) == 1
     assert not err
@@ -79,12 +86,16 @@ def test_cog_validate_validCreatioValid(monkeypatch):
     runner = CliRunner()
     with runner.isolated_filesystem():
         cog_translate(raster_rgb, "cogeo.tif", jpeg_profile, quiet=True)
-        assert cog_validate("cogeo.tif")
+        assert cog_validate(
+            "cogeo.tif", config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+        )
 
         cog_translate(
             raster_rgb, "cogeo.tif", jpeg_profile, overview_level=0, quiet=True
         )
-        assert cog_validate("cogeo.tif")
+        assert cog_validate(
+            "cogeo.tif", config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+        )
 
         # Change in rasterio 1.0.26
         # https://github.com/mapbox/rasterio/blob/master/CHANGES.txt#L43
@@ -97,4 +108,25 @@ def test_cog_validate_validCreatioValid(monkeypatch):
             config=config,
             quiet=True,
         )
-        assert cog_validate("cogeo.tif")
+        assert cog_validate(
+            "cogeo.tif", config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+        )
+
+
+def test_cog_validate_config(monkeypatch):
+    """Should work as expected (validate cogeo file)."""
+    # No external overview found
+    assert cog_validate(
+        raster_external, config={"GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR"}
+    )[0]
+
+    # External overview found
+    assert not cog_validate(
+        raster_external, config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+    )[0]
+    assert (
+        "external"
+        in cog_validate(
+            raster_external, config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
+        )[1][0]
+    )
