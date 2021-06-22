@@ -64,7 +64,7 @@ $ pip install git+https://github.com/cogeotiff/rio-cogeo.git
 
 ## GDAL Version
 
-It is recommanded to use GDAL > 2.3.2. Previous versions might not be able to
+It is recommended to use GDAL > 2.3.2. Previous versions might not be able to
 create proper COGs (ref: https://github.com/OSGeo/gdal/issues/754).
 
 
