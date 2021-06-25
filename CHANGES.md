@@ -1,6 +1,6 @@
 # Release Notes
 
-# 2.3.0 (TBD)
+# 2.3.0 (2021-0625)
 
 * allow external configuration (GDAL Env) for `cog_validate` (https://github.com/cogeotiff/rio-cogeo/pull/206)
 
