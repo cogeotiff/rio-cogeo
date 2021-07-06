@@ -1,6 +1,10 @@
 # Release Notes
 
-# 2.3.0 (2021-0625)
+# 2.3.1 (2021-07-06)
+
+* update `click` version requirement to `>=7.0` to make sure `click.Choice` supports the `case_sensitive` option.
+
+# 2.3.0 (2021-06-25)
 
 * allow external configuration (GDAL Env) for `cog_validate` (https://github.com/cogeotiff/rio-cogeo/pull/206)
 
