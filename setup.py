@@ -7,7 +7,7 @@ with open("README.md") as f:
 
 # Runtime requirements.
 inst_reqs = [
-    "click",
+    "click>=7.0",
     "rasterio>=1.1",
     "numpy~=1.15",
     "morecantile>=2.1,<2.2",
