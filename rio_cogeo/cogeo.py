@@ -360,6 +360,11 @@ def cog_translate(  # noqa: C901
                             else tms.identifier
                         )
 
+                        if add_mask and dst_kwargs.get("compress", "") != "JPEG":
+                            warnings.warn(
+                                "With GDAL COG driver, mask band will be translated to an alpha band."
+                            )
+
                     dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
                     dst_kwargs["overview_resampling"] = overview_resampling
                     dst_kwargs["warp_resampling"] = resampling

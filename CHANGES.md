@@ -1,5 +1,9 @@
 # Release Notes
 
+# 2.3.2 (2021-07-16)
+
+* raise warning when using incompatible options for GDAL COG driver (https://github.com/cogeotiff/rio-cogeo/pull/212)
+
 # 2.3.1 (2021-07-06)
 
 * update `click` version requirement to `>=7.0` to make sure `click.Choice` supports the `case_sensitive` option.
