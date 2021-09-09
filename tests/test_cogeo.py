@@ -637,3 +637,19 @@ def test_gdal_cog_compareWeb(runner):
             "cog.tif"
         ) as cog:
             assert cog.meta == gdalcogeo.meta
+
+
+def test_gdal_cog_web_mask(runner):
+    """Raise a warning for specific mask/compression/web combination."""
+    with runner.isolated_filesystem():
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgb,
+                "cogeo.tif",
+                cog_profiles.get("deflate"),
+                use_cog_driver=True,
+                web_optimized=True,
+                add_mask=True,
+                quiet=True,
+            )
+            assert cog_validate("cogeo.tif")
