@@ -1,6 +1,6 @@
 # Release Notes
 
-# 2.3.2 (2021-07-16)
+# NEXT (TBD)
 
 * raise warning when using incompatible options for GDAL COG driver (https://github.com/cogeotiff/rio-cogeo/pull/212)
 
