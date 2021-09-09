@@ -53,9 +53,13 @@ def get_zooms(
     zoom_level_strategy: str = "auto",
 ) -> Tuple[int, int]:
     """Calculate raster min/max zoom level."""
-    if src_dst.crs != tms.crs:
+    if src_dst.crs != tms.rasterio_crs:
         aff, w, h = calculate_default_transform(
-            src_dst.crs, tms.crs, src_dst.width, src_dst.height, *src_dst.bounds,
+            src_dst.crs,
+            tms.rasterio_crs,
+            src_dst.width,
+            src_dst.height,
+            *src_dst.bounds,
         )
     else:
         aff = list(src_dst.transform)
@@ -88,9 +92,13 @@ def get_web_optimized_params(
         )
     )
 
-    if src_dst.crs != tms.crs:
+    if src_dst.crs != tms.rasterio_crs:
         aff, w, h = calculate_default_transform(
-            src_dst.crs, tms.crs, src_dst.width, src_dst.height, *src_dst.bounds,
+            src_dst.crs,
+            tms.rasterio_crs,
+            src_dst.width,
+            src_dst.height,
+            *src_dst.bounds,
         )
     else:
         aff = list(src_dst.transform)
@@ -117,5 +125,8 @@ def get_web_optimized_params(
     vrt_height = max(1, round((s - n) / vrt_transform.e))
 
     return dict(
-        crs=tms.crs, transform=vrt_transform, width=vrt_width, height=vrt_height,
+        crs=tms.rasterio_crs,
+        transform=vrt_transform,
+        width=vrt_width,
+        height=vrt_height,
     )

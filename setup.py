@@ -10,20 +10,31 @@ inst_reqs = [
     "click>=7.0",
     "rasterio>=1.1",
     "numpy~=1.15",
-    "morecantile>=2.1,<2.2",
+    "morecantile>=3.0.0a0,<3.1",
     "pydantic",
 ]
 
 extra_reqs = {
-    "test": ["pytest", "pytest-cov", "rio-tiler~=2.0", "cogdumper"],
-    "dev": ["pytest", "pytest-cov", "rio-tiler~=2.0", "pre-commit", "cogdumper"],
+    "test": [
+        "pytest",
+        "pytest-cov",
+        "rio-tiler @ git+https://github.com/cogeotiff/rio-tiler.git@morecantileV3",  # TODO: replace with rio-tiler>=3.0
+        "cogdumper",
+    ],
+    "dev": [
+        "pytest",
+        "pytest-cov",
+        "rio-tiler @ git+https://github.com/cogeotiff/rio-tiler.git@morecantileV3",  # TODO: replace with rio-tiler>=3.0
+        "pre-commit",
+        "cogdumper",
+    ],
     "docs": ["mkdocs", "mkdocs-material"],
 }
 
 setup(
     name="rio-cogeo",
     version="2.3.1",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     description=u"Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -31,7 +42,6 @@ setup(
         "Intended Audience :: Information Technology",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
