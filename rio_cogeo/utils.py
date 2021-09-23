@@ -53,6 +53,7 @@ def get_zooms(
     zoom_level_strategy: str = "auto",
 ) -> Tuple[int, int]:
     """Calculate raster min/max zoom level."""
+    # If the raster is not in the TMS CRS we calculate its projected properties (height, width, resolution)
     if src_dst.crs != tms.rasterio_crs:
         aff, w, h = calculate_default_transform(
             src_dst.crs,
@@ -68,12 +69,15 @@ def get_zooms(
 
     resolution = max(abs(aff[0]), abs(aff[4]))
 
+    # The maxzoom is defined by finding the minimum difference between
+    # the raster resolution and the zoom level resolution
     max_zoom = tms.zoom_for_res(
         resolution, max_z=30, zoom_level_strategy=zoom_level_strategy,
     )
 
-    overview_level = get_maximum_overview_level(w, h, minsize=tilesize)
-    ovr_resolution = resolution * (2 ** overview_level)
+    # The minzoom is defined by the resolution of the maximum theoretical overview level
+    max_possible_overview_level = get_maximum_overview_level(w, h, minsize=tilesize)
+    ovr_resolution = resolution * (2 ** max_possible_overview_level)
     min_zoom = tms.zoom_for_res(ovr_resolution, max_z=30)
 
     return (min_zoom, max_zoom)
@@ -105,21 +109,29 @@ def get_web_optimized_params(
 
     resolution = max(abs(aff[0]), abs(aff[4]))
 
+    # find max zoom (closest to the raster resolution)
     max_zoom = tms.zoom_for_res(
         resolution, max_z=30, zoom_level_strategy=zoom_level_strategy,
     )
 
+    # defined the zoom level we want to align the raster
     aligned_levels = aligned_levels or 0
     base_zoom = max_zoom - aligned_levels
 
+    # find new raster bounds (bounds of UL tile / LR tile)
     ul_tile = tms.tile(bounds[0], bounds[3], base_zoom)
-    w, _, _, n = tms.xy_bounds(ul_tile.x, ul_tile.y, ul_tile.z)
+    w, _, _, n = tms.xy_bounds(ul_tile)
 
+    # The output resolution should match the TMS resolution at MaxZoom
     vrt_res = tms._resolution(tms.matrix(max_zoom))
+
+    # Output transform is built from the origin (UL tile) and output resolution
     vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)
 
     lr_tile = tms.tile(bounds[2], bounds[1], base_zoom)
-    e, _, _, s = tms.xy_bounds(lr_tile.x + 1, lr_tile.y + 1, lr_tile.z)
+    e, _, _, s = tms.xy_bounds(
+        morecantile.Tile(lr_tile.x + 1, lr_tile.y + 1, lr_tile.z)
+    )
 
     vrt_width = max(1, round((e - w) / vrt_transform.a))
     vrt_height = max(1, round((s - n) / vrt_transform.e))

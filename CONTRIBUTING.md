@@ -10,7 +10,7 @@ $ cd rio-cogeo
 $ pip install -e .[dev]
 ```
 
-**Python3.7 only**
+## pre-commit
 
 This repo is set to use `pre-commit` to run *isort*, *flake8*, *pydocstring*, *black* ("uncompromising Python code formatter") and mypy when committing new code.
 
@@ -18,7 +18,7 @@ This repo is set to use `pre-commit` to run *isort*, *flake8*, *pydocstring*, *b
 $ pre-commit install
 ```
 
-### Docs
+## Docs
 
 ```bash
 $ git clone https://github.com/cogeotiff/rio-cogeo.git
