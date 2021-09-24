@@ -1,6 +1,6 @@
 # Release Notes
 
-# 3.0.0a0 (TBD)
+# 3.0.0a0 (2021-09-23)
 
 * update to `morecantile>=3.0`
 * raise warning when using incompatible options for GDAL COG driver (https://github.com/cogeotiff/rio-cogeo/pull/212)
