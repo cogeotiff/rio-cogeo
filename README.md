@@ -62,12 +62,6 @@ $ pip install -U pip
 $ pip install git+https://github.com/cogeotiff/rio-cogeo.git
 ```
 
-!!! important
-    rio-cogeo 3.0 is currently available as `pre-release`
-    see https://github.com/cogeotiff/rio-cogeo/blob/master/CHANGES.md#300a0-2021-09-23
-
-    `pip install rio-cogeo --pre`
-
 ## GDAL Version
 
 It is recommended to use GDAL > 2.3.2. Previous versions might not be able to
