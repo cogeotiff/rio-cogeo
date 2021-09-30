@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.0.0 (2021-09-30)
+
+* no changes since 3.0.0a0
+
 # 3.0.0a0 (2021-09-23)
 
 * update to `morecantile>=3.0`
