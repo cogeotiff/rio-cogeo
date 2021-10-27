@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.0.1 (2021-10-27)
+
+* update `test` and `dev` dependencies to `rio-tiler>=3.0.0a0`
+
 # 3.0.0 (2021-09-30)
 
 * no changes since 3.0.0a0
