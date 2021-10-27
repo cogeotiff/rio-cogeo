@@ -15,19 +15,8 @@ inst_reqs = [
 ]
 
 extra_reqs = {
-    "test": [
-        "pytest",
-        "pytest-cov",
-        "rio-tiler @ git+https://github.com/cogeotiff/rio-tiler.git@rio-tiler-v3",  # TODO: replace with rio-tiler>=3.0
-        "cogdumper",
-    ],
-    "dev": [
-        "pytest",
-        "pytest-cov",
-        "rio-tiler @ git+https://github.com/cogeotiff/rio-tiler.git@rio-tiler-v3",  # TODO: replace with rio-tiler>=3.0
-        "pre-commit",
-        "cogdumper",
-    ],
+    "test": ["pytest", "pytest-cov", "rio-tiler>=3.0.0a0", "cogdumper"],
+    "dev": ["pytest", "pytest-cov", "rio-tiler>=3.0.0a0", "pre-commit", "cogdumper"],
     "docs": ["mkdocs", "mkdocs-material"],
 }
 
