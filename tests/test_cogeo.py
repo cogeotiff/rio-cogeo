@@ -34,6 +34,7 @@ raster_colormap = os.path.join(FIXTURES_DIR, "image_colormap.tif")
 raster_nocolormap = os.path.join(FIXTURES_DIR, "image_nocolormap.tif")
 raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
 raster_web_z5_z11 = os.path.join(FIXTURES_DIR, "image_web_z5_z11.tif")
+raster_band_tags = os.path.join(FIXTURES_DIR, "cog_band_tags.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -658,3 +659,12 @@ def test_gdal_cog_web_mask(runner):
                 quiet=True,
             )
             assert cog_validate("cogeo.tif")
+
+
+def test_info_with_metadata():
+    """Make sure info returns band metadata."""
+    info = cog_info(raster_band_tags)
+    assert info.Band_Metadata
+    assert info.dict(by_alias=True)["Band Metadata"]
+    assert info.Band_Metadata["Band 1"].Description == "Green"
+    assert info.Band_Metadata["Band 1"].Metadata

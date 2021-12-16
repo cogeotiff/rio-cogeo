@@ -587,6 +587,19 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.In
                 continue
             tags.update({str.title(ns).replace("_", " "): src_dst.tags(ns=ns)})
 
+        band_metadata = {
+            f"Band {ix}": models.BandMetadata(
+                **{
+                    "Description": src_dst.descriptions[ix - 1],
+                    "ColorInterp": src_dst.colorinterp[ix - 1].name,
+                    "Offset": src_dst.offsets[ix - 1],
+                    "Scale": src_dst.scales[ix - 1],
+                    "Metadata": src_dst.tags(ix),
+                }
+            )
+            for ix in src_dst.indexes
+        }
+
         try:
             colormap = src_dst.colormap(1)
         except ValueError:
@@ -666,5 +679,6 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.In
         Profile=profile,
         GEO=geo,
         Tags=tags,
+        Band_Metadata=band_metadata,
         IFD=ifds,
     )

@@ -3,6 +3,7 @@
 # 3.0.2 (2021-12-16)
 
 * remove usage of (soon to be deprecated) `rasterio.path` (https://github.com/cogeotiff/rio-cogeo/pull/222)
+* add band metadata in `cog_info` output and update `rio_cogeo.models.Info` (https://github.com/cogeotiff/rio-cogeo/pull/223)
 
 # 3.0.1 (2021-10-27)
 
