@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.0.2 (2021-12-16)
+
+* remove usage of (soon to be deprecated) `rasterio.path` (https://github.com/cogeotiff/rio-cogeo/pull/222)
+
 # 3.0.1 (2021-10-27)
 
 * update `test` and `dev` dependencies to `rio-tiler>=3.0.0a0`
