@@ -532,19 +532,24 @@ def test_cog_info_dict_access():
 
 
 @pytest.mark.parametrize(
-    "fname",
+    "fname,is_local",
     [
-        "mytif.tif",
-        pathlib.Path("mytif.tif"),
-        "s3://abucket/adirectory/afile.tif",
-        "https://ahost/adirectory/afile.tif",
+        (raster_path_rgba, True,),
+        (pathlib.Path(raster_path_rgba), True),
+        ("s3://abucket/adirectory/afile.tif", False),
+        ("https://ahost/adirectory/afile.tif", False),
     ],
 )
-def test_temporaryRaster(fname):
+def test_temporaryRaster(fname, is_local, runner):
     """Test TemporaryRasterFile class with vsi and pathlib."""
-    with TemporaryRasterFile(fname) as f:
-        pass
-    assert not os.path.exists(f.name)
+    with runner.isolated_filesystem() as iso:
+        with TemporaryRasterFile(fname) as f:
+            assert (
+                pathlib.Path(fname).parent == pathlib.Path(f.name).parent
+            ) == is_local
+            assert (pathlib.Path(iso).parent == pathlib.Path(f.name).parent) != is_local
+            pass
+        assert not os.path.exists(f.name)
 
 
 @pytest.mark.parametrize(

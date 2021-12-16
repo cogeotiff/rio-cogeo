@@ -16,7 +16,6 @@ from rasterio.enums import ColorInterp
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.env import GDALVersion
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
-from rasterio.path import parse_path
 from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
@@ -30,10 +29,9 @@ IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 @contextmanager
 def TemporaryRasterFile(dst_path: Union[str, pathlib.PurePath], suffix: str = ".tif"):
     """Create temporary file."""
+    # For local file we should create temporary file in the same directory
     tmpdir = (
-        None
-        if parse_path(dst_path).as_vsi().startswith("/vsi")
-        else pathlib.Path(dst_path).parent
+        None if not pathlib.Path(dst_path).is_file() else pathlib.Path(dst_path).parent
     )
     fileobj = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=suffix, delete=False)
     fileobj.close()
@@ -429,10 +427,7 @@ def cog_validate(  # noqa: C901
             if not src.driver == "GTiff":
                 raise Exception("The file is not a GeoTIFF")
 
-            if (
-                len(src.files) > 1
-                and f"{parse_path(src_path).as_vsi()}.ovr" in src.files
-            ):
+            if any(pathlib.Path(x).suffix == ".ovr" for x in src.files):
                 errors.append(
                     "Overviews found in external .ovr file. They should be internal"
                 )
