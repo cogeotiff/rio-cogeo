@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, Optional, Sequence, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 BBox = Tuple[float, float, float, float]
 
@@ -59,6 +59,16 @@ class Profile(DictLike, BaseModel):
         extra = "ignore"
 
 
+class BandMetadata(DictLike, BaseModel):
+    """band metadata"""
+
+    Description: Optional[str]
+    ColorInterp: str
+    Offset: float
+    Scale: float
+    Metadata: Optional[Dict[str, Any]]
+
+
 class Info(DictLike, BaseModel):
     """rio-cogeo Info."""
 
@@ -72,4 +82,10 @@ class Info(DictLike, BaseModel):
     Profile: Profile
     GEO: Geo
     Tags: Dict[str, Dict]
+    Band_Metadata: Dict[str, BandMetadata] = Field(None, alias="Band Metadata")
     IFD: Sequence[IFD]
+
+    class Config:
+        """Config for model."""
+
+        allow_population_by_field_name = True

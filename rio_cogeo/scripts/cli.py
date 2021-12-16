@@ -298,8 +298,9 @@ def validate(input, strict, config):
 def info(input, to_json):
     """Dataset info."""
     metadata = cog_info(input)
+
     if to_json:
-        click.echo(metadata.json(exclude_none=True))
+        click.echo(metadata.json(exclude_none=True, by_alias=True))
     else:
 
         sep = 25
@@ -346,6 +347,36 @@ def info(input, to_json):
                 click.echo(
                     f"""    {click.style(key, underline=True, bold=True)}: {val}"""
                 )
+
+        for ns, meta in metadata.Band_Metadata.items():
+            click.echo(
+                f"""
+{click.style(ns, bold=True)}"""
+            )
+
+            if meta.Description:
+                click.echo(
+                    f"""    {click.style("Description", underline=True, bold=True)}: {meta.Description}"""
+                )
+            click.echo(
+                f"""    {click.style("ColorInterp", underline=True, bold=True)}: {meta.ColorInterp}"""
+            )
+            if meta.Offset != 0.0 and meta.Scale != 1.0:
+                click.echo(
+                    f"""    {click.style("Offset", underline=True, bold=True)}: {meta.Offset}"""
+                )
+                click.echo(
+                    f"""    {click.style("Scale", underline=True, bold=True)}: {meta.Scale}"""
+                )
+
+            if meta.Metadata:
+                click.echo(
+                    f"""    {click.style("Metadata", underline=True, bold=True)}:"""
+                )
+                for key, val in meta.Metadata.items():
+                    click.echo(
+                        f"""        {click.style(key, underline=True, bold=True)}: {val}"""
+                    )
 
         click.echo(
             f"""
