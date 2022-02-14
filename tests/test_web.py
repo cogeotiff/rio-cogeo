@@ -22,6 +22,7 @@ raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web
 raster_path_north = os.path.join(
     os.path.dirname(__file__), "fixtures", "image_north.tif"
 )
+raster_geos = os.path.join(os.path.dirname(__file__), "fixtures", "image_geos.tif")
 
 
 def test_cog_translate_webZooms():
@@ -272,3 +273,40 @@ def test_cog_translate_web_align():
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom - 3))
                 assert round(cog_dst.dataset.bounds[2], 5) == round(lrTile.right, 5)
                 assert round(cog_dst.dataset.bounds[1], 5) == round(lrTile.bottom, 5)
+
+
+def test_cog_translate_web_geos():
+    """
+    Test Web-Optimized COG for input GEOS dataset.
+
+    - Test COG bounds (thus block) is aligned with Zoom levels
+
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+
+        profile = cog_profiles.get("jpeg")
+        profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256", GDAL_TIFF_INTERNAL_MASK=True)
+
+        cog_translate(
+            raster_geos,
+            "cogeo.tif",
+            profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+        )
+        cog_translate(
+            raster_geos,
+            "cogeo_gdal.tif",
+            profile,
+            quiet=True,
+            web_optimized=True,
+            use_cog_driver=True,
+            config=config,
+        )
+        with COGReader("cogeo.tif") as cog_dst, COGReader("cogeo_gdal.tif") as cog_gdal:
+            assert cog_dst.dataset.shape == cog_gdal.dataset.shape
+            for i in range(0, 4):
+                assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
