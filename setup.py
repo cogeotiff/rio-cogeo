@@ -22,7 +22,7 @@ extra_reqs = {
 
 setup(
     name="rio-cogeo",
-    version="3.0.2",
+    version="3.0.3",
     python_requires=">=3.7",
     description=u"Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio",
     long_description=readme,
