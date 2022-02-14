@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.0.3 (2021-02-14)
+
+* use `rasterio.vrt.WarpedVRT` in `utils.get_web_optimized_params` to better handle dataset with GEOS projection (crossing dateline).
+
 # 3.0.2 (2021-12-16)
 
 * remove usage of (soon to be deprecated) `rasterio.path` (https://github.com/cogeotiff/rio-cogeo/pull/222)
