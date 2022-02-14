@@ -297,5 +297,16 @@ def test_cog_translate_web_geos():
             web_optimized=True,
             config=config,
         )
-        with COGReader("cogeo.tif") as cog_dst:
-            assert cog_dst.dataset.shape == (512, 1024)
+        cog_translate(
+            raster_geos,
+            "cogeo_gdal.tif",
+            profile,
+            quiet=True,
+            web_optimized=True,
+            use_cog_driver=True,
+            config=config,
+        )
+        with COGReader("cogeo.tif") as cog_dst, COGReader("cogeo_gdal.tif") as cog_gdal:
+            assert cog_dst.dataset.shape == cog_gdal.dataset.shape
+            for i in range(0, 4):
+                assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
