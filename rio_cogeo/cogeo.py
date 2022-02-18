@@ -52,7 +52,7 @@ def cog_translate(  # noqa: C901
     overview_level: Optional[int] = None,
     overview_resampling: str = "nearest",
     web_optimized: bool = False,
-    tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
+    tms: Optional[morecantile.TileMatrixSet] = None,
     zoom_level_strategy: str = "auto",
     aligned_levels: Optional[int] = None,
     resampling: str = "nearest",
@@ -103,7 +103,7 @@ def cog_translate(  # noqa: C901
         ref: https://gdal.org/drivers/raster/cog.html#raster-cog
     aligned_levels: int, optional.
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
-        Default is to use the maximum overview levels.
+        Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
     resampling : str, optional (default: "nearest")
         Resampling algorithm.
     in_memory: bool, optional
@@ -129,6 +129,8 @@ def cog_translate(  # noqa: C901
         Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
     """
+    tms = tms or morecantile.tms.get("WebMercatorQuad")
+
     dst_kwargs = dst_kwargs.copy()
 
     if isinstance(indexes, int):
@@ -328,7 +330,7 @@ def cog_translate(  # noqa: C901
                 if web_optimized and not use_cog_driver:
                     dst_kwargs.update(
                         {
-                            "@TILING_SCHEME_NAME": "WebMercatorQuad",
+                            "@TILING_SCHEME_NAME": tms.identifier,
                             "@TILING_SCHEME_ZOOM_LEVEL": tms.zoom_for_res(
                                 max(tmp_dst.res),
                                 max_z=30,
@@ -357,18 +359,20 @@ def cog_translate(  # noqa: C901
                             if tms.identifier == "WebMercatorQuad"
                             else tms.identifier
                         )
+                        dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
 
-                        if add_mask and dst_kwargs.get("compress", "") != "JPEG":
-                            warnings.warn(
-                                "With GDAL COG driver, mask band will be translated to an alpha band."
-                            )
+                        if aligned_levels is not None:
+                            # GDAL uses Number of resolution (not overviews)
+                            # See https://github.com/OSGeo/gdal/issues/5336#issuecomment-1042946603
+                            dst_kwargs["aligned_levels"] = aligned_levels + 1
 
-                    dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
+                    if add_mask and dst_kwargs.get("compress", "") != "JPEG":
+                        warnings.warn(
+                            "With GDAL COG driver, mask band will be translated to an alpha band."
+                        )
+
                     dst_kwargs["overview_resampling"] = overview_resampling
                     dst_kwargs["warp_resampling"] = resampling
-                    if aligned_levels is not None:
-                        dst_kwargs["aligned_levels"] = aligned_levels
-
                     dst_kwargs["blocksize"] = tilesize
                     dst_kwargs.pop("blockxsize", None)
                     dst_kwargs.pop("blockysize", None)

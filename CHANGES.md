@@ -1,5 +1,13 @@
 # Release Notes
 
+# 3.1.0 (2022-02-18)
+
+* Fix equivalence for rio-cogeo and GDAL definition of `aligned_levels`
+
+**Breaking Changes:**
+
+* update morecantile requirement to `>=3.1,<4.0`. WebOptimized COGs will is now aligned with GDAL and Mercantile TMS definition.
+
 # 3.0.3 (2021-02-14)
 
 * use `rasterio.vrt.WarpedVRT` in `utils.get_web_optimized_params` to better handle dataset with GEOS projection (crossing dateline).

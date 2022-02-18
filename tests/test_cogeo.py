@@ -16,7 +16,7 @@ from rio_cogeo.errors import IncompatibleBlockRasterSize, IncompatibleOptions
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
 
-from .conftest import requires_webp
+from .conftest import requires_gdal31, requires_webp
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 raster_path_rgba = os.path.join(FIXTURES_DIR, "image_rgba.tif")
@@ -553,6 +553,7 @@ def test_temporaryRaster(fname, is_local, runner):
         assert not os.path.exists(f.name)
 
 
+@requires_gdal31
 @pytest.mark.parametrize(
     "src_path",
     [
@@ -576,6 +577,7 @@ def test_gdal_cog(src_path, runner):
         assert cog_validate("cogeo.tif")
 
 
+@requires_gdal31
 def test_gdal_cog_compare(runner):
     """Test GDAL COG."""
     with runner.isolated_filesystem():
@@ -612,6 +614,7 @@ def test_gdal_cog_compare(runner):
             assert cog.overviews(1) == gdalcogeo.overviews(1) == riocogeo.overviews(1)
 
 
+@requires_gdal31
 def test_gdal_cog_compareWeb(runner):
     """Test GDAL COG."""
     with runner.isolated_filesystem():
@@ -645,6 +648,7 @@ def test_gdal_cog_compareWeb(runner):
             assert cog.meta == gdalcogeo.meta
 
 
+@requires_gdal31
 def test_gdal_cog_web_mask(runner):
     """Raise a warning for specific mask/compression/web combination."""
     with runner.isolated_filesystem():
