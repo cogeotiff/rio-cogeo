@@ -12,11 +12,13 @@ from click.testing import CliRunner
 from cogdumper.cog_tiles import COGTiff
 from cogdumper.filedumper import Reader as FileReader
 from rasterio.warp import transform_bounds
-from rio_tiler.io import COGReader
+from rasterio.windows import from_bounds
 
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import get_zooms
+
+from .conftest import requires_gdal31
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
 raster_path_north = os.path.join(
@@ -193,10 +195,12 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with COGReader("cogeo.tif") as src_dst:
-                        data, _ = src_dst.tile(
-                            *minimumTile, resampling_method="nearest"
+                    with rasterio.open("cogeo.tif") as src_dst:
+                        w = from_bounds(*tms.xy_bounds(minimumTile), src_dst.transform)
+                        data = src_dst.read(
+                            window=w, out_shape=(src_dst.count, 256, 256)
                         )
+
                     numpy.testing.assert_array_equal(data, arr)
 
                     # Bottom right tile
@@ -206,11 +210,12 @@ def test_cog_translate_Internal():
                     arr = numpy.array(t).reshape(256, 256, 3).astype(numpy.uint8)
                     arr = numpy.transpose(arr, [2, 0, 1])
 
-                    with COGReader("cogeo.tif") as src_dst:
-                        data, _ = src_dst.tile(
-                            *maximumTile, resampling_method="nearest"
+                    with rasterio.open("cogeo.tif") as src_dst:
+                        w = from_bounds(*tms.xy_bounds(maximumTile), src_dst.transform)
+                        data = src_dst.read(
+                            window=w, out_shape=(src_dst.count, 256, 256)
                         )
-                    numpy.testing.assert_array_equal(data, arr)
+                        numpy.testing.assert_array_equal(data, arr)
 
 
 def test_cog_translate_web_align():
@@ -241,17 +246,17 @@ def test_cog_translate_web_align():
             config=config,
             aligned_levels=2,
         )
-        with COGReader(raster_path_web) as src_dst:
+        with rasterio.open(raster_path_web) as src_dst:
             bounds = src_dst.bounds
-            with COGReader("cogeo.tif") as cog:
-                _, max_zoom = get_zooms(cog.dataset)
+            with rasterio.open("cogeo.tif") as cog:
+                _, max_zoom = get_zooms(cog)
                 ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom - 2))
-                assert round(cog.dataset.bounds[0], 5) == round(ulTile.left, 5)
-                assert round(cog.dataset.bounds[3], 5) == round(ulTile.top, 5)
+                assert round(cog.bounds[0], 5) == round(ulTile.left, 5)
+                assert round(cog.bounds[3], 5) == round(ulTile.top, 5)
 
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom - 2))
-                assert round(cog.dataset.bounds[2], 5) == round(lrTile.right, 5)
-                assert round(cog.dataset.bounds[1], 5) == round(lrTile.bottom, 5)
+                assert round(cog.bounds[2], 5) == round(lrTile.right, 5)
+                assert round(cog.bounds[1], 5) == round(lrTile.bottom, 5)
 
         cog_translate(
             raster_path_web,
@@ -262,19 +267,20 @@ def test_cog_translate_web_align():
             config=config,
             aligned_levels=3,
         )
-        with COGReader(raster_path_web) as src_dst:
+        with rasterio.open(raster_path_web) as src_dst:
             bounds = src_dst.bounds
-            with COGReader("cogeo.tif") as cog_dst:
-                _, max_zoom = get_zooms(cog_dst.dataset)
+            with rasterio.open("cogeo.tif") as cog_dst:
+                _, max_zoom = get_zooms(cog_dst)
                 ulTile = tms.xy_bounds(tms.tile(bounds[0], bounds[3], max_zoom - 3))
-                assert round(cog_dst.dataset.bounds[0], 5) == round(ulTile.left, 5)
-                assert round(cog_dst.dataset.bounds[3], 5) == round(ulTile.top, 5)
+                assert round(cog_dst.bounds[0], 5) == round(ulTile.left, 5)
+                assert round(cog_dst.bounds[3], 5) == round(ulTile.top, 5)
 
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom - 3))
-                assert round(cog_dst.dataset.bounds[2], 5) == round(lrTile.right, 5)
-                assert round(cog_dst.dataset.bounds[1], 5) == round(lrTile.bottom, 5)
+                assert round(cog_dst.bounds[2], 5) == round(lrTile.right, 5)
+                assert round(cog_dst.bounds[1], 5) == round(lrTile.bottom, 5)
 
 
+@requires_gdal31
 def test_cog_translate_web_geos():
     """
     Test Web-Optimized COG for input GEOS dataset.
@@ -306,7 +312,72 @@ def test_cog_translate_web_geos():
             use_cog_driver=True,
             config=config,
         )
-        with COGReader("cogeo.tif") as cog_dst, COGReader("cogeo_gdal.tif") as cog_gdal:
-            assert cog_dst.dataset.shape == cog_gdal.dataset.shape
+        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
+            "cogeo_gdal.tif"
+        ) as cog_gdal:
+            assert cog_dst.shape == cog_gdal.shape
+            for i in range(0, 4):
+                assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
+
+
+@requires_gdal31
+def test_web_align_cogeo_gdal():
+    """Test Web-Optimized COG conformance with GDAL."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+        )
+        cog_translate(
+            raster_path_web,
+            "cogeo_gdal.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            use_cog_driver=True,
+        )
+        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
+            "cogeo_gdal.tif"
+        ) as cog_gdal:
+            assert cog_dst.shape == cog_gdal.shape
+            for i in range(0, 4):
+                assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
+
+        # Aligned Overviews
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            aligned_levels=4,
+        )
+        cog_translate(
+            raster_path_web,
+            "cogeo_gdal.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            aligned_levels=4,
+            use_cog_driver=True,
+        )
+
+        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
+            "cogeo_gdal.tif"
+        ) as cog_gdal:
+            assert cog_dst.shape == cog_gdal.shape
             for i in range(0, 4):
                 assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
