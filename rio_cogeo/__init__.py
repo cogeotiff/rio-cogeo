@@ -3,4 +3,4 @@
 from .cogeo import cog_info, cog_translate, cog_validate  # noqa
 from .profiles import cog_profiles  # noqa
 
-__version__ = "3.0.3"
+__version__ = "3.1.0"
