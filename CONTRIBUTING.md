@@ -7,7 +7,7 @@ Issues and pull requests are more than welcome.
 ```bash
 $ git clone https://github.com/cogeotiff/rio-cogeo.git
 $ cd rio-cogeo
-$ pip install -e .[dev]
+$ pip install -e .["test","dev"]
 ```
 
 ## pre-commit

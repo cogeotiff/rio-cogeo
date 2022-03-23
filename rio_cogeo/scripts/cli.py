@@ -1,7 +1,6 @@
 """Rio_cogeo.scripts.cli."""
 
 import os
-import typing
 
 import click
 import numpy
@@ -19,18 +18,6 @@ if GDALVersion.runtime().at_least("3.3"):
     OverviewResampling.append(ResamplingEnums.rms)
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
-
-
-def create_tag_table(tags: typing.Dict, sep: int) -> str:
-    """Helper method to create a table from dictionary of image tags -- used by info cli"""
-    table = ""
-    for idx, (k, v) in enumerate(tags.items()):
-        name = f"{k}:"
-        row = f"{click.style(name, bold=True):<{sep}} {v}"
-        if idx + 1 != len(tags):
-            row += "\n    "
-        table += row
-    return table
 
 
 class BdxParamType(click.ParamType):
