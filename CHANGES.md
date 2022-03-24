@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.1.1 (TBD)
+
+* Switch to `pyproject.toml` (https://github.com/cogeotiff/rio-cogeo/pull/232)
+
 # 3.1.0 (2022-02-18)
 
 * Fix equivalence for rio-cogeo and GDAL definition of `aligned_levels`
