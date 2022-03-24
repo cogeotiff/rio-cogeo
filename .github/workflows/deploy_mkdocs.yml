@@ -9,7 +9,6 @@ on:
       - 'README.md'
       - 'CHANGES.md'
       - 'CONTRIBUTING.md'
-      - 'mkdocs.yml'
       - 'docs/**'
 
 jobs:
@@ -31,4 +30,4 @@ jobs:
           python -m pip install -e .["docs"]
 
       - name: Deploy docs
-        run: mkdocs gh-deploy --force
+        run: mkdocs gh-deploy -f docs/mkdocs.yml --force
