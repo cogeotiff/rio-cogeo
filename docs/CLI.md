@@ -65,7 +65,7 @@ Options:
 
 The `strict` options will treat warnings (e.g missing overviews) as errors.
 
-Using the `--config` option can be useful to restrict GDAL environement. By default GDAL will check for external files (such as overviews), which could make a COG invalid. To force GDAL to only consider the input file you can use `--config GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR`.
+Using the `--config` option can be useful to restrict GDAL environment. By default GDAL will check for external files (such as overviews), which could make a COG invalid. To force GDAL to only consider the input file you can use `--config GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR`.
 
 e.g:
 ```
@@ -73,7 +73,7 @@ $ rio cogeo validate s3://bucket/geo.tif --config GDAL_DISABLE_READDIR_ON_OPEN=E
 ```
 
 ### Info
-(extented version or `rio info`).
+(extended version or `rio info`).
 
 ```
 $ rio cogeo info --help
