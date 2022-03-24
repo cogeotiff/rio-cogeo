@@ -3,7 +3,7 @@ site_description: Cloud Optimized GeoTIFF (COG) creation and validation plugin f
 
 repo_name: 'cogeotiff/rio-cogeo'
 repo_url: 'https://github.com/cogeotiff/rio-cogeo'
-edit_uri: 'blob/master/docs/'
+edit_uri: 'blob/master/docs/docs/'
 site_url: 'https://cogeotiff.github.io/rio-cogeo/'
 
 extra:
@@ -34,7 +34,7 @@ theme:
     scheme: default
 
 extra_css:
-  - overrides/extra.css
+  - css/extra.css
 
 # https://github.com/kylebarron/cogeo-mosaic/blob/mkdocs/mkdocs.yml#L50-L75
 markdown_extensions:
