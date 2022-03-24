@@ -11,7 +11,7 @@
 The COG Specification is pretty basic
 
 > A cloud optimized GeoTIFF is a regular GeoTIFF file, aimed at being hosted on a HTTP file server, whose internal organization is friendly for consumption by clients issuing HTTP GET range request ("bytes: start_offset-end_offset" HTTP header).
-> It contains at its beginning the metadata of the full resolution imagery, followed by the optional presence of overview metadata, and finally the imagery itself. To make it friendly with streaming and progressive rendering, we recommand starting with the imagery of the smallest overview and finishing with the imagery of the full resolution level.
+> It contains at its beginning the metadata of the full resolution imagery, followed by the optional presence of overview metadata, and finally the imagery itself. To make it friendly with streaming and progressive rendering, we recommend starting with the imagery of the smallest overview and finishing with the imagery of the full resolution level.
 
 Ref: https://github.com/cogeotiff/cog-spec/blob/master/spec.md
 
