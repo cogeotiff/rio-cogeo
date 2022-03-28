@@ -11,7 +11,7 @@ class DictLike:
     """Provides dictionary access for pydantic models, for backwards compatability with rio-cogeo<2.2.0."""
 
     def __getitem__(self, item):
-        """Dictionary access."""
+        """Access item like in Dict."""
         return self.__dict__[item]
 
 
@@ -60,7 +60,7 @@ class Profile(DictLike, BaseModel):
 
 
 class BandMetadata(DictLike, BaseModel):
-    """band metadata"""
+    """Band metadata."""
 
     Description: Optional[str]
     ColorInterp: str

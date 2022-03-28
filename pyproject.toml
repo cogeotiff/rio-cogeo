@@ -1,0 +1,80 @@
+[project]
+name = "rio-cogeo"
+description = "Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Vincent Sarago", email = "vincent@developmentseed.com"},
+]
+keywords = ["COGEO", "CloudOptimized Geotiff", "rasterio"]
+classifiers = [
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dynamic = ["version"]
+dependencies = [
+    "click>=7.0",
+    "rasterio>=1.1",
+    "numpy~=1.15",
+    "morecantile>=3.1,<4.0",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "cogdumper",
+]
+dev = [
+    "pre-commit",
+]
+doc = [
+    "mkdocs",
+    "mkdocs-material",
+]
+
+[project.urls]
+Source = "https://github.com/cogeotiff/rio-cogeo"
+Documentation = "https://cogeotiff.github.io/rio-cogeo/"
+
+[project.entry-points."rasterio.rio_plugins"]
+cogeo = "rio_cogeo.scripts.cli:cogeo"
+
+[build-system]
+requires = ["flit>=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "rio_cogeo"
+
+[tool.flit.sdist]
+exclude = [
+    "tests/",
+    "docs/",
+    ".github/",
+    "CHANGES.md",
+    "codecov.yml",
+    "CONTRIBUTING.md",
+    "mkdocs.yml",
+]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["rio_cogeo"]
+known_third_party = ["rasterio", "morecantile", "click"]
+default_section = "THIRDPARTY"
+
+[tool.mypy]
+no_strict_optional = "True"
+ignore_missing_imports = "True"
+
+[tool.pydocstyle]
+select = "D1"
+match = "(?!test).*.py"
