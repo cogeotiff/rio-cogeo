@@ -305,7 +305,7 @@ def cog_translate(  # noqa: C901
                 if not quiet and overview_level:
                     click.echo("Adding overviews...", err=True)
 
-                overviews = [2 ** j for j in range(1, overview_level + 1)]
+                overviews = [2**j for j in range(1, overview_level + 1)]
                 tmp_dst.build_overviews(overviews, ResamplingEnums[overview_resampling])
 
                 if not quiet:
@@ -575,7 +575,9 @@ def cog_validate(  # noqa: C901
 def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.Info:
     """Get general info and validate Cloud Optimized Geotiff."""
     is_valid, validation_errors, validation_warnings = cog_validate(
-        src_path, quiet=True, **kwargs,
+        src_path,
+        quiet=True,
+        **kwargs,
     )
 
     with rasterio.open(src_path) as src_dst:

@@ -535,7 +535,10 @@ def test_cog_info_dict_access():
 @pytest.mark.parametrize(
     "fname,is_local",
     [
-        (raster_path_rgba, True,),
+        (
+            raster_path_rgba,
+            True,
+        ),
         (pathlib.Path(raster_path_rgba), True),
         ("s3://abucket/adirectory/afile.tif", False),
         ("https://ahost/adirectory/afile.tif", False),
@@ -602,7 +605,11 @@ def test_gdal_cog_compare(runner):
             raster_path_rgba,
             "riocogeo.tif",
             profile.copy(),
-            indexes=(1, 2, 3,),
+            indexes=(
+                1,
+                2,
+                3,
+            ),
             add_mask=True,
             quiet=True,
         )

@@ -280,7 +280,11 @@ def validate(input, strict, config):
 @cogeo.command(short_help="Lists information about a raster dataset.")
 @options.file_in_arg
 @click.option(
-    "--json", "to_json", default=False, is_flag=True, help="Print as JSON.",
+    "--json",
+    "to_json",
+    default=False,
+    is_flag=True,
+    help="Print as JSON.",
 )
 def info(input, to_json):
     """Dataset info."""

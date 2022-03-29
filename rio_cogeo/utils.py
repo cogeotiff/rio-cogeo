@@ -71,12 +71,14 @@ def get_zooms(
     # The maxzoom is defined by finding the minimum difference between
     # the raster resolution and the zoom level resolution
     max_zoom = tms.zoom_for_res(
-        resolution, max_z=30, zoom_level_strategy=zoom_level_strategy,
+        resolution,
+        max_z=30,
+        zoom_level_strategy=zoom_level_strategy,
     )
 
     # The minzoom is defined by the resolution of the maximum theoretical overview level
     max_possible_overview_level = get_maximum_overview_level(w, h, minsize=tilesize)
-    ovr_resolution = resolution * (2 ** max_possible_overview_level)
+    ovr_resolution = resolution * (2**max_possible_overview_level)
     min_zoom = tms.zoom_for_res(ovr_resolution, max_z=30)
 
     return (min_zoom, max_zoom)
@@ -101,7 +103,9 @@ def get_web_optimized_params(
 
     # find max zoom (closest to the raster resolution)
     max_zoom = tms.zoom_for_res(
-        resolution, max_z=30, zoom_level_strategy=zoom_level_strategy,
+        resolution,
+        max_z=30,
+        zoom_level_strategy=zoom_level_strategy,
     )
 
     # defined the zoom level we want to align the raster
