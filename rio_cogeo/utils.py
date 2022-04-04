@@ -87,6 +87,7 @@ def get_zooms(
 def get_web_optimized_params(
     src_dst,
     zoom_level_strategy: str = "auto",
+    zoom_level: Optional[int] = None,
     aligned_levels: Optional[int] = None,
     tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
 ) -> Dict:
@@ -101,12 +102,15 @@ def get_web_optimized_params(
 
     resolution = max(abs(aff[0]), abs(aff[4]))
 
-    # find max zoom (closest to the raster resolution)
-    max_zoom = tms.zoom_for_res(
-        resolution,
-        max_z=30,
-        zoom_level_strategy=zoom_level_strategy,
-    )
+    if zoom_level is None:
+        # find max zoom (closest to the raster resolution)
+        max_zoom = tms.zoom_for_res(
+            resolution,
+            max_z=30,
+            zoom_level_strategy=zoom_level_strategy,
+        )
+    else:
+        max_zoom = zoom_level
 
     # defined the zoom level we want to align the raster
     aligned_levels = aligned_levels or 0

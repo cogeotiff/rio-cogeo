@@ -36,6 +36,7 @@ $ rio cogeo create --help
     --overview-blocksize              Overview's internal tile size (default defined by GDAL_TIFF_OVR_BLOCKSIZE env or 128)
     --web-optimized, -w               Create COGEO optimized for Web.
     --zoom-level-strategy             Strategy to determine zoom level (default: auto).  [lower|upper|auto]
+    --zoom-level                      Zoom level number for the highest resolution. If this option is specified, `--zoom-level-strategy` is ignored.
     --aligned-levels                  Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
     --resampling, -r                  Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.  [nearest|bilinear|cubic|cubic_spline|lanczos|average|mode|max|min|med|q1|q3|sum]
     --in-memory / --no-in-memory      Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)

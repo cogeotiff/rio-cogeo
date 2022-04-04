@@ -54,6 +54,7 @@ def cog_translate(  # noqa: C901
     web_optimized: bool = False,
     tms: Optional[morecantile.TileMatrixSet] = None,
     zoom_level_strategy: str = "auto",
+    zoom_level: Optional[int] = None,
     aligned_levels: Optional[int] = None,
     resampling: str = "nearest",
     in_memory: Optional[bool] = None,
@@ -101,6 +102,8 @@ def cog_translate(  # noqa: C901
         On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
         Defaults to AUTO which selects the closest zoom level.
         ref: https://gdal.org/drivers/raster/cog.html#raster-cog
+    zoom_level: int, optional.
+        Zoom level number (starting at 0 for coarsest zoom level). If this option is specified, `--zoom-level-strategy` is ignored.
     aligned_levels: int, optional.
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
         Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
@@ -214,6 +217,7 @@ def cog_translate(  # noqa: C901
                 params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
+                    zoom_level=zoom_level,
                     aligned_levels=aligned_levels,
                     tms=tms,
                 )
