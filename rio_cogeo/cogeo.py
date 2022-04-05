@@ -54,6 +54,7 @@ def cog_translate(  # noqa: C901
     web_optimized: bool = False,
     tms: Optional[morecantile.TileMatrixSet] = None,
     zoom_level_strategy: str = "auto",
+    zoom_level: Optional[int] = None,
     aligned_levels: Optional[int] = None,
     resampling: str = "nearest",
     in_memory: Optional[bool] = None,
@@ -101,6 +102,8 @@ def cog_translate(  # noqa: C901
         On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
         Defaults to AUTO which selects the closest zoom level.
         ref: https://gdal.org/drivers/raster/cog.html#raster-cog
+    zoom_level: int, optional.
+        Zoom level number (starting at 0 for coarsest zoom level). If this option is specified, `--zoom-level-strategy` is ignored.
     aligned_levels: int, optional.
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
         Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
@@ -214,6 +217,7 @@ def cog_translate(  # noqa: C901
                 params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
+                    zoom_level=zoom_level,
                     aligned_levels=aligned_levels,
                     tms=tms,
                 )
@@ -328,14 +332,17 @@ def cog_translate(  # noqa: C901
                     tags.update(**additional_cog_metadata)
 
                 if web_optimized and not use_cog_driver:
+                    default_zoom = tms.zoom_for_res(
+                        max(tmp_dst.res),
+                        max_z=30,
+                        zoom_level_strategy=zoom_level_strategy,
+                    )
                     dst_kwargs.update(
                         {
                             "@TILING_SCHEME_NAME": tms.identifier,
-                            "@TILING_SCHEME_ZOOM_LEVEL": tms.zoom_for_res(
-                                max(tmp_dst.res),
-                                max_z=30,
-                                zoom_level_strategy=zoom_level_strategy,
-                            ),
+                            "@TILING_SCHEME_ZOOM_LEVEL": zoom_level
+                            if zoom_level is not None
+                            else default_zoom,
                         }
                     )
 
@@ -352,6 +359,11 @@ def cog_translate(  # noqa: C901
                     click.echo("Writing output to: {}".format(dst_path), err=True)
 
                 if use_cog_driver:
+                    if not GDALVersion.runtime().at_least("3.1"):
+                        raise Exception(
+                            "GDAL 3.1 or above required to use the COG driver."
+                        )
+
                     dst_kwargs["driver"] = "COG"
                     if web_optimized:
                         dst_kwargs["TILING_SCHEME"] = (
@@ -359,7 +371,16 @@ def cog_translate(  # noqa: C901
                             if tms.identifier == "WebMercatorQuad"
                             else tms.identifier
                         )
-                        dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
+
+                        if zoom_level is not None:
+                            if not GDALVersion.runtime().at_least("3.5"):
+                                warnings.warn(
+                                    "ZOOM_LEVEL option is only available with GDAL >3.5."
+                                )
+
+                            dst_kwargs["ZOOM_LEVEL"] = zoom_level
+
+                        dst_kwargs["ZOOM_LEVEL_STRATEGY"] = zoom_level_strategy
 
                         if aligned_levels is not None:
                             # GDAL uses Number of resolution (not overviews)

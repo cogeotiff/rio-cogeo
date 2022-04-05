@@ -6,7 +6,7 @@ import pytest
 import rasterio
 
 from rio_cogeo.scripts.cli import cogeo
-from rio_cogeo.utils import has_mask_band
+from rio_cogeo.utils import get_zooms, has_mask_band
 
 raster_path_rgb = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb.tif")
 raster_path_rgba = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
@@ -539,3 +539,41 @@ def test_cogeo_info(runner):
         result = runner.invoke(cogeo, ["info", raster_band_tags])
         assert not result.exception
         assert result.exit_code == 0
+
+
+def test_cogeo_zoom_level(runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--web-optimized",
+                "--zoom-level",
+                "18",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            _, max_zoom = get_zooms(src)
+            assert max_zoom == 18
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--web-optimized",
+                "--zoom-level",
+                "19",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            _, max_zoom = get_zooms(src)
+            assert max_zoom == 19
