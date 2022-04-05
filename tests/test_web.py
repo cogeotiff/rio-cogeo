@@ -18,7 +18,7 @@ from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import get_zooms
 
-from .conftest import requires_gdal31
+from .conftest import requires_gdal31, requires_gdal35
 
 raster_path_web = os.path.join(os.path.dirname(__file__), "fixtures", "image_web.tif")
 raster_path_north = os.path.join(
@@ -132,6 +132,21 @@ def test_cog_translate_web():
         with rasterio.open("cogeo.tif") as out_dst:
             assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
             assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"]
+            assert out_dst.tags(ns="TILING_SCHEME")["ALIGNED_LEVELS"] == "4"
+
+        cog_translate(
+            raster_path_web,
+            "cogeo.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            zoom_level=19,
+            config=config,
+            aligned_levels=4,
+        )
+        with rasterio.open("cogeo.tif") as out_dst:
+            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
+            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "19"
             assert out_dst.tags(ns="TILING_SCHEME")["ALIGNED_LEVELS"] == "4"
 
 
@@ -381,3 +396,53 @@ def test_web_align_cogeo_gdal():
             assert cog_dst.shape == cog_gdal.shape
             for i in range(0, 4):
                 assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
+
+
+@requires_gdal31
+def test_gdal_zoom_options():
+    """Test Web-Optimized GDAL with Zoom Options."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+
+        cog_translate(
+            raster_path_web,
+            "cogeo_gdal.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            use_cog_driver=True,
+        )
+        with rasterio.open("cogeo_gdal.tif") as out_dst:
+            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "GOOGLEMAPSCOMPATIBLE"
+            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "18"
+            assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")
+
+
+@requires_gdal35
+def test_gdal_zoom_level_options():
+    """Test Web-Optimized GDAL with Zoom Options."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+
+        cog_translate(
+            raster_path_web,
+            "cogeo_gdal.tif",
+            web_profile,
+            quiet=True,
+            web_optimized=True,
+            config=config,
+            use_cog_driver=True,
+            zoom_level=19,
+        )
+        with rasterio.open("cogeo_gdal.tif") as out_dst:
+            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "GOOGLEMAPSCOMPATIBLE"
+            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "19"
+            assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")

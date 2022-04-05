@@ -332,14 +332,17 @@ def cog_translate(  # noqa: C901
                     tags.update(**additional_cog_metadata)
 
                 if web_optimized and not use_cog_driver:
+                    default_zoom = tms.zoom_for_res(
+                        max(tmp_dst.res),
+                        max_z=30,
+                        zoom_level_strategy=zoom_level_strategy,
+                    )
                     dst_kwargs.update(
                         {
                             "@TILING_SCHEME_NAME": tms.identifier,
-                            "@TILING_SCHEME_ZOOM_LEVEL": tms.zoom_for_res(
-                                max(tmp_dst.res),
-                                max_z=30,
-                                zoom_level_strategy=zoom_level_strategy,
-                            ),
+                            "@TILING_SCHEME_ZOOM_LEVEL": zoom_level
+                            if zoom_level is not None
+                            else default_zoom,
                         }
                     )
 
@@ -356,6 +359,11 @@ def cog_translate(  # noqa: C901
                     click.echo("Writing output to: {}".format(dst_path), err=True)
 
                 if use_cog_driver:
+                    if not GDALVersion.runtime().at_least("3.1"):
+                        raise Exception(
+                            "GDAL 3.1 or above required to use the COG driver."
+                        )
+
                     dst_kwargs["driver"] = "COG"
                     if web_optimized:
                         dst_kwargs["TILING_SCHEME"] = (
@@ -363,7 +371,16 @@ def cog_translate(  # noqa: C901
                             if tms.identifier == "WebMercatorQuad"
                             else tms.identifier
                         )
-                        dst_kwargs["zoom_level_strategy"] = zoom_level_strategy
+
+                        if zoom_level is not None:
+                            if not GDALVersion.runtime().at_least("3.5"):
+                                warnings.warn(
+                                    "ZOOM_LEVEL option is only available with GDAL >3.5."
+                                )
+
+                            dst_kwargs["ZOOM_LEVEL"] = zoom_level
+
+                        dst_kwargs["ZOOM_LEVEL_STRATEGY"] = zoom_level_strategy
 
                         if aligned_levels is not None:
                             # GDAL uses Number of resolution (not overviews)
