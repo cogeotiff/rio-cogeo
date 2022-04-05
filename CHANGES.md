@@ -1,6 +1,6 @@
 # Release Notes
 
-# 3.2.0 (TBD)
+# 3.2.0 (2022-04-05)
 
 * Switch to `pyproject.toml` (https://github.com/cogeotiff/rio-cogeo/pull/232)
 * add `--zoom-level` option to define dataset coarsest zoom level, when creating `web optimized` COG.
