@@ -1,5 +1,10 @@
 # Release Notes
 
+# 3.3.0 (2022-06-16)
+
+* allow **non-GeoTIFF** in `cog_validate`
+* allow `config` option in `rio cogeo info` CLI
+
 # 3.2.0 (2022-04-05)
 
 * Switch to `pyproject.toml` (https://github.com/cogeotiff/rio-cogeo/pull/232)

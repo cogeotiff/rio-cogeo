@@ -9,6 +9,11 @@ $ git clone https://github.com/cogeotiff/rio-cogeo.git
 $ cd rio-cogeo
 $ pip install -e .["test","dev"]
 ```
+You can then run the tests with the following command:
+
+```sh
+python -m pytest --cov rio_cogeo --cov-report term-missing
+```
 
 ## pre-commit
 

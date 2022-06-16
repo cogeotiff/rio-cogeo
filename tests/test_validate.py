@@ -53,8 +53,7 @@ def test_cog_validate_valid(monkeypatch):
     assert cog_validate(raster_no_ovr, config=config)[0]
     assert not cog_validate(raster_no_ovr, strict=True, config=config)[0]
 
-    with pytest.raises(Exception):
-        cog_validate(raster_jpeg, config=config)
+    assert not cog_validate(raster_jpeg, config=config)[0]
 
     # COG created with GDAL 3.1
     assert cog_validate(raster_rioCOGgdal31, config=config)[0]

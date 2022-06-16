@@ -293,9 +293,17 @@ def validate(input, strict, config):
     is_flag=True,
     help="Print as JSON.",
 )
-def info(input, to_json):
+@click.option(
+    "--config",
+    "config",
+    metavar="NAME=VALUE",
+    multiple=True,
+    callback=options._cb_key_val,
+    help="GDAL configuration options.",
+)
+def info(input, to_json, config):
     """Dataset info."""
-    metadata = cog_info(input)
+    metadata = cog_info(input, config=config)
 
     if to_json:
         click.echo(metadata.json(exclude_none=True, by_alias=True))
