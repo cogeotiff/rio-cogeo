@@ -1,6 +1,6 @@
 # Release Notes
 
-# 3.3.0 (2022-06-16)
+# 3.3.0 (2022-06-24)
 
 * allow **non-GeoTIFF** in `cog_validate`
 * allow `config` option in `rio cogeo info` CLI
