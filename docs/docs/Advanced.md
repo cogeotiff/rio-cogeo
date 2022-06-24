@@ -105,4 +105,4 @@ $ rio cogeo mydataset_withalpha.tif mydataset_withmask.tif --cog-profile raw --a
 **Important**
 
 Using internal nodata value with lossy compression (`webp`, `jpeg`) is not
-recommanded. Please use internal masking (or alpha band if using webp).
+recommended. Please use internal masking (or alpha band if using webp).
