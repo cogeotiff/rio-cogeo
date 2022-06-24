@@ -438,8 +438,8 @@ def cog_validate(  # noqa: C901
         List of validation warnings.
 
     """
-    errors = []
-    warnings = []
+    errors: List[str] = []
+    warnings: List[str] = []
     details: Dict[str, Any] = {}
 
     config = config or {}
@@ -450,7 +450,13 @@ def cog_validate(  # noqa: C901
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src:
             if not src.driver == "GTiff":
-                raise Exception("The file is not a GeoTIFF")
+                errors.append("The file is not a GeoTIFF")
+                if not quiet:
+                    click.secho("The following errors were found:", fg="red", err=True)
+                    for e in errors:
+                        click.echo("- " + e, err=True)
+
+                return False, errors, warnings
 
             if any(pathlib.Path(x).suffix == ".ovr" for x in src.files):
                 errors.append(
@@ -638,7 +644,9 @@ def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.In
             Height=src_dst.height,
             Tiled=src_dst.is_tiled,
             Dtype=src_dst.dtypes[0],
-            Interleave=src_dst.interleaving.value,
+            Interleave=src_dst.interleaving.value
+            if src_dst.interleaving
+            else "UNKNOWN",
             AlphaBand=utils.has_alpha_band(src_dst),
             InternalMask=utils.has_mask_band(src_dst),
             Nodata=src_dst.nodata,
