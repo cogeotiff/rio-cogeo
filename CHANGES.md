@@ -1,5 +1,11 @@
 # Release Notes
 
+# 3.4.0 (2022-09-05)
+
+* add python 3.10 support
+* allow forwarding namespaced metadata to output dataset
+* set GDAL config for all `info` methods (previously GDAL's configs were only use in the COG validation step)
+
 # 3.3.0 (2022-06-24)
 
 * allow **non-GeoTIFF** in `cog_validate`
