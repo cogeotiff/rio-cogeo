@@ -61,6 +61,7 @@ def cog_translate(  # noqa: C901
     config: Optional[Dict] = None,
     allow_intermediate_compression: bool = False,
     forward_band_tags: bool = False,
+    forward_ns_tags: bool = False,
     quiet: bool = False,
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
@@ -120,6 +121,8 @@ def cog_translate(  # noqa: C901
     forward_band_tags:  bool, optional
         Forward band tags to output bands.
         Ref: https://github.com/cogeotiff/rio-cogeo/issues/19
+    forward_ns_tags:  bool, optional
+        Forward namespaces tags to output dataset.
     quiet: bool, optional (default: False)
         Mask processing steps.
     temporary_compression: str, optional
@@ -318,7 +321,7 @@ def cog_translate(  # noqa: C901
                 for i, b in enumerate(indexes):
                     tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
                     if forward_band_tags:
-                        tmp_dst.update_tags(i + 1, **src_dst.tags(b))
+                        tmp_dst.update_tags(bidx=i + 1, **src_dst.tags(b))
 
                 tags = src_dst.tags()
                 tags.update(
@@ -330,6 +333,13 @@ def cog_translate(  # noqa: C901
                 )
                 if additional_cog_metadata:
                     tags.update(**additional_cog_metadata)
+
+                if forward_ns_tags:
+                    namespaces = src_dst.tag_namespaces()
+                    for ns in namespaces:
+                        if ns in ["DERIVED_SUBDATASETS", "IMAGE_STRUCTURE"]:
+                            continue
+                        tmp_dst.update_tags(ns=ns, **src_dst.tags(ns=ns))
 
                 if web_optimized and not use_cog_driver:
                     default_zoom = tms.zoom_for_res(
@@ -599,109 +609,112 @@ def cog_validate(  # noqa: C901
     return is_valid, errors, warnings
 
 
-def cog_info(src_path: Union[str, pathlib.PurePath], **kwargs: Any) -> models.Info:
+def cog_info(
+    src_path: Union[str, pathlib.PurePath], config: Optional[Dict] = None
+) -> models.Info:
     """Get general info and validate Cloud Optimized Geotiff."""
+    config = config or {}
+
     is_valid, validation_errors, validation_warnings = cog_validate(
-        src_path,
-        quiet=True,
-        **kwargs,
+        src_path, config=config, quiet=True
     )
 
-    with rasterio.open(src_path) as src_dst:
-        driver = src_dst.driver
-        compression = src_dst.compression.value if src_dst.compression else None
-        colorspace = src_dst.photometric.value if src_dst.photometric else None
-        overviews = src_dst.overviews(1)
+    with rasterio.Env(**config):
+        with rasterio.open(src_path) as src_dst:
+            driver = src_dst.driver
+            compression = src_dst.compression.value if src_dst.compression else None
+            colorspace = src_dst.photometric.value if src_dst.photometric else None
+            overviews = src_dst.overviews(1)
 
-        tags = {"Image Metadata": src_dst.tags()}
-        namespaces = src_dst.tag_namespaces()
-        for ns in namespaces:
-            if ns in ["DERIVED_SUBDATASETS"]:
-                continue
-            tags.update({str.title(ns).replace("_", " "): src_dst.tags(ns=ns)})
+            tags = {"Image Metadata": src_dst.tags()}
+            namespaces = src_dst.tag_namespaces()
+            for ns in namespaces:
+                if ns in ["DERIVED_SUBDATASETS"]:
+                    continue
+                tags.update({str.title(ns).replace("_", " "): src_dst.tags(ns=ns)})
 
-        band_metadata = {
-            f"Band {ix}": models.BandMetadata(
-                **{
-                    "Description": src_dst.descriptions[ix - 1],
-                    "ColorInterp": src_dst.colorinterp[ix - 1].name,
-                    "Offset": src_dst.offsets[ix - 1],
-                    "Scale": src_dst.scales[ix - 1],
-                    "Metadata": src_dst.tags(ix),
-                }
-            )
-            for ix in src_dst.indexes
-        }
+            band_metadata = {
+                f"Band {ix}": models.BandMetadata(
+                    **{
+                        "Description": src_dst.descriptions[ix - 1],
+                        "ColorInterp": src_dst.colorinterp[ix - 1].name,
+                        "Offset": src_dst.offsets[ix - 1],
+                        "Scale": src_dst.scales[ix - 1],
+                        "Metadata": src_dst.tags(ix),
+                    }
+                )
+                for ix in src_dst.indexes
+            }
 
-        try:
-            colormap = src_dst.colormap(1)
-        except ValueError:
-            colormap = None
+            try:
+                colormap = src_dst.colormap(1)
+            except ValueError:
+                colormap = None
 
-        profile = models.Profile(
-            Bands=src_dst.count,
-            Width=src_dst.width,
-            Height=src_dst.height,
-            Tiled=src_dst.is_tiled,
-            Dtype=src_dst.dtypes[0],
-            Interleave=src_dst.interleaving.value
-            if src_dst.interleaving
-            else "UNKNOWN",
-            AlphaBand=utils.has_alpha_band(src_dst),
-            InternalMask=utils.has_mask_band(src_dst),
-            Nodata=src_dst.nodata,
-            ColorInterp=tuple([color.name for color in src_dst.colorinterp]),
-            ColorMap=colormap is not None,
-            Scales=src_dst.scales,
-            Offsets=src_dst.offsets,
-        )
-
-        try:
-            crs = (
-                f"EPSG:{src_dst.crs.to_epsg()}"
-                if src_dst.crs.to_epsg()
-                else src_dst.crs.to_wkt()
-            )
-        except AttributeError:
-            crs = None
-
-        minzoom: Optional[int] = None
-        maxzoom: Optional[int] = None
-        try:
-            minzoom, maxzoom = utils.get_zooms(src_dst)
-        except Exception:
-            pass
-
-        geo = models.Geo(
-            CRS=crs,
-            BoundingBox=tuple(src_dst.bounds),
-            Origin=(src_dst.transform.c, src_dst.transform.f),
-            Resolution=(src_dst.transform.a, src_dst.transform.e),
-            MinZoom=minzoom,
-            MaxZoom=maxzoom,
-        )
-
-        ifds = [
-            models.IFD(
-                Level=0,
+            profile = models.Profile(
+                Bands=src_dst.count,
                 Width=src_dst.width,
                 Height=src_dst.height,
-                Blocksize=src_dst.block_shapes[0],
-                Decimation=0,
+                Tiled=src_dst.is_tiled,
+                Dtype=src_dst.dtypes[0],
+                Interleave=src_dst.interleaving.value
+                if src_dst.interleaving
+                else "UNKNOWN",
+                AlphaBand=utils.has_alpha_band(src_dst),
+                InternalMask=utils.has_mask_band(src_dst),
+                Nodata=src_dst.nodata,
+                ColorInterp=tuple([color.name for color in src_dst.colorinterp]),
+                ColorMap=colormap is not None,
+                Scales=src_dst.scales,
+                Offsets=src_dst.offsets,
             )
-        ]
 
-    for ix, decim in enumerate(overviews):
-        with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
-            ifds.append(
-                models.IFD(
-                    Level=ix + 1,
-                    Width=ovr_dst.width,
-                    Height=ovr_dst.height,
-                    Blocksize=ovr_dst.block_shapes[0],
-                    Decimation=decim,
+            try:
+                crs = (
+                    f"EPSG:{src_dst.crs.to_epsg()}"
+                    if src_dst.crs.to_epsg()
+                    else src_dst.crs.to_wkt()
                 )
+            except AttributeError:
+                crs = None
+
+            minzoom: Optional[int] = None
+            maxzoom: Optional[int] = None
+            try:
+                minzoom, maxzoom = utils.get_zooms(src_dst)
+            except Exception:
+                pass
+
+            geo = models.Geo(
+                CRS=crs,
+                BoundingBox=tuple(src_dst.bounds),
+                Origin=(src_dst.transform.c, src_dst.transform.f),
+                Resolution=(src_dst.transform.a, src_dst.transform.e),
+                MinZoom=minzoom,
+                MaxZoom=maxzoom,
             )
+
+            ifds = [
+                models.IFD(
+                    Level=0,
+                    Width=src_dst.width,
+                    Height=src_dst.height,
+                    Blocksize=src_dst.block_shapes[0],
+                    Decimation=0,
+                )
+            ]
+
+        for ix, decim in enumerate(overviews):
+            with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
+                ifds.append(
+                    models.IFD(
+                        Level=ix + 1,
+                        Width=ovr_dst.width,
+                        Height=ovr_dst.height,
+                        Blocksize=ovr_dst.block_shapes[0],
+                        Decimation=decim,
+                    )
+                )
 
     return models.Info(
         Path=str(src_path),

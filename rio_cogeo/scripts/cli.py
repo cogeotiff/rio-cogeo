@@ -90,7 +90,8 @@ def cogeo():
     "cogeo_profile",
     type=click.Choice(cog_profiles.keys(), case_sensitive=False),
     default="deflate",
-    help="CloudOptimized GeoTIFF profile (default: deflate).",
+    help="CloudOptimized GeoTIFF profile.",
+    show_default=True,
 )
 @click.option(
     "--nodata",
@@ -115,15 +116,17 @@ def cogeo():
 )
 @click.option(
     "--overview-resampling",
-    help="Overview creation resampling algorithm (default: nearest).",
+    help="Overview creation resampling algorithm.",
     type=click.Choice([it.name for it in OverviewResampling]),
     default="nearest",
+    show_default=True,
 )
 @click.option(
     "--overview-blocksize",
     default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
     help="Overview's internal tile size (default defined by "
     "GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
+    show_default=True,
 )
 @click.option(
     "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
@@ -132,7 +135,8 @@ def cogeo():
     "--zoom-level-strategy",
     type=click.Choice(["lower", "upper", "auto"], case_sensitive=False),
     default="auto",
-    help="Strategy to determine zoom level. (default: auto).",
+    help="Strategy to determine zoom level.",
+    show_default=True,
 )
 @click.option(
     "--zoom-level",
@@ -147,9 +151,10 @@ def cogeo():
 @click.option(
     "--resampling",
     "-r",
-    help="Resampling algorithm (default: nearest). Will only be applied with the `--web-optimized` option.",
+    help="Resampling algorithm. Will only be applied with the `--web-optimized` option.",
     type=click.Choice([it.name for it in WarpResampling]),
     default="nearest",
+    show_default=True,
 )
 @click.option(
     "--in-memory/--no-in-memory",
@@ -162,24 +167,35 @@ def cogeo():
     default=False,
     is_flag=True,
     help="Allow intermediate file compression to reduce memory/disk footprint.",
+    show_default=True,
 )
 @click.option(
     "--forward-band-tags",
     default=False,
     is_flag=True,
     help="Forward band tags to output bands.",
+    show_default=True,
+)
+@click.option(
+    "--forward-ns-tags",
+    default=False,
+    is_flag=True,
+    help="Forward namespaced tags to output dataset.",
+    show_default=True,
 )
 @click.option(
     "--threads",
     type=ThreadsParamType(),
     default="ALL_CPUS",
-    help="Number of worker threads for multi-threaded compression (default: ALL_CPUS)",
+    help="Number of worker threads for multi-threaded compression.",
+    show_default=True,
 )
 @click.option(
     "--use-cog-driver",
     help="Use GDAL COG Driver (require GDAL>=3.1).",
     is_flag=True,
     default=False,
+    show_default=True,
 )
 @options.creation_options
 @click.option(
@@ -213,6 +229,7 @@ def create(
     in_memory,
     allow_intermediate_compression,
     forward_band_tags,
+    forward_ns_tags,
     threads,
     use_cog_driver,
     creation_options,
@@ -259,6 +276,7 @@ def create(
         config=config,
         allow_intermediate_compression=allow_intermediate_compression,
         forward_band_tags=forward_band_tags,
+        forward_ns_tags=forward_ns_tags,
         use_cog_driver=use_cog_driver,
         quiet=quiet,
     )
@@ -266,7 +284,13 @@ def create(
 
 @cogeo.command(short_help="Validate COGEO")
 @options.file_in_arg
-@click.option("--strict", default=False, is_flag=True, help="Treat warnings as errors.")
+@click.option(
+    "--strict",
+    default=False,
+    is_flag=True,
+    help="Treat warnings as errors.",
+    show_default=True,
+)
 @click.option(
     "--config",
     "config",
@@ -292,6 +316,7 @@ def validate(input, strict, config):
     default=False,
     is_flag=True,
     help="Print as JSON.",
+    show_default=True,
 )
 @click.option(
     "--config",

@@ -42,6 +42,7 @@ $ rio cogeo create --help
     --in-memory / --no-in-memory      Force processing raster in memory / not in memory (default: process in memory if smaller than 120 million pixels)
     --allow-intermediate-compression  Allow intermediate file compression to reduce memory/disk footprint.
     --forward-band-tags               Forward band tags to output bands.
+    --forward-ns-tags                 Forward namespaced tags to output dataset.
     --threads                         Number of worker threads for multi-threaded compression (default: ALL_CPUS)
     --use-cog-driver                  Use GDAL COG Driver (require GDAL>=3.1).
     --co, --profile                   Driver specific creation options. See the documentation for the selected output driver for more information.
