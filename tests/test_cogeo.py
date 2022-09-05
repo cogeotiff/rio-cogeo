@@ -35,6 +35,7 @@ raster_nocolormap = os.path.join(FIXTURES_DIR, "image_nocolormap.tif")
 raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
 raster_web_z5_z11 = os.path.join(FIXTURES_DIR, "image_web_z5_z11.tif")
 raster_band_tags = os.path.join(FIXTURES_DIR, "cog_band_tags.tif")
+raster_ns_meta = os.path.join(FIXTURES_DIR, "dataset_namespace_metadata.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -679,3 +680,34 @@ def test_info_with_metadata():
     assert info.dict(by_alias=True)["Band Metadata"]
     assert info.Band_Metadata["Band 1"].Description == "Green"
     assert info.Band_Metadata["Band 1"].Metadata
+
+
+def test_cog_translate_forward_ns_metadata(runner):
+    """Forward namespace metadata."""
+    with runner.isolated_filesystem():
+        cog_translate(
+            raster_ns_meta,
+            "cogeo.tif",
+            deflate_profile,
+            config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"},
+            quiet=True,
+        )
+
+        with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="FALSE"):
+            with rasterio.open("cogeo.tif") as src:
+                assert "IMD" not in src.tag_namespaces()
+                assert "RPC" not in src.tag_namespaces()
+
+        cog_translate(
+            raster_ns_meta,
+            "cogeo.tif",
+            deflate_profile,
+            forward_ns_tags=True,
+            config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"},
+            quiet=True,
+        )
+
+        with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="FALSE"):
+            with rasterio.open("cogeo.tif") as src:
+                assert src.tags(ns="IMD")
+                assert src.tags(ns="RPC")
