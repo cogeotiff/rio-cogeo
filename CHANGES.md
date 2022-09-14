@@ -1,5 +1,9 @@
 # Release Notes
 
+# 3.4.1 (2022-09-14)
+
+* avoid breaking change for `cog_info()` when previously passing `*kwargs` to `cog_validate`
+
 # 3.4.0 (2022-09-05)
 
 * add python 3.10 support

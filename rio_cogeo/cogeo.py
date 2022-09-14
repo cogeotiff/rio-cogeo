@@ -610,13 +610,16 @@ def cog_validate(  # noqa: C901
 
 
 def cog_info(
-    src_path: Union[str, pathlib.PurePath], config: Optional[Dict] = None
+    src_path: Union[str, pathlib.PurePath],
+    strict: bool = False,
+    config: Optional[Dict] = None,
+    quiet: bool = True,
 ) -> models.Info:
     """Get general info and validate Cloud Optimized Geotiff."""
     config = config or {}
 
     is_valid, validation_errors, validation_warnings = cog_validate(
-        src_path, config=config, quiet=True
+        src_path, strict=strict, config=config, quiet=quiet
     )
 
     with rasterio.Env(**config):
