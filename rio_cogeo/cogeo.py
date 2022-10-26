@@ -1,6 +1,5 @@
 """rio_cogeo.cogeo: translate a file to a cloud optimized geotiff."""
 
-import math
 import os
 import pathlib
 import sys
@@ -21,7 +20,7 @@ from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import models, utils
-from rio_cogeo.errors import IncompatibleBlockRasterSize, IncompatibleOptions
+from rio_cogeo.errors import IncompatibleOptions
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -177,28 +176,6 @@ def cog_translate(  # noqa: C901
                 )
 
             tilesize = min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
-
-            if src_dst.width < tilesize or src_dst.height < tilesize:
-                tilesize = 2 ** int(math.log(min(src_dst.width, src_dst.height), 2))
-                if tilesize < 64:
-                    warnings.warn(
-                        "Raster has dimension < 64px. Output COG cannot be tiled"
-                        " and overviews cannot be added.",
-                        IncompatibleBlockRasterSize,
-                    )
-                    dst_kwargs.pop("blockxsize", None)
-                    dst_kwargs.pop("blockysize", None)
-                    dst_kwargs.pop("tiled")
-                    overview_level = 0
-
-                else:
-                    warnings.warn(
-                        "Block Size are bigger than raster sizes. "
-                        "Setting blocksize to {}".format(tilesize),
-                        IncompatibleBlockRasterSize,
-                    )
-                    dst_kwargs["blockxsize"] = tilesize
-                    dst_kwargs["blockysize"] = tilesize
 
             vrt_params = {
                 "add_alpha": True,
