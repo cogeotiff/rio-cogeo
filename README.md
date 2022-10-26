@@ -11,7 +11,7 @@
       <img src="https://github.com/cogeotiff/rio-cogeo/workflows/CI/badge.svg" alt="Test">
   </a>
   <a href="https://codecov.io/gh/cogeotiff/rio-cogeo" target="_blank">
-      <img src="https://codecov.io/gh/cogeotiff/rio-cogeo/branch/master/graph/badge.svg" alt="Coverage">
+      <img src="https://codecov.io/gh/cogeotiff/rio-cogeo/branch/main/graph/badge.svg" alt="Coverage">
   </a>
   <a href="https://pypi.org/project/rio-cogeo" target="_blank">
       <img src="https://img.shields.io/pypi/v/rio-cogeo?color=%2334D058&label=pypi%20package" alt="Package version">
@@ -22,7 +22,7 @@
   <a href="https://pypistats.org/packages/rio-cogeo" target="_blank">
       <img src="https://img.shields.io/pypi/dm/rio-cogeo.svg" alt="Downloads">
   </a>
-  <a href="https://github.com/cogeotiff/rio-cogeo/blob/master/LICENSE" target="_blank">
+  <a href="https://github.com/cogeotiff/rio-cogeo/blob/main/LICENSE" target="_blank">
       <img src="https://img.shields.io/github/license/cogeotiff/rio-cogeo.svg" alt="Downloads">
   </a>
 </p>
@@ -78,13 +78,13 @@ Checkout [rio-glui](https://github.com/mapbox/rio-glui/) or [rio-viz](https://gi
 
 ## Contribution & Development
 
-See [CONTRIBUTING.md](https://github.com/cogeotiff/rio-cogeo/blob/master/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/cogeotiff/rio-cogeo/blob/main/CONTRIBUTING.md)
 
 ## Changes
 
-See [CHANGES.md](https://github.com/cogeotiff/rio-cogeo/blob/master/CHANGES.md).
+See [CHANGES.md](https://github.com/cogeotiff/rio-cogeo/blob/main/CHANGES.md).
 
 ## License
 
-See [LICENSE](https://github.com/cogeotiff/rio-cogeo/blob/master/LICENSE)
+See [LICENSE](https://github.com/cogeotiff/rio-cogeo/blob/main/LICENSE)
 

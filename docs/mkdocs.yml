@@ -3,7 +3,7 @@ site_description: Cloud Optimized GeoTIFF (COG) creation and validation plugin f
 
 repo_name: 'cogeotiff/rio-cogeo'
 repo_url: 'https://github.com/cogeotiff/rio-cogeo'
-edit_uri: 'blob/master/docs/docs/'
+edit_uri: 'blob/main/docs/docs/'
 site_url: 'https://cogeotiff.github.io/rio-cogeo/'
 
 extra:
