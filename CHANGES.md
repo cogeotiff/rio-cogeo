@@ -7,6 +7,46 @@
 **Breaking Changes**
 
 * remove python 3.7 support
+* require rasterio >= 1.3.3 (ref: https://github.com/cogeotiff/rio-cogeo/discussions/248)
+* COG can be have blocksize (bigger than their `height` or `width`) and be **tiled** even if they are smaller than 512x512
+
+```bash
+# before
+rio cogeo create image_51x51.tif cog.tif
+rio cogeo info cog.tif --json | jq '.IFD'
+>>> [
+  {
+    "Level": 0,
+    "Width": 51,
+    "Height": 51,
+    "Blocksize": [
+      51,
+      51
+    ],
+    "Decimation": 0
+  }
+]
+rio cogeo info cog.tif --json | jq '.Profile.Tiled'
+>>> false
+
+# now
+rio cogeo create image_51x51.tif cog.tif
+rio cogeo info cog.tif --json | jq '.IFD'
+>>> [
+  {
+    "Level": 0,
+    "Width": 51,
+    "Height": 51,
+    "Blocksize": [
+      512,
+      512
+    ],
+    "Decimation": 0
+  }
+]
+rio cogeo info cog.tif --json | jq '.Profile.Tiled'
+>>> true
+```
 
 ## 3.4.1 (2022-09-14)
 

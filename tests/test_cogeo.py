@@ -12,7 +12,7 @@ from rasterio.shutil import copy
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo.cogeo import TemporaryRasterFile, cog_info, cog_translate, cog_validate
-from rio_cogeo.errors import IncompatibleBlockRasterSize, IncompatibleOptions
+from rio_cogeo.errors import IncompatibleOptions
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
 
@@ -310,29 +310,27 @@ def test_cog_translate_tags(runner):
 def test_cog_translate_valid_blocksize(runner):
     """Should work as expected (create cogeo file)."""
     with runner.isolated_filesystem():
-        with pytest.warns(IncompatibleBlockRasterSize):
-            cog_translate(raster_path_small, "cogeo.tif", default_profile, quiet=True)
-            assert cog_validate("cogeo.tif")
-            with rasterio.open("cogeo.tif") as src:
-                assert src.height == 171
-                assert src.width == 171
-                assert src.is_tiled
-                assert src.profile["blockxsize"] == 128
-                assert src.profile["blockysize"] == 128
-                assert src.overviews(1) == [2]
+        d = default_profile.copy()
+        d.update({"blockxsize": 128, "blockysize": 128})
+        cog_translate(raster_path_small, "cogeo.tif", d, quiet=True)
+        assert cog_validate("cogeo.tif")
+        with rasterio.open("cogeo.tif") as src:
+            assert src.height == 171
+            assert src.width == 171
+            assert src.is_tiled
+            assert src.profile["blockxsize"] == 128
+            assert src.profile["blockysize"] == 128
+            assert src.overviews(1) == [2]
 
-        with pytest.warns(IncompatibleBlockRasterSize):
-            cog_translate(
-                raster_path_toosmall, "cogeo.tif", default_profile, quiet=True
-            )
-            assert cog_validate("cogeo.tif")
-            with rasterio.open("cogeo.tif") as src:
-                assert src.height == 51
-                assert src.width == 51
-                assert not src.is_tiled
-                assert not src.profile.get("blockxsize")
-                assert not src.profile.get("blockysize")
-                assert not src.overviews(1)
+        cog_translate(raster_path_toosmall, "cogeo.tif", default_profile, quiet=True)
+        assert cog_validate("cogeo.tif")
+        with rasterio.open("cogeo.tif") as src:
+            assert src.height == 51
+            assert src.width == 51
+            assert src.is_tiled
+            assert src.profile.get("blockxsize") == 512
+            assert src.profile.get("blockysize") == 512
+            assert not src.overviews(1)
 
 
 def test_cog_translate_dataset(runner):
