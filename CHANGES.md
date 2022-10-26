@@ -1,26 +1,34 @@
 # Release Notes
 
-# 3.4.1 (2022-09-14)
+## 3.5.0 (2022-10-26)
+
+* add python 3.11 support
+
+**Breaking Changes**
+
+* remove python 3.7 support
+
+## 3.4.1 (2022-09-14)
 
 * avoid breaking change for `cog_info()` when previously passing `*kwargs` to `cog_validate`
 
-# 3.4.0 (2022-09-05)
+## 3.4.0 (2022-09-05)
 
 * add python 3.10 support
 * allow forwarding namespaced metadata to output dataset
 * set GDAL config for all `info` methods (previously GDAL's configs were only use in the COG validation step)
 
-# 3.3.0 (2022-06-24)
+## 3.3.0 (2022-06-24)
 
 * allow **non-GeoTIFF** in `cog_validate`
 * allow `config` option in `rio cogeo info` CLI
 
-# 3.2.0 (2022-04-05)
+## 3.2.0 (2022-04-05)
 
 * Switch to `pyproject.toml` (https://github.com/cogeotiff/rio-cogeo/pull/232)
 * add `--zoom-level` option to define dataset coarsest zoom level, when creating `web optimized` COG.
 
-# 3.1.0 (2022-02-18)
+## 3.1.0 (2022-02-18)
 
 * Fix equivalence for rio-cogeo and GDAL definition of `aligned_levels`
 
@@ -28,33 +36,33 @@
 
 * update morecantile requirement to `>=3.1,<4.0`. WebOptimized COGs will is now aligned with GDAL and Mercantile TMS definition.
 
-# 3.0.3 (2021-02-14)
+## 3.0.3 (2021-02-14)
 
 * use `rasterio.vrt.WarpedVRT` in `utils.get_web_optimized_params` to better handle dataset with GEOS projection (crossing dateline).
 
-# 3.0.2 (2021-12-16)
+## 3.0.2 (2021-12-16)
 
 * remove usage of (soon to be deprecated) `rasterio.path` (https://github.com/cogeotiff/rio-cogeo/pull/222)
 * add band metadata in `cog_info` output and update `rio_cogeo.models.Info` (https://github.com/cogeotiff/rio-cogeo/pull/223)
 
-# 3.0.1 (2021-10-27)
+## 3.0.1 (2021-10-27)
 
 * update `test` and `dev` dependencies to `rio-tiler>=3.0.0a0`
 
-# 3.0.0 (2021-09-30)
+## 3.0.0 (2021-09-30)
 
 * no changes since 3.0.0a0
 
-# 3.0.0a0 (2021-09-23)
+## 3.0.0a0 (2021-09-23)
 
 * update to `morecantile>=3.0`
 * raise warning when using incompatible options for GDAL COG driver (https://github.com/cogeotiff/rio-cogeo/pull/212)
 
-# 2.3.1 (2021-07-06)
+## 2.3.1 (2021-07-06)
 
 * update `click` version requirement to `>=7.0` to make sure `click.Choice` supports the `case_sensitive` option.
 
-# 2.3.0 (2021-06-25)
+## 2.3.0 (2021-06-25)
 
 * allow external configuration (GDAL Env) for `cog_validate` (https://github.com/cogeotiff/rio-cogeo/pull/206)
 
@@ -69,20 +77,20 @@
   Starting with version 2.3, it's up to the user to set the wanted GDAL configuration (e.g `EMPTY_DIR`: no external file check, `FALSE`: check for external files)
 
 
-# 2.2.3 (2021-06-18)
+## 2.2.3 (2021-06-18)
 
 * use opened file for click progressbar (https://github.com/cogeotiff/rio-cogeo/pull/204)
 
-# 2.2.2 (2021-06-01)
+## 2.2.2 (2021-06-01)
 
 * Add dictionary access to `Info` model (author @geospatial-jeff, https://github.com/cogeotiff/rio-cogeo/pull/201)
 * remove unsupported resampling method for Warping in CLI options (author @drnextgis, https://github.com/cogeotiff/rio-cogeo/pull/202)
 
-# 2.2.1 (2021-05-19)
+## 2.2.1 (2021-05-19)
 
 * replace missing rio-tiler dependencies with a custom BBox type definition (https://github.com/cogeotiff/rio-cogeo/pull/198)
 
-# 2.2.0 (2021-05-18)
+## 2.2.0 (2021-05-18)
 
 * add pydantic models for `info` output (https://github.com/cogeotiff/rio-cogeo/issues/191)
 * add `use_cog_driver` option to create COG using new GDAL COG Driver (https://github.com/cogeotiff/rio-cogeo/pull/194)
@@ -163,11 +171,11 @@ with rasterio.open("cogeo.tif") as src:
     assert has_mask_band(src)
 ```
 
-# 2.1.4 (2021-03-31)
+## 2.1.4 (2021-03-31)
 
 * fix issue in validation when BLOCK_OFFSET_0 is None (https://github.com/cogeotiff/rio-cogeo/issues/182)
 
-# 2.1.3 (2021-03-03)
+## 2.1.3 (2021-03-03)
 
 * add **colormap** options in `cog_translate` to allow a user to set or update a colormap
 
@@ -191,11 +199,11 @@ with rasterio.open("cogeo.tif") as cog:
 >>> "I made this tiff with rio-cogeo"
 ```
 
-# 2.1.2 (2021-02-10)
+## 2.1.2 (2021-02-10)
 
 * remove useless path translation to pathlib and avoid side effect when using a URL (https://github.com/cogeotiff/rio-cogeo/issues/178)
 
-# 2.1.1 (2021-01-27)
+## 2.1.1 (2021-01-27)
 
 * drop support for Python 3.5 (https://github.com/cogeotiff/rio-cogeo/issues/173)
 * allow pathlib.PurePath object as input and output (https://github.com/cogeotiff/rio-cogeo/issues/173)
