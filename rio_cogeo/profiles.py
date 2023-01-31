@@ -48,6 +48,42 @@ class ZSTDProfile(Profile):
     }
 
 
+class ZSTDProfilePred2(Profile):
+    """Tiled, ZSTD-compressed GTiff. with horizontal differencing
+    good for byte and int16 data
+
+    Note: ZSTD compression is available since gdal 2.3
+    """
+
+    defaults = {
+        "driver": "GTiff",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "ZSTD",
+        "PREDICTOR": 2,
+        'ZSTD_LEVEL': 1,
+    }
+
+
+class ZSTDProfilePred3(Profile):
+    """Tiled, ZSTD-compressed GTiff. floating point differencing
+    good for floating point data, lossless 
+
+    Note: ZSTD compression is available since gdal 2.3
+    """
+
+    defaults = {
+        "driver": "GTiff",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "ZSTD",
+        "PREDICTOR": 3,
+        'ZSTD_LEVEL': 9,
+    }
+
+
 class LZWProfile(Profile):
     """Tiled, pixel-interleaved, LZW-compressed GTiff."""
 
@@ -126,6 +162,48 @@ class LERCDEFLATEProfile(Profile):
     }
 
 
+class LERCDEFLATEProfile1cm(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+        "MAX_Z_ERROR": 0.01,
+    }
+
+
+class LERCDEFLATEProfile10cm(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+        "MAX_Z_ERROR": 0.1,
+    }
+
+
+class LERCDEFLATEProfile25cm(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+        "MAX_Z_ERROR": 0.25,
+    }
+
+
 class LERCZSTDProfile(Profile):
     """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
 
@@ -136,6 +214,48 @@ class LERCZSTDProfile(Profile):
         "blockxsize": 512,
         "blockysize": 512,
         "compress": "LERC_ZSTD",
+    }
+
+
+class LERCZSTDProfile1cm(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+        "MAX_Z_ERROR": 0.01,
+    }
+
+
+class LERCZSTDProfile10cm(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+        "MAX_Z_ERROR": 0.1,
+    }
+
+
+class LERCZSTDProfile25cm(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+        "MAX_Z_ERROR": 0.25,
     }
 
 
@@ -161,13 +281,21 @@ class COGProfiles(dict):
                 "jpeg": JPEGProfile(),
                 "webp": WEBPProfile(),
                 "zstd": ZSTDProfile(),
+                "zstd_pred2": ZSTDProfilePred2(),
+                "zstd_pred3": ZSTDProfilePred3(),
                 "lzw": LZWProfile(),
                 "deflate": DEFLATEProfile(),
                 "packbits": PACKBITSProfile(),
                 "lzma": LZMAProfile(),
                 "lerc": LERCProfile(),
                 "lerc_deflate": LERCDEFLATEProfile(),
+                "lerc_deflate_1cm": LERCDEFLATEProfile1cm(),
+                "lerc_deflate_10cm": LERCDEFLATEProfile10cm(),
+                "lerc_deflate_25cm": LERCDEFLATEProfile25cm(),
                 "lerc_zstd": LERCZSTDProfile(),
+                "lerc_zstd_1cm": LERCZSTDProfile1cm(),
+                "lerc_zstd_10cm": LERCZSTDProfile10cm(),
+                "lerc_zstd_25cm": LERCZSTDProfile25cm(),
                 "raw": RAWProfile(),
             }
         )
@@ -178,7 +306,7 @@ class COGProfiles(dict):
         if key not in (self.keys()):
             raise KeyError("{} is not a valid COG profile name".format(key))
 
-        if key in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]:
+        if any(prof in key for prof in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]):
             warnings.warn(
                 "Non-standard compression schema: {}. The output COG might not be fully"
                 " supported by software not build against latest libtiff.".format(key)
