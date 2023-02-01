@@ -62,13 +62,13 @@ class ZSTDProfilePred2(Profile):
         "blockysize": 512,
         "compress": "ZSTD",
         "PREDICTOR": 2,
-        'ZSTD_LEVEL': 1,
+        "ZSTD_LEVEL": 1,
     }
 
 
 class ZSTDProfilePred3(Profile):
     """Tiled, ZSTD-compressed GTiff. floating point differencing
-    good for floating point data, lossless 
+    good for floating point data, lossless
 
     Note: ZSTD compression is available since gdal 2.3
     """
@@ -80,7 +80,7 @@ class ZSTDProfilePred3(Profile):
         "blockysize": 512,
         "compress": "ZSTD",
         "PREDICTOR": 3,
-        'ZSTD_LEVEL': 9,
+        "ZSTD_LEVEL": 9,
     }
 
 
@@ -306,7 +306,10 @@ class COGProfiles(dict):
         if key not in (self.keys()):
             raise KeyError("{} is not a valid COG profile name".format(key))
 
-        if any(prof in key for prof in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]):
+        if any(
+            prof in key
+            for prof in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]
+        ):
             warnings.warn(
                 "Non-standard compression schema: {}. The output COG might not be fully"
                 " supported by software not build against latest libtiff.".format(key)
