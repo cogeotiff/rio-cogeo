@@ -162,7 +162,35 @@ class LERCDEFLATEProfile(Profile):
     }
 
 
-class LERCDEFLATEProfile1cm(Profile):
+class LERCDEFLATEProfiledecimilli(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+        "MAX_Z_ERROR": 0.0001,
+    }
+
+
+class LERCDEFLATEProfilemilli(Profile):
+    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_DEFLATE",
+        "MAX_Z_ERROR": 0.001,
+    }
+
+
+class LERCDEFLATEProfilecenti(Profile):
     """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
 
     defaults = {
@@ -176,7 +204,7 @@ class LERCDEFLATEProfile1cm(Profile):
     }
 
 
-class LERCDEFLATEProfile10cm(Profile):
+class LERCDEFLATEProfiledeci(Profile):
     """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
 
     defaults = {
@@ -187,20 +215,6 @@ class LERCDEFLATEProfile10cm(Profile):
         "blockysize": 512,
         "compress": "LERC_DEFLATE",
         "MAX_Z_ERROR": 0.1,
-    }
-
-
-class LERCDEFLATEProfile25cm(Profile):
-    """Tiled, pixel-interleaved, LERC_DEFLATE-compressed GTiff."""
-
-    defaults = {
-        "driver": "GTiff",
-        "interleave": "pixel",
-        "tiled": True,
-        "blockxsize": 512,
-        "blockysize": 512,
-        "compress": "LERC_DEFLATE",
-        "MAX_Z_ERROR": 0.25,
     }
 
 
@@ -217,7 +231,35 @@ class LERCZSTDProfile(Profile):
     }
 
 
-class LERCZSTDProfile1cm(Profile):
+class LERCZSTDProfiledecimilli(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+        "MAX_Z_ERROR": 0.0001,
+    }
+
+
+class LERCZSTDProfilemilli(Profile):
+    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
+
+    defaults = {
+        "driver": "GTiff",
+        "interleave": "pixel",
+        "tiled": True,
+        "blockxsize": 512,
+        "blockysize": 512,
+        "compress": "LERC_ZSTD",
+        "MAX_Z_ERROR": 0.001,
+    }
+
+
+class LERCZSTDProfilecenti(Profile):
     """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
 
     defaults = {
@@ -231,7 +273,7 @@ class LERCZSTDProfile1cm(Profile):
     }
 
 
-class LERCZSTDProfile10cm(Profile):
+class LERCZSTDProfiledeci(Profile):
     """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
 
     defaults = {
@@ -242,20 +284,6 @@ class LERCZSTDProfile10cm(Profile):
         "blockysize": 512,
         "compress": "LERC_ZSTD",
         "MAX_Z_ERROR": 0.1,
-    }
-
-
-class LERCZSTDProfile25cm(Profile):
-    """Tiled, pixel-interleaved, LERC_ZSTD-compressed GTiff."""
-
-    defaults = {
-        "driver": "GTiff",
-        "interleave": "pixel",
-        "tiled": True,
-        "blockxsize": 512,
-        "blockysize": 512,
-        "compress": "LERC_ZSTD",
-        "MAX_Z_ERROR": 0.25,
     }
 
 
@@ -289,13 +317,15 @@ class COGProfiles(dict):
                 "lzma": LZMAProfile(),
                 "lerc": LERCProfile(),
                 "lerc_deflate": LERCDEFLATEProfile(),
-                "lerc_deflate_1cm": LERCDEFLATEProfile1cm(),
-                "lerc_deflate_10cm": LERCDEFLATEProfile10cm(),
-                "lerc_deflate_25cm": LERCDEFLATEProfile25cm(),
+                "lerc_deflate_decimilli": LERCDEFLATEProfiledecimilli(),
+                "lerc_deflate_milli": LERCDEFLATEProfilemilli(),
+                "lerc_deflate_centi": LERCDEFLATEProfilecenti(),
+                "lerc_deflate_deci": LERCDEFLATEProfiledeci(),
                 "lerc_zstd": LERCZSTDProfile(),
-                "lerc_zstd_1cm": LERCZSTDProfile1cm(),
-                "lerc_zstd_10cm": LERCZSTDProfile10cm(),
-                "lerc_zstd_25cm": LERCZSTDProfile25cm(),
+                "lerc_zstd_decimilli": LERCZSTDProfiledecimilli(),
+                "lerc_zstd_milli": LERCZSTDProfilemilli(),
+                "lerc_zstd_centi": LERCZSTDProfilecenti(),
+                "lerc_zstd_deci": LERCZSTDProfiledeci(),
                 "raw": RAWProfile(),
             }
         )
