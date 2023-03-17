@@ -445,7 +445,7 @@ def cog_validate(  # noqa: C901
 
                 return False, errors, warnings
 
-            if any(pathlib.Path(x).suffix == ".ovr" for x in src.files):
+            if any(pathlib.Path(x).suffix.lower() == ".ovr" for x in src.files):
                 errors.append(
                     "Overviews found in external .ovr file. They should be internal"
                 )
