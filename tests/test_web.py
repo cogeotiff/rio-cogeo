@@ -42,7 +42,7 @@ def test_cog_translate_webZooms():
     with runner.isolated_filesystem():
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_north,
@@ -84,7 +84,7 @@ def test_cog_translate_web():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_web,
@@ -169,7 +169,7 @@ def test_cog_translate_Internal():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_web,
@@ -247,7 +247,7 @@ def test_cog_translate_web_align():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         with rasterio.open(raster_path_web) as src_dst:
             _, max_zoom = get_zooms(src_dst)
@@ -308,7 +308,7 @@ def test_cog_translate_web_geos():
 
         profile = cog_profiles.get("jpeg")
         profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256", GDAL_TIFF_INTERNAL_MASK=True)
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256", "GDAL_TIFF_INTERNAL_MASK": True}
 
         cog_translate(
             raster_geos,
@@ -343,7 +343,7 @@ def test_web_align_cogeo_gdal():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_web,
@@ -405,7 +405,7 @@ def test_gdal_zoom_options():
     with runner.isolated_filesystem():
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_web,
@@ -430,7 +430,7 @@ def test_gdal_zoom_level_options():
 
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="256")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
 
         cog_translate(
             raster_path_web,

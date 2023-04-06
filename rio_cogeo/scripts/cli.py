@@ -32,11 +32,11 @@ class BdxParamType(click.ParamType):
             assert all(b > 0 for b in bands)
             return bands
 
-        except (ValueError, AttributeError, AssertionError):
+        except (ValueError, AttributeError, AssertionError) as e:
             raise click.ClickException(
                 "bidx must be a string of comma-separated integers (> 0), "
                 "representing the band indexes."
-            )
+            ) from e
 
 
 class NodataParamType(click.ParamType):
@@ -53,8 +53,10 @@ class NodataParamType(click.ParamType):
                 return None
             else:
                 return float(value)
-        except (TypeError, ValueError):
-            raise click.ClickException("{} is not a valid nodata value.".format(value))
+        except (TypeError, ValueError) as e:
+            raise click.ClickException(
+                "{} is not a valid nodata value.".format(value)
+            ) from e
 
 
 class ThreadsParamType(click.ParamType):
@@ -69,8 +71,10 @@ class ThreadsParamType(click.ParamType):
                 return "ALL_CPUS"
             else:
                 return int(value)
-        except (TypeError, ValueError):
-            raise click.ClickException("{} is not a valid thread value.".format(value))
+        except (TypeError, ValueError) as e:
+            raise click.ClickException(
+                "{} is not a valid thread value.".format(value)
+            ) from e
 
 
 @click.group(short_help="Create and Validate COGEO")
@@ -238,7 +242,7 @@ def create(
 ):
     """Create Cloud Optimized Geotiff."""
     output_profile = cog_profiles.get(cogeo_profile)
-    output_profile.update(dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER")))
+    output_profile.update({"BIGTIFF": os.environ.get("BIGTIFF", "IF_SAFER")})
     if creation_options:
         output_profile.update(creation_options)
 
@@ -250,11 +254,11 @@ def create(
         overview_blocksize = blocksize or 512
 
     config.update(
-        dict(
-            GDAL_NUM_THREADS=threads,
-            GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-            GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
-        )
+        {
+            "GDAL_NUM_THREADS": threads,
+            "GDAL_TIFF_INTERNAL_MASK": os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
+            "GDAL_TIFF_OVR_BLOCKSIZE": str(overview_blocksize),
+        }
     )
 
     cog_translate(
@@ -326,7 +330,7 @@ def validate(input, strict, config):
     callback=options._cb_key_val,
     help="GDAL configuration options.",
 )
-def info(input, to_json, config):
+def info(input, to_json, config):  # noqa: C901
     """Dataset info."""
     metadata = cog_info(input, config=config)
 
