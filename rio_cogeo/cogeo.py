@@ -30,7 +30,9 @@ def TemporaryRasterFile(dst_path: Union[str, pathlib.PurePath], suffix: str = ".
     """Create temporary file."""
     # For local file we should create temporary file in the same directory
     tmpdir = (
-        None if not pathlib.Path(dst_path).is_file() else pathlib.Path(dst_path).parent
+        pathlib.Path(dst_path).parent
+        if pathlib.Path(dst_path).parent.is_dir()
+        else None
     )
     fileobj = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=suffix, delete=False)
     fileobj.close()

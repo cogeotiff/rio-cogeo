@@ -2,7 +2,7 @@
 name = "rio-cogeo"
 description = "Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {file = "LICENSE"}
 authors = [
     {name = "Vincent Sarago", email = "vincent@developmentseed.com"},
