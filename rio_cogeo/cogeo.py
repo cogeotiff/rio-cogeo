@@ -187,11 +187,11 @@ def cog_translate(  # noqa: C901
 
             if nodata is not None:
                 vrt_params.update(
-                    dict(nodata=nodata, add_alpha=False, src_nodata=nodata)
+                    {"nodata": nodata, "add_alpha": False, "src_nodata": nodata}
                 )
 
             if alpha:
-                vrt_params.update(dict(add_alpha=False))
+                vrt_params.update({"add_alpha": False})
 
             if web_optimized and not use_cog_driver:
                 params = utils.get_web_optimized_params(
@@ -302,11 +302,11 @@ def cog_translate(  # noqa: C901
 
                 tags = src_dst.tags()
                 tags.update(
-                    dict(
-                        OVR_RESAMPLING_ALG=ResamplingEnums[
+                    {
+                        "OVR_RESAMPLING_ALG": ResamplingEnums[
                             overview_resampling
                         ].name.upper()
-                    )
+                    }
                 )
                 if additional_cog_metadata:
                     tags.update(**additional_cog_metadata)
@@ -529,7 +529,7 @@ def cog_validate(  # noqa: C901
             details["data_offsets"] = {}
             details["data_offsets"]["main"] = data_offset
 
-            for ix, dec in enumerate(overviews):
+            for ix, _dec in enumerate(overviews):
                 block_offset = src.get_tag_item(
                     "BLOCK_OFFSET_0_0", "TIFF", bidx=1, ovr=ix
                 )
@@ -564,7 +564,7 @@ def cog_validate(  # noqa: C901
                     )
                 )
 
-        for ix, dec in enumerate(overviews):
+        for ix, _dec in enumerate(overviews):
             with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
                 if ovr_dst.width > 512 and ovr_dst.height > 512:
                     if not ovr_dst.is_tiled:

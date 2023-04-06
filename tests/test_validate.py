@@ -98,7 +98,7 @@ def test_cog_validate_validCreatioValid(monkeypatch):
 
         # Change in rasterio 1.0.26
         # https://github.com/mapbox/rasterio/blob/master/CHANGES.txt#L43
-        config = dict(GDAL_TIFF_OVR_BLOCKSIZE="1024")
+        config = {"GDAL_TIFF_OVR_BLOCKSIZE": "1024"}
         cog_translate(
             raster_big,
             "cogeo.tif",
