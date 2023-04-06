@@ -3,6 +3,7 @@
 ## 3.5.1 (2023-04-06)
 
 * Use Case-insensitive check for external overviews (author @mplough-kobold, https://github.com/cogeotiff/rio-cogeo/pull/252)
+* Use destination directory for the temporary file
 
 ## 3.5.0 (2022-10-26)
 
