@@ -66,6 +66,17 @@ exclude = [
     "mkdocs.yml",
 ]
 
+[tool.coverage.run]
+branch = true
+parallel = true
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
 [tool.isort]
 profile = "black"
 known_first_party = ["rio_cogeo"]
@@ -76,6 +87,16 @@ default_section = "THIRDPARTY"
 no_strict_optional = "True"
 ignore_missing_imports = "True"
 
-[tool.pydocstyle]
-select = "D1"
-match = "(?!test).*.py"
+[tool.ruff]
+select = [
+    "D1",  # pydocstyle errors
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "B905",  # ignore zip() without an explicit strict= parameter, only support with python >3.10
+]

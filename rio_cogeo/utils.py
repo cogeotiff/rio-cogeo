@@ -134,9 +134,9 @@ def get_web_optimized_params(
     vrt_width = max(1, round((e - w) / vrt_transform.a))
     vrt_height = max(1, round((s - n) / vrt_transform.e))
 
-    return dict(
-        crs=tms.rasterio_crs,
-        transform=vrt_transform,
-        width=vrt_width,
-        height=vrt_height,
-    )
+    return {
+        "crs": tms.rasterio_crs,
+        "transform": vrt_transform,
+        "width": vrt_width,
+        "height": vrt_height,
+    }
