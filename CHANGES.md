@@ -1,5 +1,9 @@
 # Release Notes
 
+## 3.5.2 (2023-05-22)
+
+* Flag GeoTIFFs with invalidated optimizations as invalid COGs (author @mplough-kobold, https://github.com/cogeotiff/rio-cogeo/pull/260)
+
 ## 3.5.1 (2023-04-06)
 
 * Use Case-insensitive check for external overviews (author @mplough-kobold, https://github.com/cogeotiff/rio-cogeo/pull/252)
