@@ -26,6 +26,11 @@ raster_rioCOGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.
 # COG created using GDAL COG Driver
 raster_COGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
 
+# COG written and then modified to invalidate COG layout
+raster_known_incompatible = os.path.join(
+    fixture_dir, "validate", "image_known_incompatible_ghost_headers.tif"
+)
+
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 
@@ -53,7 +58,11 @@ def test_cog_validate_valid(monkeypatch):
     assert cog_validate(raster_no_ovr, config=config)[0]
     assert not cog_validate(raster_no_ovr, strict=True, config=config)[0]
 
+    # not a GeoTIFF
     assert not cog_validate(raster_jpeg, config=config)[0]
+
+    # optimizations invalidated by layout modification
+    assert not cog_validate(raster_known_incompatible, config=config)[0]
 
     # COG created with GDAL 3.1
     assert cog_validate(raster_rioCOGgdal31, config=config)[0]
