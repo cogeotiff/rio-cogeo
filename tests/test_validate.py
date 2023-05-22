@@ -27,7 +27,9 @@ raster_rioCOGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.
 raster_COGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
 
 # COG written and then modified to invalidate COG layout
-raster_known_incompatible = os.path.join(fixture_dir, "validate", "image_known_incompatible_ghost_headers.tif")
+raster_known_incompatible = os.path.join(
+    fixture_dir, "validate", "image_known_incompatible_ghost_headers.tif"
+)
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 256, "blockysize": 256})

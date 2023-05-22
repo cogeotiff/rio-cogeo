@@ -490,7 +490,10 @@ def cog_validate(  # noqa: C901
             # Optimizations are usually invalidated when a COG is modified.
             # When this happens, GDAL >= 3.1 flags the modifications by updating the ghost headers.
             gdal_ghost_headers = src.get_tag_item("GDAL_STRUCTURAL_METADATA", "TIFF")
-            if gdal_ghost_headers is not None and "KNOWN_INCOMPATIBLE_EDITION=YES" in gdal_ghost_headers:
+            if (
+                gdal_ghost_headers is not None
+                and "KNOWN_INCOMPATIBLE_EDITION=YES" in gdal_ghost_headers
+            ):
                 errors.append(
                     "This file used to have optimizations in its layout, "
                     "but those have been, at least partly, invalidated by later changes"
