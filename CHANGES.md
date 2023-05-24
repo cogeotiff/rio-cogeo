@@ -1,5 +1,35 @@
 # Release Notes
 
+## 4.0.0 (TBD)
+
+* update morecantile requirement to `>=4.0.0`
+* native support for all TileMatrixSet (with respect of the TMS spec 2.0)
+* add `--tms` option to specify a path to a TileMatrixSet JSON file
+
+**breaking change**
+
+* Web optimization is now done in rio-cogeo instead of GDAL, when using `--web-optimized` and `--use-cog-driver` options
+
+* switch from using `TILING_SCHEME` namespaced tags to simple `TILING_SCHEME_` prefixed metadata
+
+  ```python
+  # before
+  with rasterio.open("cog_web.tif") as src:
+      print(src.tags(ns="TILING_SCHEME"))
+  >>> {
+      "NAME": "WebMercatorQuad",
+      "ZOOM_LEVEL": "18",
+  }
+
+  # now
+  with rasterio.open("cog_web.tif") as src:
+      print(src.tags())
+  >>> {
+      "TILING_SCHEME_NAME": "WebMercatorQuad",
+      "TILING_SCHEME_ZOOM_LEVEL": "18",
+  }
+  ```
+
 ## 3.5.2 (2023-05-22)
 
 * Flag GeoTIFFs with invalidated optimizations as invalid COGs (author @mplough-kobold, https://github.com/cogeotiff/rio-cogeo/pull/260)

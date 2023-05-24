@@ -1,9 +1,11 @@
 """Rio_cogeo.scripts.cli."""
 
+import json
 import os
 
 import click
 import numpy
+from morecantile import TileMatrixSet
 from rasterio.enums import Resampling as ResamplingEnums
 from rasterio.env import GDALVersion
 from rasterio.rio import options
@@ -201,6 +203,11 @@ def cogeo():
     default=False,
     show_default=True,
 )
+@click.option(
+    "--tms",
+    help="Path to TileMatrixSet JSON file.",
+    type=click.Path(),
+)
 @options.creation_options
 @click.option(
     "--config",
@@ -236,6 +243,7 @@ def create(
     forward_ns_tags,
     threads,
     use_cog_driver,
+    tms,
     creation_options,
     config,
     quiet,
@@ -261,6 +269,13 @@ def create(
         }
     )
 
+    if tms:
+        with open(tms, "r") as f:
+            tilematrixset = TileMatrixSet(**json.load(f))
+
+    else:
+        tilematrixset = None
+
     cog_translate(
         input,
         output,
@@ -281,6 +296,7 @@ def create(
         allow_intermediate_compression=allow_intermediate_compression,
         forward_band_tags=forward_band_tags,
         forward_ns_tags=forward_ns_tags,
+        tms=tilematrixset,
         use_cog_driver=use_cog_driver,
         quiet=quiet,
     )

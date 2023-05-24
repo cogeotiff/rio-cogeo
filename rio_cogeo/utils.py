@@ -53,10 +53,11 @@ def get_zooms(
 ) -> Tuple[int, int]:
     """Calculate raster min/max zoom level."""
     # If the raster is not in the TMS CRS we calculate its projected properties (height, width, resolution)
-    if src_dst.crs != tms.rasterio_crs:
+    tms_crs = tms.rasterio_crs
+    if src_dst.crs != tms_crs:
         aff, w, h = calculate_default_transform(
             src_dst.crs,
-            tms.rasterio_crs,
+            tms_crs,
             src_dst.width,
             src_dst.height,
             *src_dst.bounds,
@@ -92,10 +93,13 @@ def get_web_optimized_params(
     tms: morecantile.TileMatrixSet = morecantile.tms.get("WebMercatorQuad"),
 ) -> Dict:
     """Return VRT parameters for a WebOptimized COG."""
-    if src_dst.crs != tms.rasterio_crs:
-        with WarpedVRT(src_dst, crs=tms.rasterio_crs) as vrt:
+    tms_crs = tms.rasterio_crs
+
+    if src_dst.crs != tms_crs:
+        with WarpedVRT(src_dst, crs=tms_crs) as vrt:
             bounds = vrt.bounds
             aff = list(vrt.transform)
+
     else:
         bounds = src_dst.bounds
         aff = list(src_dst.transform)
@@ -109,6 +113,7 @@ def get_web_optimized_params(
             max_z=30,
             zoom_level_strategy=zoom_level_strategy,
         )
+
     else:
         max_zoom = zoom_level
 
@@ -135,7 +140,7 @@ def get_web_optimized_params(
     vrt_height = max(1, round((s - n) / vrt_transform.e))
 
     return {
-        "crs": tms.rasterio_crs,
+        "crs": tms_crs,
         "transform": vrt_transform,
         "width": vrt_width,
         "height": vrt_height,
