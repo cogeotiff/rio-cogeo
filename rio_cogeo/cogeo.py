@@ -17,7 +17,6 @@ from rasterio.env import GDALVersion
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
-from rasterio.transform import array_bounds
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import models, utils
