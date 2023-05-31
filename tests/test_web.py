@@ -116,9 +116,11 @@ def test_cog_translate_web():
                 lrTile = tms.xy_bounds(tms.tile(bounds[2], bounds[1], max_zoom))
                 assert out_dst.bounds.right == lrTile.right
                 assert round(out_dst.bounds.bottom, 6) == round(lrTile.bottom, 6)
-                assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
-                assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"]
-                assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")
+
+                tags = out_dst.tags()
+                assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
+                assert tags["TILING_SCHEME_ZOOM_LEVEL"]
+                assert "TILING_SCHEME_ALIGNED_LEVELS" not in tags
 
         cog_translate(
             raster_path_web,
@@ -130,9 +132,10 @@ def test_cog_translate_web():
             aligned_levels=4,
         )
         with rasterio.open("cogeo.tif") as out_dst:
-            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
-            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"]
-            assert out_dst.tags(ns="TILING_SCHEME")["ALIGNED_LEVELS"] == "4"
+            tags = out_dst.tags()
+            assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
+            assert tags["TILING_SCHEME_ZOOM_LEVEL"]
+            assert tags["TILING_SCHEME_ALIGNED_LEVELS"] == "4"
 
         cog_translate(
             raster_path_web,
@@ -145,9 +148,10 @@ def test_cog_translate_web():
             aligned_levels=4,
         )
         with rasterio.open("cogeo.tif") as out_dst:
-            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "WEBMERCATORQUAD"
-            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "19"
-            assert out_dst.tags(ns="TILING_SCHEME")["ALIGNED_LEVELS"] == "4"
+            tags = out_dst.tags()
+            assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
+            assert tags["TILING_SCHEME_ZOOM_LEVEL"] == "19"
+            assert tags["TILING_SCHEME_ALIGNED_LEVELS"] == "4"
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")
@@ -417,9 +421,10 @@ def test_gdal_zoom_options():
             use_cog_driver=True,
         )
         with rasterio.open("cogeo_gdal.tif") as out_dst:
-            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "GOOGLEMAPSCOMPATIBLE"
-            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "18"
-            assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")
+            tags = out_dst.tags()
+            assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
+            assert tags["TILING_SCHEME_ZOOM_LEVEL"] == "18"
+            assert "TILING_SCHEME_ALIGNED_LEVELS" not in tags
 
 
 @requires_gdal35
@@ -443,6 +448,7 @@ def test_gdal_zoom_level_options():
             zoom_level=19,
         )
         with rasterio.open("cogeo_gdal.tif") as out_dst:
-            assert out_dst.tags(ns="TILING_SCHEME")["NAME"] == "GOOGLEMAPSCOMPATIBLE"
-            assert out_dst.tags(ns="TILING_SCHEME")["ZOOM_LEVEL"] == "19"
-            assert not out_dst.tags(ns="TILING_SCHEME").get("ALIGNED_LEVELS")
+            tags = out_dst.tags()
+            assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
+            assert tags["TILING_SCHEME_ZOOM_LEVEL"] == "19"
+            assert "TILING_SCHEME_ALIGNED_LEVELS" not in tags

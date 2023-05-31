@@ -23,7 +23,7 @@ dependencies = [
     "click>=7.0",
     "rasterio>=1.3.3",
     "numpy~=1.15",
-    "morecantile>=3.1,<4.0",
+    "morecantile>=4.0,<5.0",
     "pydantic",
 ]
 
@@ -92,6 +92,7 @@ select = [
     "D1",  # pydocstyle errors
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
+    "F",  # flake8
     "C",  # flake8-comprehensions
     "B",  # flake8-bugbear
 ]

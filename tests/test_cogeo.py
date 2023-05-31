@@ -636,6 +636,7 @@ def test_gdal_cog_compareWeb(runner):
             quiet=True,
             use_cog_driver=True,
             web_optimized=True,
+            aligned_levels=1,
         )
 
         # pure COG
@@ -646,12 +647,23 @@ def test_gdal_cog_compareWeb(runner):
             blocksize=256,
             compress="JPEG",
             TILING_SCHEME="GoogleMapsCompatible",
+            TILING_SCHEME_ALIGNED_LEVELS="2",
         )
 
         with rasterio.open("gdalcogeo.tif") as gdalcogeo, rasterio.open(
             "cog.tif"
         ) as cog:
-            assert cog.meta == gdalcogeo.meta
+            cog_meta = cog.meta
+            _ = cog_meta.pop("transform")
+
+            gdal_meta = gdalcogeo.meta
+            _ = gdal_meta.pop("transform")
+
+            assert cog_meta == gdal_meta
+            # there are sub-centimeter difference in the affine transform so we round
+            # the bounds
+            for xc, yc in zip(cog.bounds, gdalcogeo.bounds):
+                assert round(xc, 5) == round(yc, 5)
 
 
 @requires_gdal31

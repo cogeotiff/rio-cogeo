@@ -73,16 +73,17 @@ jobs:
 
       - name: Set tag version
         id: tag
-        # https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        run: |
+          echo "version=${GITHUB_REF#refs/*/}"
+          echo "version=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
       - name: Set module version
         id: module
-        # https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
-        run: echo ::set-output name=version::$(python -c 'from importlib.metadata import version; print(version("rio_cogeo"))')
+        run: |
+          echo version=$(python -c'import rio_cogeo; print(rio_cogeo.__version__)') >> $GITHUB_OUTPUT
 
       - name: Build and publish
-        if: steps.tag.outputs.tag == steps.module.outputs.version
+        if: ${{ steps.tag.outputs.version }} == ${{ steps.module.outputs.version}}
         env:
           FLIT_USERNAME: ${{ secrets.PYPI_USERNAME }}
           FLIT_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

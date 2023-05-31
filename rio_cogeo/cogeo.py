@@ -195,15 +195,15 @@ def cog_translate(  # noqa: C901
             if alpha:
                 vrt_params.update({"add_alpha": False})
 
-            if web_optimized and not use_cog_driver:
-                params = utils.get_web_optimized_params(
+            if web_optimized:
+                wo_params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
                     zoom_level=zoom_level,
                     aligned_levels=aligned_levels,
                     tms=tms,
                 )
-                vrt_params.update(**params)
+                vrt_params.update(**wo_params)
 
             with WarpedVRT(src_dst, **vrt_params) as vrt_dst:
                 meta = vrt_dst.meta
@@ -310,6 +310,23 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     }
                 )
+                if web_optimized:
+                    default_zoom = tms.zoom_for_res(
+                        max(tmp_dst.res),
+                        max_z=30,
+                        zoom_level_strategy=zoom_level_strategy,
+                    )
+                    tags.update(
+                        {
+                            "TILING_SCHEME_NAME": tms.id or "CUSTOM",
+                            "TILING_SCHEME_ZOOM_LEVEL": zoom_level
+                            if zoom_level is not None
+                            else default_zoom,
+                        }
+                    )
+                    if aligned_levels:
+                        tags["TILING_SCHEME_ALIGNED_LEVELS"] = aligned_levels
+
                 if additional_cog_metadata:
                     tags.update(**additional_cog_metadata)
 
@@ -319,26 +336,6 @@ def cog_translate(  # noqa: C901
                         if ns in ["DERIVED_SUBDATASETS", "IMAGE_STRUCTURE"]:
                             continue
                         tmp_dst.update_tags(ns=ns, **src_dst.tags(ns=ns))
-
-                if web_optimized and not use_cog_driver:
-                    default_zoom = tms.zoom_for_res(
-                        max(tmp_dst.res),
-                        max_z=30,
-                        zoom_level_strategy=zoom_level_strategy,
-                    )
-                    dst_kwargs.update(
-                        {
-                            "@TILING_SCHEME_NAME": tms.identifier,
-                            "@TILING_SCHEME_ZOOM_LEVEL": zoom_level
-                            if zoom_level is not None
-                            else default_zoom,
-                        }
-                    )
-
-                    if aligned_levels:
-                        dst_kwargs.update(
-                            {"@TILING_SCHEME_ALIGNED_LEVELS": aligned_levels}
-                        )
 
                 tmp_dst.update_tags(**tags)
                 tmp_dst._set_all_scales([vrt_dst.scales[b - 1] for b in indexes])
@@ -354,27 +351,6 @@ def cog_translate(  # noqa: C901
                         )
 
                     dst_kwargs["driver"] = "COG"
-                    if web_optimized:
-                        dst_kwargs["TILING_SCHEME"] = (
-                            "GoogleMapsCompatible"
-                            if tms.identifier == "WebMercatorQuad"
-                            else tms.identifier
-                        )
-
-                        if zoom_level is not None:
-                            if not GDALVersion.runtime().at_least("3.5"):
-                                warnings.warn(
-                                    "ZOOM_LEVEL option is only available with GDAL >3.5."
-                                )
-
-                            dst_kwargs["ZOOM_LEVEL"] = zoom_level
-
-                        dst_kwargs["ZOOM_LEVEL_STRATEGY"] = zoom_level_strategy
-
-                        if aligned_levels is not None:
-                            # GDAL uses Number of resolution (not overviews)
-                            # See https://github.com/OSGeo/gdal/issues/5336#issuecomment-1042946603
-                            dst_kwargs["aligned_levels"] = aligned_levels + 1
 
                     if add_mask and dst_kwargs.get("compress", "") != "JPEG":
                         warnings.warn(
