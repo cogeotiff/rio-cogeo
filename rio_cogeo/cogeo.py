@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 import click
 import morecantile
@@ -42,6 +42,35 @@ def TemporaryRasterFile(dst_path: Union[str, pathlib.PurePath], suffix: str = ".
         os.remove(fileobj.name)
 
 
+# RasterIO() resampling method.
+# ref: https://gdal.org/api/raster_c_api.html#_CPPv418GDALRIOResampleAlg
+RIOResampling = Literal[
+    "nearest",
+    "bilinear",
+    "cubic",
+    "cubic_spline",
+    "lanczos",
+    "average",
+    "mode",
+    "gauss",
+    "rms",
+]
+
+# WarpKernel resampling method.
+# ref: https://gdal.org/api/gdalwarp_cpp.html#_CPPv4N14GDALWarpKernel9eResampleE
+WarpResampling = Literal[
+    "nearest",
+    "bilinear",
+    "cubic",
+    "cubic_spline",
+    "lanczos",
+    "average",
+    "mode",
+    "sum",
+    "rms",
+]
+
+
 def cog_translate(  # noqa: C901
     source: Union[str, pathlib.PurePath, DatasetReader, DatasetWriter, WarpedVRT],
     dst_path: Union[str, pathlib.PurePath],
@@ -51,13 +80,13 @@ def cog_translate(  # noqa: C901
     dtype: Optional[str] = None,
     add_mask: bool = False,
     overview_level: Optional[int] = None,
-    overview_resampling: str = "nearest",
+    overview_resampling: RIOResampling = "nearest",
     web_optimized: bool = False,
     tms: Optional[morecantile.TileMatrixSet] = None,
     zoom_level_strategy: str = "auto",
     zoom_level: Optional[int] = None,
     aligned_levels: Optional[int] = None,
-    resampling: str = "nearest",
+    resampling: WarpResampling = "nearest",
     in_memory: Optional[bool] = None,
     config: Optional[Dict] = None,
     allow_intermediate_compression: bool = False,
@@ -93,7 +122,7 @@ def cog_translate(  # noqa: C901
     overview_level : int, optional (default: None)
         COGEO overview (decimation) level. By default, inferred from data size.
     overview_resampling : str, optional (default: "nearest")
-        Resampling algorithm for overviews
+        RasterIO Resampling algorithm for overviews
     web_optimized: bool, optional (default: False)
         Create web-optimized cogeo.
     tms: morecantile.TileMatrixSet, optional (default: "WebMercatorQuad")
@@ -110,7 +139,7 @@ def cog_translate(  # noqa: C901
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
         Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
     resampling : str, optional (default: "nearest")
-        Resampling algorithm.
+        Warp Resampling algorithm.
     in_memory: bool, optional
         Force processing raster in memory (default: process in memory if small)
     config : dict

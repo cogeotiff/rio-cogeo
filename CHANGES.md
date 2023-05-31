@@ -1,10 +1,11 @@
 # Release Notes
 
-## 4.0.0 (TBD)
+## 4.0.0 (2023-05-31)
 
 * update morecantile requirement to `>=4.0.0`
 * native support for all TileMatrixSet (with respect of the TMS spec 2.0)
 * add `--tms` option to specify a path to a TileMatrixSet JSON file
+* switch resampling enums to python Literal
 
 **breaking change**
 
