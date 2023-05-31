@@ -2,22 +2,22 @@
 
 import json
 import os
+import typing
 
 import click
 import numpy
 from morecantile import TileMatrixSet
-from rasterio.enums import Resampling as ResamplingEnums
-from rasterio.env import GDALVersion
 from rasterio.rio import options
-from rasterio.warp import SUPPORTED_RESAMPLING as WarpResampling
 
 from rio_cogeo import __version__ as cogeo_version
-from rio_cogeo.cogeo import cog_info, cog_translate, cog_validate
+from rio_cogeo.cogeo import (
+    RIOResampling,
+    WarpResampling,
+    cog_info,
+    cog_translate,
+    cog_validate,
+)
 from rio_cogeo.profiles import cog_profiles
-
-OverviewResampling = [r for r in ResamplingEnums if r.value < 8]
-if GDALVersion.runtime().at_least("3.3"):
-    OverviewResampling.append(ResamplingEnums.rms)
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -123,7 +123,7 @@ def cogeo():
 @click.option(
     "--overview-resampling",
     help="Overview creation resampling algorithm.",
-    type=click.Choice([it.name for it in OverviewResampling]),
+    type=click.Choice(list(typing.get_args(RIOResampling))),
     default="nearest",
     show_default=True,
 )
@@ -158,7 +158,7 @@ def cogeo():
     "--resampling",
     "-r",
     help="Resampling algorithm. Will only be applied with the `--web-optimized` option.",
-    type=click.Choice([it.name for it in WarpResampling]),
+    type=click.Choice(list(typing.get_args(WarpResampling))),
     default="nearest",
     show_default=True,
 )
