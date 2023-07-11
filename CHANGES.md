@@ -1,5 +1,9 @@
 # Release Notes
 
+## 4.0.1 (2023-07-11)
+
+* limit pydantic requirement to `~=1.0``
+
 ## 4.0.0 (2023-05-31)
 
 * update morecantile requirement to `>=4.0.0`
