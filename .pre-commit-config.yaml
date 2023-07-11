@@ -29,3 +29,5 @@ repos:
         language_version: python
         # No reason to run if only tests have changed. They intentionally break typing.
         exclude: tests/.*
+        additional_dependencies:
+          - pydantic~=1.0
