@@ -687,7 +687,7 @@ def test_info_with_metadata():
     """Make sure info returns band metadata."""
     info = cog_info(raster_band_tags)
     assert info.Band_Metadata
-    assert info.dict(by_alias=True)["Band Metadata"]
+    assert info.model_dump(by_alias=True)["Band Metadata"]
     assert info.Band_Metadata["Band 1"].Description == "Green"
     assert info.Band_Metadata["Band 1"].Metadata
 

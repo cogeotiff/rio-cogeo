@@ -351,7 +351,7 @@ def info(input, to_json, config):  # noqa: C901
     metadata = cog_info(input, config=config)
 
     if to_json:
-        click.echo(metadata.json(exclude_none=True, by_alias=True))
+        click.echo(metadata.model_dump_json(exclude_none=True, by_alias=True))
     else:
 
         sep = 25
