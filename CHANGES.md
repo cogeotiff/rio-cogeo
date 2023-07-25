@@ -1,10 +1,10 @@
 # Release Notes
 
-## 5.0.0 (unreleased)
+## 5.0.0 (2023-07-25)
 
-* update `morecantile` requirement to `>=5.0,<6.0`
-* update `pydantic` requirement to `~=2.0`
-* fix `pydantic` deprecation warnings:
+* update `morecantile` requirement to `>=5.0,<6.0` (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/267)
+* update `pydantic` requirement to `~=2.0` (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/267)
+* fix `pydantic` deprecation warnings (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/267)
   * replace `BaseModel.json` with `BaseModel.model_dump_json`
   * replace `BaseModel.dict` with `BaseModel.model_dump`
   * replace `class Config` with `model_config` class variables
