@@ -28,12 +28,12 @@ class IFD(DictLike, BaseModel):
 class Geo(DictLike, BaseModel):
     """rio-cogeo validation GEO information."""
 
-    CRS: Optional[str]
+    CRS: Optional[str] = None
     BoundingBox: BBox
     Origin: Tuple[float, float]
     Resolution: Tuple[float, float]
-    MinZoom: Optional[int]
-    MaxZoom: Optional[int]
+    MinZoom: Optional[int] = None
+    MaxZoom: Optional[int] = None
 
 
 class Profile(DictLike, BaseModel):
@@ -47,26 +47,23 @@ class Profile(DictLike, BaseModel):
     Interleave: str
     AlphaBand: bool
     InternalMask: bool
-    Nodata: Any
+    Nodata: Any = None
     ColorInterp: Sequence[str]
     ColorMap: bool
     Scales: Sequence[float]
     Offsets: Sequence[float]
 
-    class Config:
-        """Config for model."""
-
-        extra = "ignore"
+    model_config = {"extra": "ignore"}
 
 
 class BandMetadata(DictLike, BaseModel):
     """Band metadata."""
 
-    Description: Optional[str]
+    Description: Optional[str] = None
     ColorInterp: str
     Offset: float
     Scale: float
-    Metadata: Optional[Dict[str, Any]]
+    Metadata: Optional[Dict[str, Any]] = None
 
 
 class Info(DictLike, BaseModel):
@@ -75,17 +72,14 @@ class Info(DictLike, BaseModel):
     Path: str
     Driver: str
     COG: bool
-    Compression: Optional[str]
-    ColorSpace: Optional[str]
-    COG_errors: Optional[Sequence[str]]
-    COG_warnings: Optional[Sequence[str]]
+    Compression: Optional[str] = None
+    ColorSpace: Optional[str] = None
+    COG_errors: Optional[Sequence[str]] = None
+    COG_warnings: Optional[Sequence[str]] = None
     Profile: Profile
     GEO: Geo
     Tags: Dict[str, Dict]
     Band_Metadata: Dict[str, BandMetadata] = Field(None, alias="Band Metadata")
     IFD: Sequence[IFD]
 
-    class Config:
-        """Config for model."""
-
-        allow_population_by_field_name = True
+    model_config = {"populate_by_name": True}
