@@ -1,5 +1,14 @@
 # Release Notes
 
+## 5.0.0 (unreleased)
+
+* update `morecantile` requirement to `>=5.0,<6.0`
+* update `pydantic` requirement to `~=2.0`
+* fix `pydantic` deprecation warnings:
+  * replace `BaseModel.json` with `BaseModel.model_dump_json`
+  * replace `BaseModel.dict` with `BaseModel.model_dump`
+  * replace `class Config` with `model_config` class variables
+
 ## 4.0.1 (2023-07-11)
 
 * limit pydantic requirement to `~=1.0``
