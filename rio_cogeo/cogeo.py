@@ -8,6 +8,7 @@ import warnings
 from contextlib import ExitStack, contextmanager
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
+import _io
 import click
 import morecantile
 import rasterio
@@ -93,6 +94,7 @@ def cog_translate(  # noqa: C901
     forward_band_tags: bool = False,
     forward_ns_tags: bool = False,
     quiet: bool = False,
+    progress: Union[bool, _io.TextIOWrapper] = False,
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
@@ -155,6 +157,8 @@ def cog_translate(  # noqa: C901
         Forward namespaces tags to output dataset.
     quiet: bool, optional (default: False)
         Mask processing steps.
+    progress: _io.TextIOWrapper, False, options (default: False)
+        Output progress precentage to TextIO. Quiet must be False.
     temporary_compression: str, optional
         Compression used for the intermediate file, default is deflate.
     colormap: dict, optional
@@ -302,15 +306,25 @@ def cog_translate(  # noqa: C901
                     click.echo("Reading input: {}".format(source), err=True)
 
                 fout = ctx.enter_context(open(os.devnull, "w")) if quiet else sys.stderr
+
+                def updateProgress(pct):
+                    if type(progress) == _io.TextIOWrapper and not quiet:
+                        progress.write(str(windows.pct) + "\n")
+                        progress.flush()
+
                 with click.progressbar(wind, file=fout, show_percent=True) as windows:  # type: ignore
                     for _, w in windows:
                         matrix = vrt_dst.read(window=w, indexes=indexes)
+                        updateProgress(windows.pct)
                         tmp_dst.write(matrix, window=w)
+                        updateProgress(windows.pct)
 
                         if add_mask or mask:
                             # Cast mask to uint8 to fix rasterio 1.1.2 error (ref #115)
                             mask_value = vrt_dst.dataset_mask(window=w).astype("uint8")
+                            updateProgress(windows.pct)
                             tmp_dst.write_mask(mask_value, window=w)
+                            updateProgress(windows.pct)
 
                 if overview_level is None:
                     overview_level = get_maximum_overview_level(

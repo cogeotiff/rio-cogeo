@@ -107,3 +107,28 @@ with MemoryFile() as mem_dst:
     client = boto3_session.client("s3")
     client.upload_fileobj(mem_dst, "my-bucket", "my-key")
 ```
+
+3. Progress to TextIO
+
+```python
+from rio_cogeo.cogeo import cog_translate
+from rio_cogeo.profiles import cog_profiles
+
+config = dict(
+    GDAL_NUM_THREADS="ALL_CPUS",
+    GDAL_TIFF_INTERNAL_MASK=True,
+    GDAL_TIFF_OVR_BLOCKSIZE="128",
+)
+
+with open("logfile.txt", "w+") as example:
+    cog_translate(
+        "example-input.tif",
+        "example-output.tif",
+        cog_profiles.get("deflate"),
+        config=config,
+        in_memory=False,
+        nodata=0,
+        quiet=False,
+        progress=example
+    )
+```
