@@ -120,7 +120,10 @@ config = dict(
     GDAL_TIFF_OVR_BLOCKSIZE="128",
 )
 
+
+
 with open("logfile.txt", "w+") as example:
+    example.isatty = lambda: True # Enable Interactive File like terminal
     cog_translate(
         "example-input.tif",
         "example-output.tif",
@@ -128,7 +131,6 @@ with open("logfile.txt", "w+") as example:
         config=config,
         in_memory=False,
         nodata=0,
-        quiet=False,
-        progress=example
+        quiet=example,
     )
 ```
