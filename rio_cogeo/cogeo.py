@@ -92,7 +92,8 @@ def cog_translate(  # noqa: C901
     allow_intermediate_compression: bool = False,
     forward_band_tags: bool = False,
     forward_ns_tags: bool = False,
-    quiet: Union[bool, TextIO] = False,
+    quiet: bool = False,
+    progress_out: Optional[TextIO] = None,
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
@@ -153,8 +154,10 @@ def cog_translate(  # noqa: C901
         Ref: https://github.com/cogeotiff/rio-cogeo/issues/19
     forward_ns_tags:  bool, optional
         Forward namespaces tags to output dataset.
-    quiet: bool, TextIO, optional (default: False)
-        Mask processing steps. Define the output buffer for the progress bar.
+    quiet: bool, optional (default: False)
+        Mask processing steps.
+    progress_out: TextIO, optional
+        Output progress steps to alternative text buffer. Quiet must be False.
     temporary_compression: str, optional
         Compression used for the intermediate file, default is deflate.
     colormap: dict, optional
@@ -301,11 +304,9 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Reading input: {}".format(source), err=True)
 
-                fout = sys.stderr
-                if quiet is True:
-                    fout = ctx.enter_context(open(os.devnull, "w"))
-                elif quiet is not False:
-                    fout = quiet
+                fout = ctx.enter_context(open(os.devnull, "w")) if quiet else sys.stderr
+                if quiet is False and progress_out:
+                    fout = progress_out
 
                 with click.progressbar(wind, file=fout, show_percent=True) as windows:  # type: ignore
                     for _, w in windows:

@@ -108,22 +108,28 @@ with MemoryFile() as mem_dst:
     client.upload_fileobj(mem_dst, "my-bucket", "my-key")
 ```
 
-3. Progress to TextIO
+3. Output Progress to Alternative Text Buffer
 
+Use Case: You may want to run your translation tasks in the background and keep
+track of progress. To do so you can utilize an alternative text buffer and another
+thread. By outputting the progress to a seperate text buffer you can then track
+the translation progress without blocking the program.
 ```python
 from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
-config = dict(
-    GDAL_NUM_THREADS="ALL_CPUS",
-    GDAL_TIFF_INTERNAL_MASK=True,
-    GDAL_TIFF_OVR_BLOCKSIZE="128",
-)
+config = {
+    "GDAL_NUM_THREADS": "ALL_CPUS",
+    "GDAL_TIFF_INTERNAL_MASK": True,
+    "GDAL_TIFF_OVR_BLOCKSIZE": "128",
+}
 
 
+with open("logfile.txt", "w+") as buffer:
 
-with open("logfile.txt", "w+") as example:
-    example.isatty = lambda: True # Enable Interactive File like terminal
+    # Progress output buffer must be interactive
+    buffer.isatty = lambda: True
+
     cog_translate(
         "example-input.tif",
         "example-output.tif",
@@ -131,6 +137,18 @@ with open("logfile.txt", "w+") as example:
         config=config,
         in_memory=False,
         nodata=0,
-        quiet=example,
+        quiet=False,
+        progress_out=buffer,
     )
 ```
+
+Below is a snippet of code that allows you to grab the percentage complete a
+translation is using the text buffer.
+
+```python
+import re
+
+def getPercentage(buffer:str) -> float:
+    return int(re.findall("\d*%", buffer)[-1].replace("%", "")) / 100
+```
+
