@@ -6,7 +6,7 @@ import sys
 import tempfile
 import warnings
 from contextlib import ExitStack, contextmanager
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, TextIO, Tuple, Union
 
 import click
 import morecantile
@@ -93,6 +93,7 @@ def cog_translate(  # noqa: C901
     forward_band_tags: bool = False,
     forward_ns_tags: bool = False,
     quiet: bool = False,
+    progress_out: Optional[TextIO] = None,
     temporary_compression: str = "DEFLATE",
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
@@ -155,6 +156,8 @@ def cog_translate(  # noqa: C901
         Forward namespaces tags to output dataset.
     quiet: bool, optional (default: False)
         Mask processing steps.
+    progress_out: TextIO, optional
+        Output progress steps to alternative text buffer. Quiet must be False.
     temporary_compression: str, optional
         Compression used for the intermediate file, default is deflate.
     colormap: dict, optional
@@ -302,6 +305,9 @@ def cog_translate(  # noqa: C901
                     click.echo("Reading input: {}".format(source), err=True)
 
                 fout = ctx.enter_context(open(os.devnull, "w")) if quiet else sys.stderr
+                if quiet is False and progress_out:
+                    fout = progress_out
+
                 with click.progressbar(wind, file=fout, show_percent=True) as windows:  # type: ignore
                     for _, w in windows:
                         matrix = vrt_dst.read(window=w, indexes=indexes)
