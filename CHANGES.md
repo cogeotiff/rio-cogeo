@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.1.0 (2023-12-11)
+
+* add option to write progress to an external text buffer (author @SellersEvan, https://github.com/cogeotiff/rio-cogeo/pull/273)
+
 ## 5.0.0 (2023-07-25)
 
 * update `morecantile` requirement to `>=5.0,<6.0` (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/267)
