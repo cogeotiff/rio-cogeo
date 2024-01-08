@@ -126,7 +126,7 @@ def get_web_optimized_params(
     w, _, _, n = tms.xy_bounds(ul_tile)
 
     # The output resolution should match the TMS resolution at MaxZoom
-    vrt_res = tms._resolution(tms.matrix(max_zoom))
+    vrt_res = tms.matrix(max_zoom).cellSize
 
     # Output transform is built from the origin (UL tile) and output resolution
     vrt_transform = Affine(vrt_res, 0, w, 0, -vrt_res, n)

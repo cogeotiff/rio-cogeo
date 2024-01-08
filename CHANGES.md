@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.1.1 (2024-01-08)
+
+* use morecantile `TileMatrixSet.cellSize` property instead of deprecated/private `TileMatrixSet._resolution` method
+
 ## 5.1.0 (2023-12-11)
 
 * add option to write progress to an external text buffer (author @SellersEvan, https://github.com/cogeotiff/rio-cogeo/pull/273)
