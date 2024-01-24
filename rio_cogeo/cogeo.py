@@ -660,7 +660,7 @@ def cog_info(
                 Bands=src_dst.count,
                 Width=src_dst.width,
                 Height=src_dst.height,
-                Tiled=(src_dst.block_shapes[0][1] != src.width),
+                Tiled=(src_dst.block_shapes[0][1] != src_dst.width),
                 Dtype=src_dst.dtypes[0],
                 Interleave=src_dst.interleaving.value
                 if src_dst.interleaving
