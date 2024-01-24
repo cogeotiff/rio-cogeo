@@ -60,7 +60,7 @@ def _validate_translated_rgb_jpeg(src):
     assert src.height == 512
     assert src.width == 512
     assert src.meta["dtype"] == "uint8"
-    assert src.is_tiled
+    assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
     assert src.profile["blockxsize"] == 64
     assert src.profile["blockysize"] == 64
     assert src.compression.value == "JPEG"
@@ -127,7 +127,7 @@ def test_cog_translate_validRaw(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
             assert src.width == 512
-            assert src.is_tiled
+            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
             assert not src.compression
             assert src.interleaving.value == "PIXEL"
 
@@ -161,7 +161,7 @@ def test_cog_translate_validAlpha(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert src.is_tiled
+            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
             assert src.compression.value == "WEBP"
             assert has_alpha_band(src)
 
@@ -259,7 +259,7 @@ def test_cog_translate_validCustom(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert src.is_tiled
+            assert all([(256, 256) == (h, w) for (h, w) in src.block_shapes])
             assert src.compression.value == "JPEG"
             assert src.profile["blockxsize"] == 256
             assert src.profile["blockysize"] == 256
@@ -317,7 +317,7 @@ def test_cog_translate_valid_blocksize(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 171
             assert src.width == 171
-            assert src.is_tiled
+            all([(128, 128) == (h, w) for (h, w) in src.block_shapes])
             assert src.profile["blockxsize"] == 128
             assert src.profile["blockysize"] == 128
             assert src.overviews(1) == [2]
@@ -327,7 +327,7 @@ def test_cog_translate_valid_blocksize(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 51
             assert src.width == 51
-            assert src.is_tiled
+            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
             assert src.profile.get("blockxsize") == 512
             assert src.profile.get("blockysize") == 512
             assert not src.overviews(1)
