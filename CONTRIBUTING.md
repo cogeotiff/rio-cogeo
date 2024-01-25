@@ -31,10 +31,10 @@ $ cd rio-cogeo
 $ pip install -e .["docs"]
 ```
 
-Hot-reloading docs:
+Hot-reloading docs (from repository root):
 
 ```bash
-$ mkdocs serve
+$ mkdocs serve -f docs/mkdocs.yml
 ```
 
 To manually deploy docs (note you should never need to do this because Github
