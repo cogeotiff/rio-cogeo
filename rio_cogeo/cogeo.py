@@ -465,7 +465,7 @@ def cog_validate(  # noqa: C901
 
             overviews = src.overviews(1)
             if src.width > 512 and src.height > 512:
-                if not src.is_tiled:
+                if src.block_shapes and src.block_shapes[0][1] == src.width:
                     errors.append(
                         "The file is greater than 512xH or 512xW, but is not tiled"
                     )
@@ -592,7 +592,10 @@ def cog_validate(  # noqa: C901
         for ix, _dec in enumerate(overviews):
             with rasterio.open(src_path, OVERVIEW_LEVEL=ix) as ovr_dst:
                 if ovr_dst.width > 512 and ovr_dst.height > 512:
-                    if not ovr_dst.is_tiled:
+                    if (
+                        ovr_dst.block_shapes
+                        and ovr_dst.block_shapes[0][1] == ovr_dst.width
+                    ):
                         errors.append("Overview of index {} is not tiled".format(ix))
 
     if warnings and not quiet:
@@ -660,7 +663,7 @@ def cog_info(
                 Bands=src_dst.count,
                 Width=src_dst.width,
                 Height=src_dst.height,
-                Tiled=src_dst.is_tiled,
+                Tiled=(src_dst.block_shapes[0][1] != src_dst.width),
                 Dtype=src_dst.dtypes[0],
                 Interleave=src_dst.interleaving.value
                 if src_dst.interleaving
