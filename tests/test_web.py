@@ -456,3 +456,21 @@ def test_gdal_zoom_level_options():
             assert tags["TILING_SCHEME_NAME"] == "WebMercatorQuad"
             assert tags["TILING_SCHEME_ZOOM_LEVEL"] == "19"
             assert "TILING_SCHEME_ALIGNED_LEVELS" not in tags
+
+
+def test_web_optimized_arg_warning():
+    """Verify a deprecation warning is emitted for `web_optimized` parameter"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        web_profile = cog_profiles.get("raw")
+        web_profile.update({"blockxsize": 256, "blockysize": 256})
+        with pytest.warns(
+            DeprecationWarning, match=r"^'web_optomized' option is deprecated.*"
+        ):
+            cog_translate(
+                raster_path_north,
+                "cogeo.tif",
+                web_profile,
+                quiet=True,
+                web_optimized=True,
+            )
