@@ -127,7 +127,7 @@ def test_cog_translate_validRaw(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
             assert src.width == 512
-            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
+            assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
             assert not src.compression
             assert src.interleaving.value == "PIXEL"
 
@@ -161,7 +161,7 @@ def test_cog_translate_validAlpha(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
+            assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
             assert src.compression.value == "WEBP"
             assert has_alpha_band(src)
 
