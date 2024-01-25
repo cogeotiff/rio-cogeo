@@ -3,8 +3,10 @@
 import json
 import os
 import typing
+from typing import Optional
 
 import click
+import morecantile
 import numpy
 from morecantile import TileMatrixSet
 from rasterio.rio import options
@@ -269,12 +271,12 @@ def create(
         }
     )
 
+    tilematrixset: Optional[TileMatrixSet] = None
     if tms:
         with open(tms, "r") as f:
             tilematrixset = TileMatrixSet(**json.load(f))
-
-    else:
-        tilematrixset = None
+    elif web_optimized:
+        tilematrixset = morecantile.tms.get("WebMercatorQuad")
 
     cog_translate(
         input,
@@ -286,7 +288,6 @@ def create(
         add_mask=add_mask,
         overview_level=overview_level,
         overview_resampling=overview_resampling,
-        web_optimized=web_optimized,
         zoom_level_strategy=zoom_level_strategy,
         zoom_level=zoom_level,
         aligned_levels=aligned_levels,
