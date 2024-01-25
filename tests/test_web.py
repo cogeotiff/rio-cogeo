@@ -40,6 +40,7 @@ def test_cog_translate_webZooms():
     """
     runner = CliRunner()
     with runner.isolated_filesystem():
+        web_tms = morecantile.tms.get("WebMercatorQuad")
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -49,7 +50,7 @@ def test_cog_translate_webZooms():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
         )
         with rasterio.open("cogeo.tif") as out_dst:
@@ -61,7 +62,7 @@ def test_cog_translate_webZooms():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             zoom_level_strategy="lower",
             config=config,
         )
@@ -91,7 +92,7 @@ def test_cog_translate_web():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             config=config,
             aligned_levels=0,
         )
@@ -127,7 +128,7 @@ def test_cog_translate_web():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             config=config,
             aligned_levels=4,
         )
@@ -142,7 +143,7 @@ def test_cog_translate_web():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             zoom_level=19,
             config=config,
             aligned_levels=4,
@@ -180,7 +181,7 @@ def test_cog_translate_Internal():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             config=config,
             aligned_levels=0,
         )
@@ -261,7 +262,7 @@ def test_cog_translate_web_align():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             config=config,
             aligned_levels=2,
         )
@@ -282,7 +283,7 @@ def test_cog_translate_web_align():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=tms,
             config=config,
             aligned_levels=3,
         )
@@ -309,7 +310,7 @@ def test_cog_translate_web_geos():
     """
     runner = CliRunner()
     with runner.isolated_filesystem():
-
+        web_tms = morecantile.tms.get("WebMercatorQuad")
         profile = cog_profiles.get("jpeg")
         profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256", "GDAL_TIFF_INTERNAL_MASK": True}
@@ -319,7 +320,7 @@ def test_cog_translate_web_geos():
             "cogeo.tif",
             profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
         )
         cog_translate(
@@ -327,7 +328,7 @@ def test_cog_translate_web_geos():
             "cogeo_gdal.tif",
             profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             use_cog_driver=True,
             config=config,
         )
@@ -345,6 +346,8 @@ def test_web_align_cogeo_gdal():
     runner = CliRunner()
     with runner.isolated_filesystem():
 
+        web_tms = morecantile.tms.get("WebMercatorQuad")
+
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -354,7 +357,7 @@ def test_web_align_cogeo_gdal():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
         )
         cog_translate(
@@ -362,7 +365,7 @@ def test_web_align_cogeo_gdal():
             "cogeo_gdal.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
             use_cog_driver=True,
         )
@@ -379,7 +382,7 @@ def test_web_align_cogeo_gdal():
             "cogeo.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
             aligned_levels=4,
         )
@@ -388,7 +391,7 @@ def test_web_align_cogeo_gdal():
             "cogeo_gdal.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
             aligned_levels=4,
             use_cog_driver=True,
@@ -407,6 +410,7 @@ def test_gdal_zoom_options():
     """Test Web-Optimized GDAL with Zoom Options."""
     runner = CliRunner()
     with runner.isolated_filesystem():
+        web_tms = morecantile.tms.get("WebMercatorQuad")
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -416,7 +420,7 @@ def test_gdal_zoom_options():
             "cogeo_gdal.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
             use_cog_driver=True,
         )
@@ -432,7 +436,7 @@ def test_gdal_zoom_level_options():
     """Test Web-Optimized GDAL with Zoom Options."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-
+        web_tms = morecantile.tms.get("WebMercatorQuad")
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -442,7 +446,7 @@ def test_gdal_zoom_level_options():
             "cogeo_gdal.tif",
             web_profile,
             quiet=True,
-            web_optimized=True,
+            tms=web_tms,
             config=config,
             use_cog_driver=True,
             zoom_level=19,
