@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unrelease
+
+* remove `is_tiled` rasterio method and add better test for blockshapes for the validation script (author @sgillies, https://github.com/cogeotiff/rio-cogeo/pull/278)
+
 ## 5.1.1 (2024-01-08)
 
 * use morecantile `TileMatrixSet.cellSize` property instead of deprecated/private `TileMatrixSet._resolution` method
