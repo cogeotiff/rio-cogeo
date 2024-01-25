@@ -126,18 +126,23 @@ def cog_translate(  # noqa: C901
         RasterIO Resampling algorithm for overviews
     web_optimized: bool, optional (default: False)
         Create web-optimized cogeo.
+        Deprecated: Behavior changed since 5.1.2. See deprecation warning at the bottom of function doc.
     tms: morecantile.TileMatrixSet, optional (default: "WebMercatorQuad")
         TileMatrixSet to use for reprojection, resolution and alignment.
     zoom_level_strategy: str, optional (default: auto)
         Strategy to determine zoom level (same as in GDAL 3.2).
+        Used only when either "web_optimized" argument is True, or `tms` is not None.
         LOWER will select the zoom level immediately below the theoretical computed non-integral zoom level, leading to subsampling.
         On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
         Defaults to AUTO which selects the closest zoom level.
         ref: https://gdal.org/drivers/raster/cog.html#raster-cog
     zoom_level: int, optional.
-        Zoom level number (starting at 0 for coarsest zoom level). If this option is specified, `--zoom-level-strategy` is ignored.
+        Zoom level number (starting at 0 for coarsest zoom level).
+        If this option is specified, `--zoom-level-strategy` is ignored.
+        In any case, it is used only when either "web_optimized" argument is True, or `tms` is not None.
     aligned_levels: int, optional.
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
+        Used only when either "web_optimized" argument is True, or `tms` is not None.
         Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
     resampling : str, optional (default: "nearest")
         Warp Resampling algorithm.
@@ -167,8 +172,19 @@ def cog_translate(  # noqa: C901
     use_cog_driver: bool, optional (default: False)
         Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
 
+    .. deprecated:: 5.1.2
+        `web_optimized` is deprecated in favor of `tms`.
+        Previously, `tms` usage was conditioned by `web_optimized` state.
+        The behaviour has changed to allow setting a tile matrix set without the need of `web_optimized` flag.
+        `web_optimized` now only serve to activate a default `WebMercatorQuad` tile matrix set.
+        It might be removed in future versions.
     """
-    tms = tms or morecantile.tms.get("WebMercatorQuad")
+    if web_optimized:
+        warnings.warn(
+            "'web_optomized' option is deprecated and will be removed in 6.0. Please use the `tms` option",
+            DeprecationWarning,
+        )
+        tms = tms or morecantile.tms.get("WebMercatorQuad")
 
     dst_kwargs = dst_kwargs.copy()
 
@@ -227,7 +243,7 @@ def cog_translate(  # noqa: C901
             if alpha:
                 vrt_params.update({"add_alpha": False})
 
-            if web_optimized:
+            if tms:
                 wo_params = utils.get_web_optimized_params(
                     src_dst,
                     zoom_level_strategy=zoom_level_strategy,
@@ -345,7 +361,7 @@ def cog_translate(  # noqa: C901
                         ].name.upper()
                     }
                 )
-                if web_optimized:
+                if tms:
                     default_zoom = tms.zoom_for_res(
                         max(tmp_dst.res),
                         max_z=30,
