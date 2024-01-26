@@ -4,6 +4,31 @@
 
 * remove `is_tiled` rasterio method and add better test for blockshapes for the validation script (author @sgillies, https://github.com/cogeotiff/rio-cogeo/pull/278)
 
+* Deprecate parameter **web_optimized** of `cogeo.cog_translate` Python function (author @alexismanin, https://github.com/cogeotiff/rio-cogeo/pull/279)
+
+    ```python
+    # before
+    output_profile = cog_profiles.get(profile)
+
+    tms = morecantile.tms.get("WGS1984Quad")
+    cog_translate(
+        "in.tif",
+        "out.tif",
+        output_profile,
+        web_optimzed=True,
+        tms=tms
+    )
+
+    # now
+    tms = morecantile.tms.get("WGS1984Quad")
+    cog_translate(
+        "in.tif",
+        "out.tif",
+        output_profile,
+        tms=tms
+    )
+    ```
+
 ## 5.1.1 (2024-01-08)
 
 * use morecantile `TileMatrixSet.cellSize` property instead of deprecated/private `TileMatrixSet._resolution` method

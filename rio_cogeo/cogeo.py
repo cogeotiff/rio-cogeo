@@ -177,7 +177,8 @@ def cog_translate(  # noqa: C901
         Previously, `tms` usage was conditioned by `web_optimized` state.
         The behaviour has changed to allow setting a tile matrix set without the need of `web_optimized` flag.
         `web_optimized` now only serve to activate a default `WebMercatorQuad` tile matrix set.
-        It might be removed in future versions.
+        Set to be removed 6.0.
+
     """
     if web_optimized:
         warnings.warn(

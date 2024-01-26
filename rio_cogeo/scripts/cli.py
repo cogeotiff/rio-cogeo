@@ -275,6 +275,7 @@ def create(
     if tms:
         with open(tms, "r") as f:
             tilematrixset = TileMatrixSet(**json.load(f))
+
     elif web_optimized:
         tilematrixset = morecantile.tms.get("WebMercatorQuad")
 
