@@ -101,3 +101,7 @@ ENV/
 .mypy_cache/
 
 .pytest_cache
+
+# Jetbrains IDE (PyCharm or other with Python plugin installed)
+.idea
+*.iml

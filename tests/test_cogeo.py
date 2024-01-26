@@ -3,6 +3,7 @@
 import os
 import pathlib
 
+import morecantile
 import numpy
 import pytest
 import rasterio
@@ -624,6 +625,7 @@ def test_gdal_cog_compare(runner):
 def test_gdal_cog_compareWeb(runner):
     """Test GDAL COG."""
     with runner.isolated_filesystem():
+        web_tms = morecantile.tms.get("WebMercatorQuad")
         profile = cog_profiles.get("jpeg")
         profile["blockxsize"] = 256
         profile["blockysize"] = 256
@@ -635,7 +637,7 @@ def test_gdal_cog_compareWeb(runner):
             profile.copy(),
             quiet=True,
             use_cog_driver=True,
-            web_optimized=True,
+            tms=web_tms,
             aligned_levels=1,
         )
 
@@ -671,12 +673,13 @@ def test_gdal_cog_web_mask(runner):
     """Raise a warning for specific mask/compression/web combination."""
     with runner.isolated_filesystem():
         with pytest.warns(UserWarning):
+            web_tms = morecantile.tms.get("WebMercatorQuad")
             cog_translate(
                 raster_path_rgb,
                 "cogeo.tif",
                 cog_profiles.get("deflate"),
                 use_cog_driver=True,
-                web_optimized=True,
+                tms=web_tms,
                 add_mask=True,
                 quiet=True,
             )
