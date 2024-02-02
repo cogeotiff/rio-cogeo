@@ -564,7 +564,26 @@ def cog_validate(  # noqa: C901
                             )
                         )
 
-            block_offset = src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1)
+            # Get blocks size
+            block_size = src.block_shapes[0]
+
+            # Extract number of blocks per row and column
+            blocks_per_row = src.width // block_size[1]
+            blocks_per_column = src.height // block_size[0]
+
+            # Initialize loop variables
+            y = 0
+            block_offset = None
+
+            # Find the first block with a valid block_offset
+            while y < blocks_per_column and block_offset is None:
+                x = 0
+                while x < blocks_per_row and block_offset is None:
+                    block_offset = src.get_tag_item(
+                        "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1
+                    )
+                    x += 1
+                y += 1
 
             data_offset = int(block_offset) if block_offset else 0
             data_offsets = [data_offset]
@@ -572,9 +591,29 @@ def cog_validate(  # noqa: C901
             details["data_offsets"]["main"] = data_offset
 
             for ix, _dec in enumerate(overviews):
-                block_offset = src.get_tag_item(
-                    "BLOCK_OFFSET_0_0", "TIFF", bidx=1, ovr=ix
-                )
+
+                # Get the width and height of the overview
+                overview_width = src.width // (_dec)
+                overview_height = src.height // (_dec)
+
+                # Extract number of blocks per row and column
+                blocks_per_row = overview_width // block_size[1]
+                blocks_per_column = overview_height // block_size[0]
+
+                # Initialize loop variables
+                y = 0
+                block_offset = None
+
+                # Find the first block with a valid block_offset
+                while y < blocks_per_column and block_offset is None:
+                    x = 0
+                    while x < blocks_per_row and block_offset is None:
+                        block_offset = src.get_tag_item(
+                            "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1, ovr=ix
+                        )
+                        x += 1
+                    y += 1
+
                 data_offset = int(block_offset) if block_offset else 0
                 data_offsets.append(data_offset)
                 details["data_offsets"]["overview_{}".format(ix)] = data_offset
