@@ -568,27 +568,21 @@ def cog_validate(  # noqa: C901
             block_size = src.block_shapes[0]
 
             # Extract number of blocks per row and column
-            blocks_per_row = src.width // block_size[1]
-            blocks_per_column = src.height // block_size[0]
-
-            # Initialize loop variables
-            y = 0
-            block_offset = None
+            yblocks = (src.height + block_size[1] - 1) // block_size[1]
+            xblocks = (src.width + block_size[0] - 1) // block_size[0]
 
             # Find the first block with a valid block_offset
-            while y < blocks_per_column and block_offset is None:
-                x = 0
-                while x < blocks_per_row and block_offset is None:
-                    block_offset = src.get_tag_item(
-                        "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1
-                    )
-                    x += 1
-                y += 1
-
-            data_offset = int(block_offset) if block_offset else 0
-            data_offsets = [data_offset]
-            details["data_offsets"] = {}
-            details["data_offsets"]["main"] = data_offset
+            for y in range(yblocks):
+                for x in range(xblocks):
+                    data_offset = get_data_offset(src, x, y)
+                    if data_offset > 0:
+                        data_offsets = [data_offset]
+                        details["data_offsets"] = {}
+                        details["data_offsets"]["main"] = data_offset
+                        break
+                else:
+                    continue
+                break
 
             for ix, _dec in enumerate(overviews):
 
@@ -597,26 +591,22 @@ def cog_validate(  # noqa: C901
                 overview_height = src.height // (_dec)
 
                 # Extract number of blocks per row and column
-                blocks_per_row = overview_width // block_size[1]
-                blocks_per_column = overview_height // block_size[0]
+                yblocks = (overview_height + block_size[1] - 1) // block_size[1]
+                xblocks = (overview_width + block_size[0] - 1) // block_size[0]
 
-                # Initialize loop variables
-                y = 0
-                block_offset = None
-
-                # Find the first block with a valid block_offset
-                while y < blocks_per_column and block_offset is None:
-                    x = 0
-                    while x < blocks_per_row and block_offset is None:
-                        block_offset = src.get_tag_item(
-                            "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1, ovr=ix
-                        )
-                        x += 1
-                    y += 1
-
-                data_offset = int(block_offset) if block_offset else 0
-                data_offsets.append(data_offset)
-                details["data_offsets"]["overview_{}".format(ix)] = data_offset
+                for y in range(yblocks):
+                    for x in range(xblocks):
+                        data_offset = get_data_offset(src, x, y, ix)
+                        if data_offset > 0:
+                            data_offset = int(data_offset) if data_offset else 0
+                            data_offsets.append(data_offset)
+                            details["data_offsets"][
+                                "overview_{}".format(ix)
+                            ] = data_offset
+                            break
+                    else:
+                        continue
+                    break
 
             if data_offsets[-1] != 0 and data_offsets[-1] < ifd_offsets[-1]:
                 if len(overviews) > 0:
@@ -668,6 +658,30 @@ def cog_validate(  # noqa: C901
     is_valid = False if errors or (warnings and strict) else True
 
     return is_valid, errors, warnings
+
+
+def get_data_offset(src, x, y, ix=None):
+    """
+    Retrieves the data offset from the source based on the given block coordinates.
+
+    Parameters:
+        src : object
+            The source from which to retrieve the data offset.
+        x : int
+            The x-coordinate of the block.
+        y : int
+            The y-coordinate of the block.
+        ix : int, optional
+            The index of the overview. Default is None.
+
+    Returns:
+        int
+            The data offset retrieved from the source. Returns 0 if the data offset is None.
+    """
+    data_offset = src.get_tag_item(
+        "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1, ovr=ix
+    )
+    return int(data_offset) if data_offset is not None else 0
 
 
 def cog_info(
