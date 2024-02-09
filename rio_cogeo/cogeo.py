@@ -564,20 +564,49 @@ def cog_validate(  # noqa: C901
                             )
                         )
 
-            block_offset = src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1)
+            # Get blocks size
+            block_size = src.block_shapes[0]
 
-            data_offset = int(block_offset) if block_offset else 0
-            data_offsets = [data_offset]
-            details["data_offsets"] = {}
-            details["data_offsets"]["main"] = data_offset
+            # Extract number of blocks per row and column
+            yblocks = (src.height + block_size[1] - 1) // block_size[1]
+            xblocks = (src.width + block_size[0] - 1) // block_size[0]
+
+            # Find the first block with a valid block_offset
+            for y in range(yblocks):
+                for x in range(xblocks):
+                    data_offset = get_data_offset(src, x, y)
+                    if data_offset > 0:
+                        data_offsets = [data_offset]
+                        details["data_offsets"] = {}
+                        details["data_offsets"]["main"] = data_offset
+                        break
+                else:
+                    continue
+                break
 
             for ix, _dec in enumerate(overviews):
-                block_offset = src.get_tag_item(
-                    "BLOCK_OFFSET_0_0", "TIFF", bidx=1, ovr=ix
-                )
-                data_offset = int(block_offset) if block_offset else 0
-                data_offsets.append(data_offset)
-                details["data_offsets"]["overview_{}".format(ix)] = data_offset
+
+                # Get the width and height of the overview
+                overview_width = src.width // (_dec)
+                overview_height = src.height // (_dec)
+
+                # Extract number of blocks per row and column
+                yblocks = (overview_height + block_size[1] - 1) // block_size[1]
+                xblocks = (overview_width + block_size[0] - 1) // block_size[0]
+
+                for y in range(yblocks):
+                    for x in range(xblocks):
+                        data_offset = get_data_offset(src, x, y, ix)
+                        if data_offset > 0:
+                            data_offset = int(data_offset) if data_offset else 0
+                            data_offsets.append(data_offset)
+                            details["data_offsets"][
+                                "overview_{}".format(ix)
+                            ] = data_offset
+                            break
+                    else:
+                        continue
+                    break
 
             if data_offsets[-1] != 0 and data_offsets[-1] < ifd_offsets[-1]:
                 if len(overviews) > 0:
@@ -629,6 +658,30 @@ def cog_validate(  # noqa: C901
     is_valid = False if errors or (warnings and strict) else True
 
     return is_valid, errors, warnings
+
+
+def get_data_offset(src, x, y, ix=None):
+    """
+    Retrieves the data offset from the source based on the given block coordinates.
+
+    Parameters:
+        src : object
+            The source from which to retrieve the data offset.
+        x : int
+            The x-coordinate of the block.
+        y : int
+            The y-coordinate of the block.
+        ix : int, optional
+            The index of the overview. Default is None.
+
+    Returns:
+        int
+            The data offset retrieved from the source. Returns 0 if the data offset is None.
+    """
+    data_offset = src.get_tag_item(
+        "BLOCK_OFFSET_%d_%d" % (x, y), "TIFF", bidx=1, ovr=ix
+    )
+    return int(data_offset) if data_offset is not None else 0
 
 
 def cog_info(
