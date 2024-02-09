@@ -29,6 +29,8 @@
     )
     ```
 
+* fix COG validation for SPARSE dataset (author @mpadillaruiz, https://github.com/cogeotiff/rio-cogeo/issues/281)
+
 ## 5.1.1 (2024-01-08)
 
 * use morecantile `TileMatrixSet.cellSize` property instead of deprecated/private `TileMatrixSet._resolution` method
