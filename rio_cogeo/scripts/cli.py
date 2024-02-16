@@ -270,11 +270,23 @@ def create(
         tilematrixset = morecantile.tms.get("WebMercatorQuad")
 
     if tilematrixset:
-        blocksize = blocksize or min(
-            tilematrixset.matrix(tilematrixset.minzoom).tileHeight,
-            tilematrixset.matrix(tilematrixset.minzoom).tileWidth,
-        )
-        overview_blocksize = overview_blocksize or blocksize
+        if not blocksize:
+            click.secho(
+                f"Defining `blocksize` from {tilematrixset.id} TileMatrixSet `tileWidth` and `tileHeight`",
+                fg="yellow",
+            )
+
+            blocksize = min(
+                tilematrixset.matrix(tilematrixset.minzoom).tileHeight,
+                tilematrixset.matrix(tilematrixset.minzoom).tileWidth,
+            )
+
+        if not overview_blocksize:
+            click.secho(
+                f"Defining overview's `blocksize` to match the high resolution `blocksize`: {blocksize}",
+                fg="yellow",
+            )
+            overview_blocksize = blocksize
 
     if blocksize:
         output_profile["blockxsize"] = blocksize
