@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unrelease
+## 5.2.0 (2024-02-16)
 
 * remove `is_tiled` rasterio method and add better test for blockshapes for the validation script (author @sgillies, https://github.com/cogeotiff/rio-cogeo/pull/278)
 
