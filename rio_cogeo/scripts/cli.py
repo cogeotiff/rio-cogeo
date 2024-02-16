@@ -131,10 +131,8 @@ def cogeo():
 )
 @click.option(
     "--overview-blocksize",
-    default=lambda: os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE", 128),
-    help="Overview's internal tile size (default defined by "
-    "GDAL_TIFF_OVR_BLOCKSIZE env or 128)",
-    show_default=True,
+    help="Overview's internal tile size (default can be defined by "
+    "GDAL_TIFF_OVR_BLOCKSIZE env). The default is 128, or starting with GDAL 3.1 to use the same block size as the full-resolution dataset if possible).",
 )
 @click.option(
     "--web-optimized", "-w", is_flag=True, help="Create COGEO optimized for Web."
@@ -251,25 +249,17 @@ def create(
     quiet,
 ):
     """Create Cloud Optimized Geotiff."""
-    output_profile = cog_profiles.get(cogeo_profile)
-    output_profile.update({"BIGTIFF": os.environ.get("BIGTIFF", "IF_SAFER")})
-    if creation_options:
-        output_profile.update(creation_options)
-
-    if blocksize:
-        output_profile["blockxsize"] = blocksize
-        output_profile["blockysize"] = blocksize
-
-    if web_optimized:
-        overview_blocksize = blocksize or 512
-
     config.update(
         {
             "GDAL_NUM_THREADS": threads,
             "GDAL_TIFF_INTERNAL_MASK": os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-            "GDAL_TIFF_OVR_BLOCKSIZE": str(overview_blocksize),
         }
     )
+
+    output_profile = cog_profiles.get(cogeo_profile)
+    output_profile.update({"BIGTIFF": os.environ.get("BIGTIFF", "IF_SAFER")})
+    if creation_options:
+        output_profile.update(creation_options)
 
     tilematrixset: Optional[TileMatrixSet] = None
     if tms:
@@ -278,6 +268,33 @@ def create(
 
     elif web_optimized:
         tilematrixset = morecantile.tms.get("WebMercatorQuad")
+
+    if tilematrixset:
+        if not blocksize:
+            click.secho(
+                f"Defining `blocksize` from {tilematrixset.id} TileMatrixSet `tileWidth` and `tileHeight`",
+                fg="yellow",
+            )
+
+            blocksize = min(
+                tilematrixset.matrix(tilematrixset.minzoom).tileHeight,
+                tilematrixset.matrix(tilematrixset.minzoom).tileWidth,
+            )
+
+        if not overview_blocksize:
+            click.secho(
+                f"Defining overview's `blocksize` to match the high resolution `blocksize`: {blocksize}",
+                fg="yellow",
+            )
+            overview_blocksize = blocksize
+
+    if blocksize:
+        output_profile["blockxsize"] = blocksize
+        output_profile["blockysize"] = blocksize
+
+    overview_blocksize = overview_blocksize or os.environ.get("GDAL_TIFF_OVR_BLOCKSIZE")
+    if overview_blocksize:
+        config.update({"GDAL_TIFF_OVR_BLOCKSIZE": str(overview_blocksize)})
 
     cog_translate(
         input,

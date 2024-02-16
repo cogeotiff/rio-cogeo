@@ -31,6 +31,14 @@
 
 * fix COG validation for SPARSE dataset (author @mpadillaruiz, https://github.com/cogeotiff/rio-cogeo/issues/281)
 
+#### CLI
+
+* remove default (*128*) for `--overview-blocksize` option in the CLI. Now defaults to GDAL behaviour.
+
+* change how `blocksize` for overviews is defined when using `tms` or `web-optimized` options
+
+* `blocksize` is now defined from the tilematrixset's `tileWidth` and `tileHeight` when `--blocksize` is not provided
+
 ## 5.1.1 (2024-01-08)
 
 * use morecantile `TileMatrixSet.cellSize` property instead of deprecated/private `TileMatrixSet._resolution` method

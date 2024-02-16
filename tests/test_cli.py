@@ -2,6 +2,7 @@
 
 import os
 
+import morecantile
 import pytest
 import rasterio
 
@@ -513,30 +514,23 @@ def test_cogeo_validUpercaseProfile(monkeypatch, runner):
             assert src.compression.value == "DEFLATE"
 
 
-def test_cogeo_info(runner):
+@pytest.mark.parametrize(
+    "src_path",
+    [
+        raster_path_rgb,
+        raster_invalid_cog,
+        raster_band_tags,
+        raster_path_gcps,
+    ],
+)
+def test_cogeo_info(src_path, runner):
     """Should work as expected."""
     with runner.isolated_filesystem():
-        result = runner.invoke(cogeo, ["info", raster_path_rgb])
+        result = runner.invoke(cogeo, ["info", src_path])
         assert not result.exception
         assert result.exit_code == 0
 
-        result = runner.invoke(cogeo, ["info", raster_path_rgb, "--json"])
-        assert not result.exception
-        assert result.exit_code == 0
-
-        result = runner.invoke(cogeo, ["info", raster_invalid_cog])
-        assert not result.exception
-        assert result.exit_code == 0
-
-        result = runner.invoke(cogeo, ["info", raster_path_gcps])
-        assert not result.exception
-        assert result.exit_code == 0
-
-        result = runner.invoke(cogeo, ["info", raster_band_tags, "--json"])
-        assert not result.exception
-        assert result.exit_code == 0
-
-        result = runner.invoke(cogeo, ["info", raster_band_tags])
+        result = runner.invoke(cogeo, ["info", src_path, "--json"])
         assert not result.exception
         assert result.exit_code == 0
 
@@ -577,3 +571,104 @@ def test_cogeo_zoom_level(runner):
         with rasterio.open("output.tif") as src:
             _, max_zoom = get_zooms(src)
             assert max_zoom == 19
+
+
+def test_create_web_tms(runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--web-optimized",
+                "--aligned-levels",
+                2,
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            meta = src.profile
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=0) as src:
+            meta_ovr = src.profile
+            assert meta_ovr["blockysize"] == meta["blockysize"]
+
+        with open("webmercator.json", "w") as f:
+            tms = morecantile.tms.get("WebMercatorQuad")
+            f.write(tms.model_dump_json())
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--aligned-levels",
+                "2",
+                "--tms",
+                "webmercator.json",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            meta_tms = src.profile
+
+        assert meta_tms["crs"] == meta["crs"]
+        assert meta_tms["transform"] == meta["transform"]
+        assert meta_tms["blockysize"] == meta["blockysize"] == 256
+        assert meta_tms["width"] == meta["width"]
+        assert meta_tms["height"] == meta["height"]
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=0) as src:
+            meta_ovr = src.profile
+            assert meta_ovr["blockysize"] == meta_tms["blockysize"] == 256
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--aligned-levels",
+                "2",
+                "--blocksize",
+                512,
+                "--tms",
+                "webmercator.json",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            meta_tms = src.profile
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=0) as src:
+            meta_ovr = src.profile
+            assert meta_ovr["blockysize"] == meta_tms["blockysize"] == 512
+
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--aligned-levels",
+                "2",
+                "--blocksize",
+                512,
+                "--overview-blocksize",
+                128,
+                "--tms",
+                "webmercator.json",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+
+        with rasterio.open("output.tif", OVERVIEW_LEVEL=0) as src:
+            meta_ovr = src.profile
+            assert meta_ovr["blockysize"] == 128
