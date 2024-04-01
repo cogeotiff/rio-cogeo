@@ -123,6 +123,14 @@ def cogeo():
     "internal blocksize)",
 )
 @click.option(
+    "--decimation-base",
+    type=int,
+    help="Decimation base, how to sub-divide a raster for each overview level. "
+    "Also requires that --overview-level is provided.",
+    default=2,
+    show_default=True,
+)
+@click.option(
     "--overview-resampling",
     help="Overview creation resampling algorithm.",
     type=click.Choice(list(typing.get_args(RIOResampling))),
@@ -230,6 +238,7 @@ def create(
     add_mask,
     blocksize,
     overview_level,
+    decimation_base,
     overview_resampling,
     overview_blocksize,
     web_optimized,
@@ -318,6 +327,7 @@ def create(
         tms=tilematrixset,
         use_cog_driver=use_cog_driver,
         quiet=quiet,
+        decimation_base=decimation_base,
     )
 
 

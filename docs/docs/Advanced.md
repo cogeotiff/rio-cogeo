@@ -41,6 +41,20 @@ print(overviews)
 [2, 4, 8]
 ```
 
+### Decimation Base
+
+As described above, a decimation base of 2 is used by default. However you can provide a custom base, N > 1, with *--decimation-base N*. Optimal overviews are computed assuming a base 2 is used, so using *--decimation-base* also requires that *--overview-level* is provided. Similar to the default example, here are the overviews for base 3:
+
+```python
+overview_level = 3
+decimation_base = 3
+overviews = [decimation_base ** j for j in range(1, overview_level + 1)]
+print(overviews)
+[3, 9, 27]
+```
+
+This is primarily useful when working with [custom TileMatrixSets](https://developmentseed.org/morecantile/usage/#define-custom-grid) that also use a non-default decimation base.
+
 ## Band metadata
 By default rio cogeo DO NOT forward **band** metadata (e.g statistics) to the output dataset.
 
