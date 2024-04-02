@@ -98,6 +98,7 @@ def cog_translate(  # noqa: C901
     colormap: Optional[Dict] = None,
     additional_cog_metadata: Optional[Dict] = None,
     use_cog_driver: bool = False,
+    decimation_base: int = 2,
 ):
     """
     Create Cloud Optimized Geotiff.
@@ -171,6 +172,10 @@ def cog_translate(  # noqa: C901
         Additional dataset metadata to add to the COG.
     use_cog_driver: bool, optional (default: False)
         Use GDAL COG driver if set to True. COG driver is available starting with GDAL 3.1.
+    decimation_base: int, default: 2
+        How overviews are divided at each zoom level (default is 2). Must be greater than 1.
+        Also requires that `overview_level` is provided for `decimation_base` values greater
+        than 2.
 
     .. deprecated:: 5.1.2
         `web_optimized` is deprecated in favor of `tms`.
@@ -186,6 +191,15 @@ def cog_translate(  # noqa: C901
             DeprecationWarning,
         )
         tms = tms or morecantile.tms.get("WebMercatorQuad")
+
+    if decimation_base <= 1:
+        raise ValueError(
+            "Decimation base must be greater than 1 for building overviews."
+        )
+    elif decimation_base > 2 and overview_level is None:
+        raise ValueError(
+            "Decimation base values greater than 2 require that overview_level is defined."
+        )
 
     dst_kwargs = dst_kwargs.copy()
 
@@ -343,7 +357,7 @@ def cog_translate(  # noqa: C901
                 if not quiet and overview_level:
                     click.echo("Adding overviews...", err=True)
 
-                overviews = [2**j for j in range(1, overview_level + 1)]
+                overviews = [decimation_base**j for j in range(1, overview_level + 1)]
                 tmp_dst.build_overviews(overviews, ResamplingEnums[overview_resampling])
 
                 if not quiet:

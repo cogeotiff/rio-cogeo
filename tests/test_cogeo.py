@@ -724,3 +724,23 @@ def test_cog_translate_forward_ns_metadata(runner):
             with rasterio.open("cogeo.tif") as src:
                 assert src.tags(ns="IMD")
                 assert src.tags(ns="RPC")
+
+
+def test_cog_translate_decimation_base(runner):
+    """Should create proper overviews when using custom decimation base."""
+    with runner.isolated_filesystem():
+
+        base_level_pairs = [(3, 6), (4, 5), (5, 4)]
+
+        for decimation_base, overview_level in base_level_pairs:
+            cog_translate(
+                raster_path_rgb,
+                "cogeo.tif",
+                cog_profiles.get("deflate"),
+                decimation_base=decimation_base,
+                overview_level=overview_level,
+                quiet=True,
+            )
+
+            with rasterio.open("cogeo.tif") as src:
+                assert src.overviews(1)[0] == decimation_base

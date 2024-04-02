@@ -210,6 +210,28 @@ def test_cogeo_validOvrOption(runner):
             assert src.overviews(1) == [2, 4]
 
 
+def test_cogeo_decimation_base_option(runner):
+    """Should work as expected."""
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cogeo,
+            [
+                "create",
+                raster_path_rgb,
+                "output.tif",
+                "--decimation-base",
+                3,
+                "--overview-level",
+                6,
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open("output.tif") as src:
+            assert len(src.overviews(1)) == 6
+            assert src.overviews(1)[0] == 3
+
+
 def test_cogeo_overviewTilesize(monkeypatch, runner):
     """Should work as expected."""
     with runner.isolated_filesystem():
