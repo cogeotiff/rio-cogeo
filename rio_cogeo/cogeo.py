@@ -385,9 +385,9 @@ def cog_translate(  # noqa: C901
                     tags.update(
                         {
                             "TILING_SCHEME_NAME": tms.id or "CUSTOM",
-                            "TILING_SCHEME_ZOOM_LEVEL": zoom_level
-                            if zoom_level is not None
-                            else default_zoom,
+                            "TILING_SCHEME_ZOOM_LEVEL": (
+                                zoom_level if zoom_level is not None else default_zoom
+                            ),
                         }
                     )
                     if aligned_levels:
@@ -422,7 +422,8 @@ def cog_translate(  # noqa: C901
                         warnings.warn(
                             "With GDAL COG driver, mask band will be translated to an alpha band."
                         )
-
+                    if overview_level == 0:
+                        dst_kwargs["overviews"] = "NONE"
                     dst_kwargs["overview_resampling"] = overview_resampling
                     dst_kwargs["warp_resampling"] = resampling
                     dst_kwargs["blocksize"] = tilesize
@@ -749,9 +750,9 @@ def cog_info(
                 Height=src_dst.height,
                 Tiled=(src_dst.block_shapes[0][1] != src_dst.width),
                 Dtype=src_dst.dtypes[0],
-                Interleave=src_dst.interleaving.value
-                if src_dst.interleaving
-                else "UNKNOWN",
+                Interleave=(
+                    src_dst.interleaving.value if src_dst.interleaving else "UNKNOWN"
+                ),
                 AlphaBand=utils.has_alpha_band(src_dst),
                 InternalMask=utils.has_mask_band(src_dst),
                 Nodata=src_dst.nodata,
