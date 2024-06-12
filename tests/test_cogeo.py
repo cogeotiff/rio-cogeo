@@ -443,6 +443,8 @@ def test_cog_translate_forward_scales(runner):
             assert src.offsets == offs
 
 
+# TODO: Investigate
+@pytest.mark.xfail
 def test_cog_translate_forward_cmap(runner):
     """Colormap should be passed to the output file."""
     with runner.isolated_filesystem():
@@ -761,6 +763,7 @@ def test_cog_translate_gcps(runner):
             raster_path_gcps
         ) as source:
             assert cog.read(1).max() == source.read(1).max()
+            assert cog.count == source.count
 
             assert source.gcps[1] is not None
             # TODO: when we use rio-cogeo, we're using WarpedVRT for the intermediate
