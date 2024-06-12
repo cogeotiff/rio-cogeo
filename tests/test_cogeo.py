@@ -37,6 +37,7 @@ raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
 raster_web_z5_z11 = os.path.join(FIXTURES_DIR, "image_web_z5_z11.tif")
 raster_band_tags = os.path.join(FIXTURES_DIR, "cog_band_tags.tif")
 raster_ns_meta = os.path.join(FIXTURES_DIR, "dataset_namespace_metadata.tif")
+raster_path_gcps = os.path.join(FIXTURES_DIR, "slc.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -744,3 +745,25 @@ def test_cog_translate_decimation_base(runner):
 
             with rasterio.open("cogeo.tif") as src:
                 assert src.overviews(1)[0] == decimation_base
+
+
+def test_cog_translate_gcps(runner):
+    """Should create proper COG."""
+    with runner.isolated_filesystem():
+        cog_translate(
+            raster_path_gcps,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+        )
+
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_gcps
+        ) as source:
+            assert cog.read(1).max() == source.read(1).max()
+
+            assert source.gcps[1] is not None
+            # TODO: when we use rio-cogeo, we're using WarpedVRT for the intermediate
+            # step. This result on the output COG to be `reprojected` automatically
+            # ref: https://github.com/cogeotiff/rio-cogeo/issues/292
+            assert cog.gcps[1] is None

@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.3.1 (2024-06-12)
+
+* fix issue when creating COG from file with internal GCPS
+
 ## 5.3.0 (2024-03-02)
 
 * add `decimation_base` option in `cogeo.cog_translate` (author @mccarthyryanc, https://github.com/cogeotiff/rio-cogeo/pull/285)
