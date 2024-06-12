@@ -17,6 +17,7 @@ from rasterio.env import GDALVersion
 from rasterio.io import DatasetReader, DatasetWriter, MemoryFile
 from rasterio.rio.overview import get_maximum_overview_level
 from rasterio.shutil import copy
+from rasterio.transform import from_gcps as transform_from_gcps
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import models, utils
@@ -249,6 +250,13 @@ def cog_translate(  # noqa: C901
                 "height": src_dst.height,
                 "resampling": ResamplingEnums[resampling],
             }
+            if src_dst.gcps[1]:
+                vrt_params.update(
+                    {
+                        "src_crs": src_dst.gcps[1],
+                        "src_transform": transform_from_gcps(src_dst.gcps[0]),
+                    }
+                )
 
             if nodata is not None:
                 vrt_params.update(

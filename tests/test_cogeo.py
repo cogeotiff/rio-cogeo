@@ -37,6 +37,7 @@ raster_badoutputsize = os.path.join(FIXTURES_DIR, "bad_output_vrt.tif")
 raster_web_z5_z11 = os.path.join(FIXTURES_DIR, "image_web_z5_z11.tif")
 raster_band_tags = os.path.join(FIXTURES_DIR, "cog_band_tags.tif")
 raster_ns_meta = os.path.join(FIXTURES_DIR, "dataset_namespace_metadata.tif")
+raster_path_gcps = os.path.join(FIXTURES_DIR, "slc.tif")
 
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 64, "blockysize": 64})
@@ -446,7 +447,9 @@ def test_cog_translate_forward_cmap(runner):
     """Colormap should be passed to the output file."""
     with runner.isolated_filesystem():
         with rasterio.open(raster_colormap) as dataset:
-            cog_translate(dataset, "cogeo.tif", deflate_profile, quiet=True)
+            cog_translate(
+                dataset, "cogeo.tif", deflate_profile, quiet=True, dtype="uint8"
+            )
 
             with rasterio.open("cogeo.tif") as cog:
                 assert cog.colormap(1) == dataset.colormap(1)
@@ -456,7 +459,12 @@ def test_cog_translate_forward_cmap(runner):
         cmap = {0: (0, 0, 0, 0), 1: (1, 2, 3, 255)}
         with rasterio.open(raster_nocolormap) as dataset:
             cog_translate(
-                dataset, "cogeo.tif", deflate_profile, quiet=True, colormap=cmap
+                dataset,
+                "cogeo.tif",
+                deflate_profile,
+                quiet=True,
+                colormap=cmap,
+                dtype="uint8",
             )
             with rasterio.open("cogeo.tif") as cog:
                 assert cog.colormap(1)[1] == cmap[1]
@@ -471,6 +479,7 @@ def test_cog_translate_forward_cmap(runner):
                     quiet=True,
                     colormap=cmap,
                     indexes=(1, 1, 1),
+                    dtype="uint8",
                 )
 
         # add an external colormap (warns of wrong colorinterp)
@@ -483,6 +492,7 @@ def test_cog_translate_forward_cmap(runner):
                     quiet=True,
                     colormap=cmap,
                     indexes=(1,),
+                    dtype="uint8",
                 )
                 with rasterio.open("cogeo.tif") as cog:
                     assert cog.colormap(1)[1] == cmap[1]
@@ -492,7 +502,9 @@ def test_cog_translate_forward_cmap(runner):
         # Input dataset has colorinterp set to `Palette` but no colormap
         with pytest.warns(UserWarning):
             with rasterio.open(raster_nocolormap) as dataset:
-                cog_translate(dataset, "cogeo.tif", deflate_profile, quiet=True)
+                cog_translate(
+                    dataset, "cogeo.tif", deflate_profile, quiet=True, dtype="uint8"
+                )
                 with rasterio.open("cogeo.tif") as cog:
                     assert cog.colorinterp == dataset.colorinterp
 
@@ -744,3 +756,26 @@ def test_cog_translate_decimation_base(runner):
 
             with rasterio.open("cogeo.tif") as src:
                 assert src.overviews(1)[0] == decimation_base
+
+
+def test_cog_translate_gcps(runner):
+    """Should create proper COG."""
+    with runner.isolated_filesystem():
+        cog_translate(
+            raster_path_gcps,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+        )
+
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_gcps
+        ) as source:
+            assert cog.read(1).max() == source.read(1).max()
+            assert cog.count == source.count
+
+            assert source.gcps[1] is not None
+            # TODO: when we use rio-cogeo, we're using WarpedVRT for the intermediate
+            # step. This result on the output COG to be `reprojected` automatically
+            # ref: https://github.com/cogeotiff/rio-cogeo/issues/292
+            assert cog.gcps[1] is None
