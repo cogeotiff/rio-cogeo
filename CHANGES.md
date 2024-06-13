@@ -1,5 +1,10 @@
 # Release Notes
 
+## 5.3.2 (2024-06-13)
+
+* do not set output size in the intermediate VRT
+* add Alpha band for GCPS wrapped dataset
+
 ## 5.3.1 (2024-06-12)
 
 * fix issue when creating COG from file with internal GCPS

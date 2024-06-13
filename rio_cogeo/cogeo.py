@@ -227,6 +227,13 @@ def cog_translate(  # noqa: C901
                     "Cannot add a colormap for multiple bands data."
                 )
 
+            # we need to remove the `alpha band` index from the output data
+            # when we translate the band to an internal mask
+            if alpha and add_mask:
+                indexes = tuple(
+                    x for x in indexes if x in utils.non_alpha_indexes(src_dst)
+                )
+
             if not add_mask and (
                 (nodata is not None or alpha)
                 and dst_kwargs.get("compress", "").lower() == "jpeg"
@@ -241,10 +248,11 @@ def cog_translate(  # noqa: C901
                     else indexes
                 )
 
+            src_indexes = indexes
+
             tilesize = min(int(dst_kwargs["blockxsize"]), int(dst_kwargs["blockysize"]))
 
             vrt_params = {
-                "add_alpha": True,
                 "dtype": dtype,
                 "width": src_dst.width,
                 "height": src_dst.height,
@@ -253,6 +261,7 @@ def cog_translate(  # noqa: C901
             if src_dst.gcps[1]:
                 vrt_params.update(
                     {
+                        "add_alpha": True,
                         "src_crs": src_dst.gcps[1],
                         "src_transform": transform_from_gcps(src_dst.gcps[0]),
                     }
@@ -263,8 +272,11 @@ def cog_translate(  # noqa: C901
                     {"nodata": nodata, "add_alpha": False, "src_nodata": nodata}
                 )
 
-            if alpha:
+            elif alpha:
                 vrt_params.update({"add_alpha": False})
+
+            elif mask:
+                vrt_params.update({"add_alpha": True})
 
             if tms:
                 wo_params = utils.get_web_optimized_params(
@@ -275,6 +287,9 @@ def cog_translate(  # noqa: C901
                     tms=tms,
                 )
                 vrt_params.update(**wo_params)
+
+            if vrt_params.get("add_alpha", False) and not (add_mask or mask):
+                indexes = tuple(indexes) + (src_dst.count + 1,)
 
             with WarpedVRT(src_dst, **vrt_params) as vrt_dst:
                 meta = vrt_dst.meta
@@ -371,7 +386,7 @@ def cog_translate(  # noqa: C901
                 if not quiet:
                     click.echo("Updating dataset tags...", err=True)
 
-                for i, b in enumerate(indexes):
+                for i, b in enumerate(src_indexes):
                     tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
                     if forward_band_tags:
                         tmp_dst.update_tags(bidx=i + 1, **src_dst.tags(b))
