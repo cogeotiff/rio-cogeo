@@ -198,6 +198,35 @@ def test_cog_translate_validAlpha(runner):
                 assert src.compression.value == "JPEG"
                 assert has_mask_band(src)
 
+        cog_translate(
+            raster_path_rgba,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+        )
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_rgba
+        ) as source:
+            assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
+            assert cog.count == source.count
+            assert cog.colorinterp == source.colorinterp
+
+        cog_translate(
+            raster_path_rgba,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+            add_mask=True,
+        )
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_rgba
+        ) as source:
+            assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
+            assert cog.count <= source.count
+            assert cog.colorinterp != source.colorinterp
+            assert has_mask_band(cog)
+            assert not has_alpha_band(cog)
+
 
 def test_cog_translate_valiNodataNan(runner):
     """Should work as expected and create mask from NaN."""
@@ -274,8 +303,19 @@ def test_cog_translate_mask(runner):
     """Should work as expected (copy mask from input)."""
     with runner.isolated_filesystem():
         cog_translate(raster_path_mask, "cogeo.tif", jpeg_profile, quiet=True)
-        with rasterio.open("cogeo.tif") as src:
-            assert has_mask_band(src)
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_mask
+        ) as source:
+            assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
+            assert cog.count == source.count
+            assert cog.colorinterp == source.colorinterp
+            assert has_mask_band(cog)
+
+            arr = cog.read(1, masked=True)
+            cog_mask = arr.mask
+            arr = source.read(1, masked=True)
+            source_mask = arr.mask
+            numpy.testing.assert_array_equal(cog_mask, source_mask)
 
 
 def test_cog_translate_tags(runner):
@@ -577,6 +617,7 @@ def test_temporaryRaster(fname, is_local, runner):
         raster_path_nan,
         raster_path_nodata,
         raster_path_float,
+        raster_path_gcps,
     ],
 )
 def test_gdal_cog(src_path, runner):
@@ -772,10 +813,75 @@ def test_cog_translate_gcps(runner):
             raster_path_gcps
         ) as source:
             assert cog.read(1).max() == source.read(1).max()
-            assert cog.count == source.count
+            assert not cog.count == source.count
 
             assert source.gcps[1] is not None
             # TODO: when we use rio-cogeo, we're using WarpedVRT for the intermediate
             # step. This result on the output COG to be `reprojected` automatically
             # ref: https://github.com/cogeotiff/rio-cogeo/issues/292
             assert cog.gcps[1] is None
+            # we add an alpha band
+            assert cog.count == 2
+            assert cog.colorinterp == (ColorInterp.gray, ColorInterp.alpha)
+
+        cog_translate(
+            raster_path_gcps,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            add_mask=True,
+            quiet=True,
+        )
+
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(
+            raster_path_gcps
+        ) as source:
+            assert cog.read(1).max() == source.read(1).max()
+            assert cog.count == source.count
+            assert cog.count == 1
+            assert cog.colorinterp == (ColorInterp.gray,)
+            assert has_mask_band(cog)
+
+            assert source.gcps[1] is not None
+            # TODO: when we use rio-cogeo, we're using WarpedVRT for the intermediate
+            # step. This result on the output COG to be `reprojected` automatically
+            # ref: https://github.com/cogeotiff/rio-cogeo/issues/292
+            assert cog.gcps[1] is None
+
+
+@pytest.mark.parametrize(
+    "src_path",
+    [
+        raster_path_rgb,
+        raster_path_nodata,
+        raster_path_missingnodata,
+        raster_path_mask,
+        raster_path_small,
+    ],
+)
+def test_cog_values(src_path, runner):
+    """Test that COG values are the same."""
+    with runner.isolated_filesystem():
+        cog_translate(
+            src_path,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+        )
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(src_path) as source:
+            assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
+            assert cog.count == source.count
+            assert cog.colorinterp == source.colorinterp
+
+        cog_translate(
+            src_path,
+            "cogeo.tif",
+            cog_profiles.get("deflate"),
+            quiet=True,
+            add_mask=True,
+        )
+        with rasterio.open("cogeo.tif") as cog, rasterio.open(src_path) as source:
+            assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
+            assert cog.count == source.count
+            assert cog.colorinterp == source.colorinterp
+            assert has_mask_band(cog)
+            assert not has_alpha_band(cog)
