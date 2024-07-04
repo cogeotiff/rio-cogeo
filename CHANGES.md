@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.3.3 (2024-07-04)
+
+* remove Numpy requirement in `pyproject.toml`
+
 ## 5.3.2 (2024-06-13)
 
 * do not set output size in the intermediate VRT

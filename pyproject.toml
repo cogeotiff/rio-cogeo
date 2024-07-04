@@ -22,7 +22,6 @@ dynamic = ["version"]
 dependencies = [
     "click>=7.0",
     "rasterio>=1.3.3",
-    "numpy~=1.15",
     "morecantile>=5.0,<6.0",
     "pydantic~=2.0",
 ]
@@ -101,3 +100,17 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "B905",  # ignore zip() without an explicit strict= parameter, only support with python >3.10
 ]
+
+
+[tool.bumpversion]
+current_version = "5.3.2"
+search = "{current_version}"
+replace = "{new_version}"
+tag = true
+commit = true
+tag_name = "{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "rio_cogeo/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
