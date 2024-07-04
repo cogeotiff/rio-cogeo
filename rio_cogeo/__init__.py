@@ -1,6 +1,6 @@
 """rio_cogeo: Cloud Optimized GeoTIFF creation and validation plugin for rasterio."""
 
-__version__ = "5.3.2"
+__version__ = "5.3.3"
 
 from .cogeo import cog_info, cog_translate, cog_validate  # noqa
 from .profiles import cog_profiles  # noqa
