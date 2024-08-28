@@ -48,7 +48,7 @@ Documentation = "https://cogeotiff.github.io/rio-cogeo/"
 cogeo = "rio_cogeo.scripts.cli:cogeo"
 
 [build-system]
-requires = ["flit>=3.2,<4"]
+requires = ["flit_core>=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.module]

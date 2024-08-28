@@ -739,6 +739,37 @@ def test_gdal_cog_web_mask(runner):
             assert cog_validate("cogeo.tif")
 
 
+@requires_gdal31
+def test_gdal_cog_overview(runner):
+    """Test GDAL COG."""
+    with runner.isolated_filesystem():
+        profile = cog_profiles.get("jpeg")
+        profile["blockxsize"] = 256
+        profile["blockysize"] = 256
+
+        cog_translate(
+            raster_path_rgba,
+            "gdalcogeo.tif",
+            profile.copy(),
+            quiet=True,
+            use_cog_driver=True,
+            overview_level=0,
+        )
+        with rasterio.open("gdalcogeo.tif") as src:
+            assert src.overviews(1) == []
+
+        cog_translate(
+            raster_path_rgba,
+            "gdalcogeo.tif",
+            profile.copy(),
+            quiet=True,
+            use_cog_driver=True,
+            overview_level=None,
+        )
+        with rasterio.open("gdalcogeo.tif") as src:
+            assert src.overviews(1) == [2]
+
+
 def test_info_with_metadata():
     """Make sure info returns band metadata."""
     info = cog_info(raster_band_tags)
