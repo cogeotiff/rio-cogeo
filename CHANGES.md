@@ -1,8 +1,12 @@
 # Release Notes
 
-## 5.3.5 (2024-10-03)
+## 5.3.6 (2024-10-03)
 
 * add `py.typed` file (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/297)
+
+## 5.3.5 (2024-10-03)
+
+* no change since `5.3.4`
 
 ## 5.3.4 (2024-08-28)
 
