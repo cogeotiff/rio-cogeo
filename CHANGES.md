@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.3.5 (2024-10-03)
+
+* add `py.typed` file (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/297)
+
 ## 5.3.4 (2024-08-28)
 
 * make sure there is no overviews when `overview_level=0` and using GDAL COG Driver (author @lagamura, https://github.com/cogeotiff/rio-cogeo/pull/289)
