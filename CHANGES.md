@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.4.0 (2024-11-25)
+
+* update `morecantile` dependency to `morecantile>=5.0,<7.0` (author @AndrewAnnex, https://github.com/cogeotiff/rio-cogeo/pull/298)
+
 ## 5.3.6 (2024-10-03)
 
 * add `py.typed` file (author @mentaljam, https://github.com/cogeotiff/rio-cogeo/pull/297)
