@@ -738,7 +738,7 @@ def cog_info(
     with rasterio.Env(**config):
         with rasterio.open(src_path) as src_dst:
             driver = src_dst.driver
-            compression = src_dst.compression.value if src_dst.compression else None
+            compression = getattr(src_dst.compression, "value", src_dst.compression)
             colorspace = src_dst.photometric.value if src_dst.photometric else None
             overviews = src_dst.overviews(1)
 
