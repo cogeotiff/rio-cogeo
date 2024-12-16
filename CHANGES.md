@@ -1,5 +1,9 @@
 # Release Notes
 
+## 5.4.1 (2024-12-16)
+
+* fix reading raster compression value with `rasterio>=1.4.3` (author @glostis, https://github.com/cogeotiff/rio-cogeo/pull/300)
+
 ## 5.4.0 (2024-11-25)
 
 * update `morecantile` dependency to `morecantile>=5.0,<7.0` (author @AndrewAnnex, https://github.com/cogeotiff/rio-cogeo/pull/298)
