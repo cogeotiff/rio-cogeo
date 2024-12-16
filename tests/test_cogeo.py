@@ -65,7 +65,7 @@ def _validate_translated_rgb_jpeg(src):
     assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
     assert src.profile["blockxsize"] == 64
     assert src.profile["blockysize"] == 64
-    assert src.compression.value == "JPEG"
+    assert src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
     assert src.photometric.value == "YCbCr"
     assert src.interleaving.value == "PIXEL"
     assert src.overviews(1) == [2, 4, 8]
@@ -101,7 +101,9 @@ def test_cog_translate_NodataLossyWarning(runner):
             )
             with rasterio.open("cogeo.tif") as src:
                 assert not src.nodata
-                assert src.compression.value == "JPEG"
+                assert (
+                    src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
+                )
                 assert has_mask_band(src)
 
 
@@ -186,7 +188,9 @@ def test_cog_translate_validAlpha(runner):
             )
             with rasterio.open("cogeo.tif") as src:
                 assert src.count == 3
-                assert src.compression.value == "JPEG"
+                assert (
+                    src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
+                )
                 assert has_mask_band(src)
 
         with pytest.warns(UserWarning):
@@ -291,7 +295,7 @@ def test_cog_translate_validCustom(runner):
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
             assert all([(256, 256) == (h, w) for (h, w) in src.block_shapes])
-            assert src.compression.value == "JPEG"
+            assert src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
             assert src.profile["blockxsize"] == 256
             assert src.profile["blockysize"] == 256
             assert src.photometric.value == "YCbCr"
