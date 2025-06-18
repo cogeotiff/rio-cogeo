@@ -129,11 +129,11 @@ def cog_translate(  # noqa: C901
     web_optimized: bool, optional (default: False)
         Create web-optimized cogeo.
         Deprecated: Behavior changed since 5.1.2. See deprecation warning at the bottom of function doc.
-    tms: morecantile.TileMatrixSet, optional (default: "WebMercatorQuad")
+    tms: morecantile.TileMatrixSet, optional
         TileMatrixSet to use for reprojection, resolution and alignment.
     zoom_level_strategy: str, optional (default: auto)
         Strategy to determine zoom level (same as in GDAL 3.2).
-        Used only when either "web_optimized" argument is True, or `tms` is not None.
+        Used only when `tms` is not None.
         LOWER will select the zoom level immediately below the theoretical computed non-integral zoom level, leading to subsampling.
         On the contrary, UPPER will select the immediately above zoom level, leading to oversampling.
         Defaults to AUTO which selects the closest zoom level.
@@ -141,10 +141,10 @@ def cog_translate(  # noqa: C901
     zoom_level: int, optional.
         Zoom level number (starting at 0 for coarsest zoom level).
         If this option is specified, `--zoom-level-strategy` is ignored.
-        In any case, it is used only when either "web_optimized" argument is True, or `tms` is not None.
+        In any case, it is used only when `tms` is not None.
     aligned_levels: int, optional.
         Number of overview levels for which GeoTIFF tile and tiles defined in the tiling scheme match.
-        Used only when either "web_optimized" argument is True, or `tms` is not None.
+        Used only when `tms` is not None.
         Default is to use the maximum overview levels. Note: GDAL use number of resolution levels instead of overview levels.
     resampling : str, optional (default: "nearest")
         Warp Resampling algorithm.

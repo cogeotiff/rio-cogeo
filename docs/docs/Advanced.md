@@ -6,8 +6,8 @@ rio-cogeo provide a *--web-optimized* option which aims to create a web-tiling f
 
 Output dataset features:
 
-- bounds and internal tiles aligned with web-mercator grid.
-- raw data and overviews resolution match mercator zoom level resolution.
+- bounds and internal tiles aligned with web-mercator grid (or to a given TMS grid).
+- raw data and overviews resolution match the TMS zoom level resolution.
 
 **Important**
 
