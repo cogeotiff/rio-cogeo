@@ -104,7 +104,7 @@ ignore = [
 
 
 [tool.bumpversion]
-current_version = "5.4.1"
+current_version = "5.4.2"
 search = "{current_version}"
 replace = "{new_version}"
 tag = true
