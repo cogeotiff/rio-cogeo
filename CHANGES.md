@@ -1,6 +1,5 @@
 # Release Notes
 
-
 ## 5.4.2 (2025-06-27)
 
 * add user warning when input dataset has both Nodata and internal Alpha/Mask band
