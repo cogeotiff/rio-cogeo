@@ -21,7 +21,7 @@ from rasterio.transform import from_gcps as transform_from_gcps
 from rasterio.vrt import WarpedVRT
 
 from rio_cogeo import models, utils
-from rio_cogeo.errors import IncompatibleOptions
+from rio_cogeo.errors import IncompatibleOptions, NodataAlphaMaskWarning
 
 IN_MEMORY_THRESHOLD = int(os.environ.get("IN_MEMORY_THRESHOLD", 10980 * 10980))
 
@@ -221,6 +221,12 @@ def cog_translate(  # noqa: C901
             dtype = dtype if dtype else src_dst.dtypes[0]
             alpha = utils.has_alpha_band(src_dst)
             mask = utils.has_mask_band(src_dst)
+
+            if nodata is not None and (alpha or mask):
+                warnings.warn(
+                    "Input dataset has both a nodata value and internal alpha/mask band. Nodata value will be prioritized.",
+                    NodataAlphaMaskWarning,
+                )
 
             if colormap and len(indexes) > 1:
                 raise IncompatibleOptions(

@@ -1,5 +1,10 @@
 # Release Notes
 
+
+## 5.4.2 (2025-06-27)
+
+* add user warning when input dataset has both Nodata and internal Alpha/Mask band
+
 ## 5.4.1 (2024-12-16)
 
 * fix reading raster compression value with `rasterio>=1.4.3` (author @glostis, https://github.com/cogeotiff/rio-cogeo/pull/300)
