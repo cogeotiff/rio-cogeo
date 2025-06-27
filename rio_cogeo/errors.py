@@ -9,6 +9,10 @@ class IncompatibleBlockRasterSize(UserWarning):
     """Rio-cogeo module incompatible raster block/size warning."""
 
 
+class NodataAlphaMaskWarning(UserWarning):
+    """Dataset with nodata and alpha/mask warning."""
+
+
 class RioCogeoError(Exception):
     """Base exception class."""
 

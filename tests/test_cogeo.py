@@ -21,6 +21,7 @@ from .conftest import requires_gdal31, requires_webp
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 raster_path_rgba = os.path.join(FIXTURES_DIR, "image_rgba.tif")
+raster_path_rgba_nodata = os.path.join(FIXTURES_DIR, "image_rgba_nodata.tif")
 raster_path_rgb = os.path.join(FIXTURES_DIR, "image_rgb.tif")
 raster_path_nan = os.path.join(FIXTURES_DIR, "image_nan.tif")
 raster_path_nodata = os.path.join(FIXTURES_DIR, "image_nodata.tif")
@@ -920,3 +921,20 @@ def test_cog_values(src_path, runner):
             assert cog.colorinterp == source.colorinterp
             assert has_mask_band(cog)
             assert not has_alpha_band(cog)
+
+
+def test_nodata_alpha_incompatible(runner):
+    """test nodata/alpha warning."""
+    with runner.isolated_filesystem():
+        with pytest.warns(UserWarning):
+            cog_translate(
+                raster_path_rgba_nodata,
+                "cogeo.tif",
+                cog_profiles.get("deflate"),
+                quiet=True,
+            )
+            assert cog_validate("cogeo.tif")
+
+        with rasterio.open("cogeo.tif") as cog:
+            assert cog.nodata is not None
+            assert has_alpha_band(cog)
