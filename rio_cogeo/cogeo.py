@@ -459,7 +459,6 @@ def cog_translate(  # noqa: C901
                     dst_kwargs.pop("blockxsize", None)
                     dst_kwargs.pop("blockysize", None)
                     dst_kwargs.pop("tiled", None)
-                    dst_kwargs.pop("interleave", None)
                     dst_kwargs.pop("photometric", None)
 
                     copy(tmp_dst, dst_path, **dst_kwargs)

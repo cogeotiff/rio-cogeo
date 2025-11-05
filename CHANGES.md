@@ -1,5 +1,11 @@
 # Release Notes
 
+## 6.0.0 (2025-11-05)
+
+* allow `interleave=BAND` when using GDAL COG driver (require `GDAL>=3.11`)
+* remove python 3.8 and 3.9 support
+* add support for python 3.13
+
 ## 5.4.2 (2025-06-27)
 
 * add user warning when input dataset has both Nodata and internal Alpha/Mask band

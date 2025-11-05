@@ -39,6 +39,10 @@ requires_gdal35 = pytest.mark.skipif(
     not gdal_version.at_least("3.5"), reason="Requires GDAL 3.5.x"
 )
 
+requires_gdal311 = pytest.mark.skipif(
+    not gdal_version.at_least("3.11"), reason="Requires GDAL 3.11.x"
+)
+
 
 @pytest.fixture
 def runner():

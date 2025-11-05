@@ -17,7 +17,7 @@ from rio_cogeo.errors import IncompatibleOptions
 from rio_cogeo.profiles import cog_profiles
 from rio_cogeo.utils import has_alpha_band, has_mask_band
 
-from .conftest import requires_gdal31, requires_webp
+from .conftest import requires_gdal31, requires_gdal311, requires_webp
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 raster_path_rgba = os.path.join(FIXTURES_DIR, "image_rgba.tif")
@@ -938,3 +938,37 @@ def test_nodata_alpha_incompatible(runner):
         with rasterio.open("cogeo.tif") as cog:
             assert cog.nodata is not None
             assert has_alpha_band(cog)
+
+
+def test_cog_interleave(runner):
+    """Test Interleave BAND."""
+    prof = cog_profiles.get("deflate")
+    prof["interleave"] = "BAND"
+
+    with runner.isolated_filesystem():
+        cog_translate(
+            raster_path_rgb,
+            "cogeo.tif",
+            prof,
+            quiet=True,
+        )
+        with rasterio.open("cogeo.tif") as cog:
+            assert cog.interleaving.value == "BAND"
+
+
+@requires_gdal311
+def test_cog_interleave_gdal(runner):
+    """Test Interleave BAND."""
+    prof = cog_profiles.get("deflate")
+    prof["interleave"] = "BAND"
+
+    with runner.isolated_filesystem():
+        cog_translate(
+            raster_path_rgb,
+            "cogeo.tif",
+            prof,
+            use_cog_driver=True,
+            quiet=True,
+        )
+        with rasterio.open("cogeo.tif") as cog:
+            assert cog.interleaving.value == "BAND"
