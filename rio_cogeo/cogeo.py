@@ -400,7 +400,7 @@ def cog_translate(  # noqa: C901
                 tags = src_dst.tags()
                 tags.update(
                     {
-                        "OVR_RESAMPLING_ALG": ResamplingEnums[
+                        "OVERVIEW_RESAMPLING": ResamplingEnums[
                             overview_resampling
                         ].name.upper()
                     }
