@@ -70,7 +70,7 @@ def _validate_translated_rgb_jpeg(src):
     assert src.photometric.value == "YCbCr"
     assert src.interleaving.value == "PIXEL"
     assert src.overviews(1) == [2, 4, 8]
-    assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+    assert src.tags()["OVERVIEW_RESAMPLING"] == "NEAREST"
     assert not has_mask_band(src)
 
 
@@ -328,7 +328,7 @@ def test_cog_translate_tags(runner):
     with runner.isolated_filesystem():
         cog_translate(raster_path_tags, "cogeo.tif", jpeg_profile, quiet=True)
         with rasterio.open("cogeo.tif") as src:
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+            assert src.tags()["OVERVIEW_RESAMPLING"] == "NEAREST"
             assert src.tags()["DatasetName"] == "my useful dataset"
             assert src.descriptions[0] == "first band"
             assert src.descriptions[1] == "second band"
@@ -342,14 +342,14 @@ def test_cog_translate_tags(runner):
             additional_cog_metadata={"comment": "it should work"},
         )
         with rasterio.open("cogeo.tif") as src:
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+            assert src.tags()["OVERVIEW_RESAMPLING"] == "NEAREST"
             assert src.tags()["comment"] == "it should work"
 
         cog_translate(
             raster_path_tags, "cogeo.tif", raw_profile, indexes=[2], quiet=True
         )
         with rasterio.open("cogeo.tif") as src:
-            assert src.tags()["OVR_RESAMPLING_ALG"] == "NEAREST"
+            assert src.tags()["OVERVIEW_RESAMPLING"] == "NEAREST"
             assert src.tags()["DatasetName"] == "my useful dataset"
             assert src.descriptions[0] == "second band"
 

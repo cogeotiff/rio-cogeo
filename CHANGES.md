@@ -2,9 +2,10 @@
 
 ## 6.0.0 (2025-11-05)
 
-* allow `interleave=BAND` when using GDAL COG driver (require `GDAL>=3.11`)
+* allow `interleave=BAND` when using GDAL COG driver (require `GDAL>=3.11`) (https://github.com/cogeotiff/rio-cogeo/issues/306)
 * remove python 3.8 and 3.9 support
 * add support for python 3.13
+* rename `OVR_RESAMPLING_ALG` tag to `OVERVIEW_RESAMPLING` (https://github.com/cogeotiff/rio-cogeo/issues/308)
 
 ## 5.4.2 (2025-06-27)
 
