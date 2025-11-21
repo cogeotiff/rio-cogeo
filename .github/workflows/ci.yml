@@ -16,43 +16,38 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version:
-        - '3.10'
-        - '3.11'
-        - '3.12'
-        - '3.13'
+        python-version: ['3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
+          version: "0.9.*" 
+          enable-cache: true
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-
-      - name: Install rio-cogeo
-        run: python -m pip install .["test"]
+          uv sync
 
       - name: Run pre-commit
         if: ${{ matrix.python-version == env.LATEST_PY_VERSION }}
         run: |
-          python -m pip install pre-commit
-          pre-commit run --all-files
+          uv run pre-commit run --all-files
 
       - name: Run test
-        run: python -m pytest --cov rio_cogeo --cov-report xml --cov-report term-missing
+        run: uv run pytest --cov rio_cogeo --cov-report xml --cov-report term-missing
 
       - name: Upload Results
         if: ${{ matrix.python-version == env.LATEST_PY_VERSION }}
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
-          name: ${{ matrix.platform }}-${{ matrix.tox-env }}
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     needs: [tests]
@@ -60,16 +55,17 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python
-        uses: actions/setup-python@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
+          version: "0.9.*" 
+          enable-cache: true
           python-version: ${{ env.LATEST_PY_VERSION }}
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install flit
-          python -m pip install .
+          uv sync --group deploy
 
       - name: Set tag version
         id: tag
@@ -80,11 +76,13 @@ jobs:
       - name: Set module version
         id: module
         run: |
-          echo version=$(python -c'import rio_cogeo; print(rio_cogeo.__version__)') >> $GITHUB_OUTPUT
+          echo "version=$(uv run hatch --quiet version)" >> $GITHUB_OUTPUT
 
       - name: Build and publish
         if: ${{ steps.tag.outputs.version }} == ${{ steps.module.outputs.version}}
         env:
-          FLIT_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          FLIT_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: flit publish
+          HATCH_INDEX_USER: ${{ secrets.PYPI_USERNAME }}
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          uv run hatch build 
+          uv run hatch publish

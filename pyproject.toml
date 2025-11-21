@@ -2,7 +2,7 @@
 name = "rio-cogeo"
 description = "Cloud Optimized GeoTIFF (COGEO) creation plugin for rasterio"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 authors = [
     {name = "Vincent Sarago", email = "vincent@developmentseed.com"},
@@ -12,7 +12,6 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -22,22 +21,24 @@ dynamic = ["version"]
 dependencies = [
     "click>=7.0",
     "rasterio>=1.3.3",
-    "morecantile>=5.0,<7.0",
+    "morecantile>=5.0,<8.0",
     "pydantic~=2.0",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov",
-    "cogdumper",
-]
+[dependency-groups]
 dev = [
+    "cogdumper",
+    "pytest",
+    "pytest-cov",    
     "pre-commit",
+    "bump-my-version",
 ]
 docs = [
     "mkdocs",
     "mkdocs-material",
+]
+deploy = [
+    "hatch",
 ]
 
 [project.urls]
@@ -48,22 +49,17 @@ Documentation = "https://cogeotiff.github.io/rio-cogeo/"
 cogeo = "rio_cogeo.scripts.cli:cogeo"
 
 [build-system]
-requires = ["flit_core>=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.flit.module]
-name = "rio_cogeo"
+[tool.hatch.version]
+path = "rio_cogeo/__init__.py"
 
-[tool.flit.sdist]
-exclude = [
-    "tests/",
-    "docs/",
-    ".github/",
-    "CHANGES.md",
-    "codecov.yml",
-    "CONTRIBUTING.md",
-    "mkdocs.yml",
-]
+[tool.hatch.build.targets.sdist]
+only-include = ["rio_cogeo/"]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["rio_cogeo/"]
 
 [tool.coverage.run]
 branch = true
@@ -100,7 +96,6 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "B905",  # ignore zip() without an explicit strict= parameter, only support with python >3.10
 ]
-
 
 [tool.bumpversion]
 current_version = "6.0.0"
