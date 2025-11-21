@@ -1,0 +1,3026 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio.">
+      
+      
+      
+        <link rel="canonical" href="https://cogeotiff.github.io/rio-cogeo/release-notes/">
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Release Notes - rio-cogeo</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#release-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="rio-cogeo" class="md-header__button md-logo" aria-label="rio-cogeo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            rio-cogeo
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Release Notes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/cogeotiff/rio-cogeo" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cogeotiff/rio-cogeo
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="rio-cogeo" class="md-nav__button md-logo" aria-label="rio-cogeo" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    rio-cogeo
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/cogeotiff/rio-cogeo" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cogeotiff/rio-cogeo
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CLI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface (CLI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application programming interface (API)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Advanced/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Topics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../profile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    COG Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Is_it_a_COG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How To
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development - Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#700-2025-11-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.0.0 (2025-11-21)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#600-2025-11-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.0.0 (2025-11-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#542-2025-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.2 (2025-06-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#541-2024-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.1 (2024-12-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#540-2024-11-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.0 (2024-11-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#536-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.6 (2024-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#535-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.5 (2024-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#534-2024-08-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.4 (2024-08-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#533-2024-07-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.3 (2024-07-04)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#532-2024-06-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.2 (2024-06-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#531-2024-06-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.1 (2024-06-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#530-2024-03-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.0 (2024-03-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#520-2024-02-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.0 (2024-02-16)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.0 (2024-02-16)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#511-2024-01-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.1 (2024-01-08)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#510-2023-12-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.0 (2023-12-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#500-2023-07-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.0 (2023-07-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#401-2023-07-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.1 (2023-07-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#400-2023-05-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.0 (2023-05-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#352-2023-05-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.2 (2023-05-22)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#351-2023-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.1 (2023-04-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#350-2022-10-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.0 (2022-10-26)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#341-2022-09-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4.1 (2022-09-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#340-2022-09-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4.0 (2022-09-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#330-2022-06-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.0 (2022-06-24)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#320-2022-04-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.0 (2022-04-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#310-2022-02-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.0 (2022-02-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#303-2021-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.3 (2021-02-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#302-2021-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.2 (2021-12-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#301-2021-10-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.1 (2021-10-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#300-2021-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0 (2021-09-30)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#300a0-2021-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0a0 (2021-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#231-2021-07-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 (2021-07-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#230-2021-06-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.0 (2021-06-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#223-2021-06-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.3 (2021-06-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#222-2021-06-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.2 (2021-06-01)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#221-2021-05-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 (2021-05-19)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#220-2021-05-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.0 (2021-05-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#214-2021-03-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.4 (2021-03-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#213-2021-03-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.3 (2021-03-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#212-2021-02-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.2 (2021-02-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#211-2021-01-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 (2021-01-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#210-2020-12-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.0 (2020-12-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#201-2020-10-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.1 (2020-10-07)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#200-2020-10-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.0 (2020-10-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a9-2020-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a9 (2020-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a8-2020-09-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a8 (2020-09-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a7post1-2020-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a7.post1 (2020-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a7-2020-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a7 (2020-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a6-2020-08-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a6 (2020-08-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a5-2020-07-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a5 (2020-07-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a4-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a4 (2020-06-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a3-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a3 (2020-06-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a2-2020-05-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a2 (2020-05-20)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a1-2020-05-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a1 (2020-05-07)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1110-2020-02-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.10 (2020-02-21)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#119-2020-02-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.9 (2020-02-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#118-2020-01-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.8 (2020-01-08)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#117-2019-12-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.7 (2019-12-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#116-2019-11-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.6 (2019-11-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#115-2019-10-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.5 (2019-10-04)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#114-2019-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 (2019-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#113-2019-09-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 (2019-09-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#112-2019-09-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 (2019-09-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#111-2019-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 (2019-09-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2019-07-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0 (2019-07-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-2019-04-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0 (2019-04-19)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b3-2019-03-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b3 (2019-03-30)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b2-2019-03-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b2 (2019-03-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b1-2019-03-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b1 (2019-03-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b0-2019-03-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b0 (2019-03-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev10-2019-02-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev10 (2019-02-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev9-2019-02-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev9 (2019-02-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev8-2018-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev8 (2018-10-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev7-2018-09-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev7 (2018-09-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev6-2018-08-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev6 (2018-08-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev4-2018-07-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev4 (2018-07-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev3-2018-07-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev3 (2018-07-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev2-2018-06-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev2 (2018-06-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev12018-16-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev1(2018-16-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#700-2025-11-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.0.0 (2025-11-21)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#600-2025-11-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.0.0 (2025-11-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#542-2025-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.2 (2025-06-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#541-2024-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.1 (2024-12-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#540-2024-11-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.0 (2024-11-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#536-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.6 (2024-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#535-2024-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.5 (2024-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#534-2024-08-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.4 (2024-08-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#533-2024-07-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.3 (2024-07-04)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#532-2024-06-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.2 (2024-06-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#531-2024-06-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.1 (2024-06-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#530-2024-03-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.0 (2024-03-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#520-2024-02-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.0 (2024-02-16)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.0 (2024-02-16)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#511-2024-01-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.1 (2024-01-08)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#510-2023-12-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.0 (2023-12-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#500-2023-07-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.0 (2023-07-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#401-2023-07-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.1 (2023-07-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#400-2023-05-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.0 (2023-05-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#352-2023-05-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.2 (2023-05-22)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#351-2023-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.1 (2023-04-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#350-2022-10-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.0 (2022-10-26)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#341-2022-09-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4.1 (2022-09-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#340-2022-09-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4.0 (2022-09-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#330-2022-06-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.0 (2022-06-24)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#320-2022-04-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.0 (2022-04-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#310-2022-02-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.0 (2022-02-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#303-2021-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.3 (2021-02-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#302-2021-12-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.2 (2021-12-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#301-2021-10-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.1 (2021-10-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#300-2021-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0 (2021-09-30)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#300a0-2021-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.0.0a0 (2021-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#231-2021-07-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 (2021-07-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#230-2021-06-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.0 (2021-06-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#223-2021-06-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.3 (2021-06-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#222-2021-06-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.2 (2021-06-01)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#221-2021-05-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 (2021-05-19)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#220-2021-05-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.0 (2021-05-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#214-2021-03-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.4 (2021-03-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#213-2021-03-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.3 (2021-03-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#212-2021-02-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.2 (2021-02-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#211-2021-01-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 (2021-01-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#210-2020-12-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.0 (2020-12-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#201-2020-10-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.1 (2020-10-07)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#200-2020-10-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.0 (2020-10-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a9-2020-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a9 (2020-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a8-2020-09-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a8 (2020-09-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a7post1-2020-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a7.post1 (2020-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a7-2020-09-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a7 (2020-09-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a6-2020-08-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a6 (2020-08-18)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a5-2020-07-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a5 (2020-07-31)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a4-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a4 (2020-06-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a3-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a3 (2020-06-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a2-2020-05-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a2 (2020-05-20)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20a1-2020-05-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0a1 (2020-05-07)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1110-2020-02-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.10 (2020-02-21)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#119-2020-02-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.9 (2020-02-06)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#118-2020-01-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.8 (2020-01-08)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#117-2019-12-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.7 (2019-12-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#116-2019-11-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.6 (2019-11-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#115-2019-10-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.5 (2019-10-04)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#114-2019-10-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 (2019-10-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#113-2019-09-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 (2019-09-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#112-2019-09-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 (2019-09-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#111-2019-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 (2019-09-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2019-07-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0 (2019-07-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-2019-04-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0 (2019-04-19)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b3-2019-03-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b3 (2019-03-30)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b2-2019-03-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b2 (2019-03-27)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b1-2019-03-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b1 (2019-03-25)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10b0-2019-03-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0b0 (2019-03-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev10-2019-02-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev10 (2019-02-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev9-2019-02-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev9 (2019-02-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev8-2018-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev8 (2018-10-02)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev7-2018-09-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev7 (2018-09-12)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev6-2018-08-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev6 (2018-08-23)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev4-2018-07-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev4 (2018-07-16)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev3-2018-07-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev3 (2018-07-05)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev2-2018-06-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev2 (2018-06-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10dev12018-16-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0dev1(2018-16-13)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="release-notes">Release Notes<a class="headerlink" href="#release-notes" title="Permanent link">&para;</a></h1>
+<h2 id="700-2025-11-21">7.0.0 (2025-11-21)<a class="headerlink" href="#700-2025-11-21" title="Permanent link">&para;</a></h2>
+<ul>
+<li>switch to UV for development</li>
+<li>remove python 3.10 support <strong>breaking change</strong></li>
+<li>update morecantile requirement to <code>&gt;=5.0,&lt;8.0</code> </li>
+</ul>
+<h2 id="600-2025-11-05">6.0.0 (2025-11-05)<a class="headerlink" href="#600-2025-11-05" title="Permanent link">&para;</a></h2>
+<ul>
+<li>allow <code>interleave=BAND</code> when using GDAL COG driver (require <code>GDAL&gt;=3.11</code>) (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/306" title="GitHub Issue: cogeotiff/rio-cogeo #306">cogeotiff/rio-cogeo#306</a>)</li>
+<li>remove python 3.8 and 3.9 support</li>
+<li>add support for python 3.13</li>
+<li>rename <code>OVR_RESAMPLING_ALG</code> tag to <code>OVERVIEW_RESAMPLING</code> (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/308" title="GitHub Issue: cogeotiff/rio-cogeo #308">cogeotiff/rio-cogeo#308</a>)</li>
+</ul>
+<h2 id="542-2025-06-27">5.4.2 (2025-06-27)<a class="headerlink" href="#542-2025-06-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add user warning when input dataset has both Nodata and internal Alpha/Mask band</li>
+</ul>
+<h2 id="541-2024-12-16">5.4.1 (2024-12-16)<a class="headerlink" href="#541-2024-12-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>fix reading raster compression value with <code>rasterio&gt;=1.4.3</code> (author @glostis, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/300" title="GitHub Pull Request: cogeotiff/rio-cogeo #300">cogeotiff/rio-cogeo!300</a>)</li>
+</ul>
+<h2 id="540-2024-11-25">5.4.0 (2024-11-25)<a class="headerlink" href="#540-2024-11-25" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update <code>morecantile</code> dependency to <code>morecantile&gt;=5.0,&lt;7.0</code> (author @AndrewAnnex, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/298" title="GitHub Pull Request: cogeotiff/rio-cogeo #298">cogeotiff/rio-cogeo!298</a>)</li>
+</ul>
+<h2 id="536-2024-10-03">5.3.6 (2024-10-03)<a class="headerlink" href="#536-2024-10-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>py.typed</code> file (author @mentaljam, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/297" title="GitHub Pull Request: cogeotiff/rio-cogeo #297">cogeotiff/rio-cogeo!297</a>)</li>
+</ul>
+<h2 id="535-2024-10-03">5.3.5 (2024-10-03)<a class="headerlink" href="#535-2024-10-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>no change since <code>5.3.4</code></li>
+</ul>
+<h2 id="534-2024-08-28">5.3.4 (2024-08-28)<a class="headerlink" href="#534-2024-08-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>make sure there is no overviews when <code>overview_level=0</code> and using GDAL COG Driver (author @lagamura, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/289" title="GitHub Pull Request: cogeotiff/rio-cogeo #289">cogeotiff/rio-cogeo!289</a>)</li>
+<li>add python 3.12 support</li>
+</ul>
+<h2 id="533-2024-07-04">5.3.3 (2024-07-04)<a class="headerlink" href="#533-2024-07-04" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove Numpy requirement in <code>pyproject.toml</code></li>
+</ul>
+<h2 id="532-2024-06-13">5.3.2 (2024-06-13)<a class="headerlink" href="#532-2024-06-13" title="Permanent link">&para;</a></h2>
+<ul>
+<li>do not set output size in the intermediate VRT</li>
+<li>add Alpha band for GCPS wrapped dataset</li>
+</ul>
+<h2 id="531-2024-06-12">5.3.1 (2024-06-12)<a class="headerlink" href="#531-2024-06-12" title="Permanent link">&para;</a></h2>
+<ul>
+<li>fix issue when creating COG from file with internal GCPS</li>
+</ul>
+<h2 id="530-2024-03-02">5.3.0 (2024-03-02)<a class="headerlink" href="#530-2024-03-02" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>decimation_base</code> option in <code>cogeo.cog_translate</code> (author @mccarthyryanc, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/285" title="GitHub Pull Request: cogeotiff/rio-cogeo #285">cogeotiff/rio-cogeo!285</a>)</li>
+</ul>
+<h2 id="520-2024-02-16">5.2.0 (2024-02-16)<a class="headerlink" href="#520-2024-02-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>remove <code>is_tiled</code> rasterio method and add better test for blockshapes for the validation script (author @sgillies, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/278" title="GitHub Pull Request: cogeotiff/rio-cogeo #278">cogeotiff/rio-cogeo!278</a>)</p>
+</li>
+<li>
+<p>Deprecate parameter <strong>web_optimized</strong> of <code>cogeo.cog_translate</code> Python function (author @alexismanin, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/279" title="GitHub Pull Request: cogeotiff/rio-cogeo #279">cogeotiff/rio-cogeo!279</a>)</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+<span class="n">output_profile</span> <span class="o">=</span> <span class="n">cog_profiles</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+
+<span class="n">tms</span> <span class="o">=</span> <span class="n">morecantile</span><span class="o">.</span><span class="n">tms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;WGS1984Quad&quot;</span><span class="p">)</span>
+<span class="n">cog_translate</span><span class="p">(</span>
+    <span class="s2">&quot;in.tif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;out.tif&quot;</span><span class="p">,</span>
+    <span class="n">output_profile</span><span class="p">,</span>
+    <span class="n">web_optimzed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">tms</span><span class="o">=</span><span class="n">tms</span>
+<span class="p">)</span>
+
+<span class="c1"># now</span>
+<span class="n">tms</span> <span class="o">=</span> <span class="n">morecantile</span><span class="o">.</span><span class="n">tms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;WGS1984Quad&quot;</span><span class="p">)</span>
+<span class="n">cog_translate</span><span class="p">(</span>
+    <span class="s2">&quot;in.tif&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;out.tif&quot;</span><span class="p">,</span>
+    <span class="n">output_profile</span><span class="p">,</span>
+    <span class="n">tms</span><span class="o">=</span><span class="n">tms</span>
+<span class="p">)</span>
+</code></pre></div>
+</li>
+<li>
+<p>fix COG validation for SPARSE dataset (author @mpadillaruiz, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/281" title="GitHub Issue: cogeotiff/rio-cogeo #281">cogeotiff/rio-cogeo#281</a>)</p>
+</li>
+</ul>
+<h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>remove default (<em>128</em>) for <code>--overview-blocksize</code> option in the CLI. Now defaults to GDAL behaviour.</p>
+</li>
+<li>
+<p>change how <code>blocksize</code> for overviews is defined when using <code>tms</code> or <code>web-optimized</code> options</p>
+</li>
+<li>
+<p><code>blocksize</code> is now defined from the tilematrixset's <code>tileWidth</code> and <code>tileHeight</code> when <code>--blocksize</code> is not provided</p>
+</li>
+</ul>
+<h2 id="511-2024-01-08">5.1.1 (2024-01-08)<a class="headerlink" href="#511-2024-01-08" title="Permanent link">&para;</a></h2>
+<ul>
+<li>use morecantile <code>TileMatrixSet.cellSize</code> property instead of deprecated/private <code>TileMatrixSet._resolution</code> method</li>
+</ul>
+<h2 id="510-2023-12-11">5.1.0 (2023-12-11)<a class="headerlink" href="#510-2023-12-11" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add option to write progress to an external text buffer (author @SellersEvan, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/273" title="GitHub Pull Request: cogeotiff/rio-cogeo #273">cogeotiff/rio-cogeo!273</a>)</li>
+</ul>
+<h2 id="500-2023-07-25">5.0.0 (2023-07-25)<a class="headerlink" href="#500-2023-07-25" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update <code>morecantile</code> requirement to <code>&gt;=5.0,&lt;6.0</code> (author @mentaljam, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/267" title="GitHub Pull Request: cogeotiff/rio-cogeo #267">cogeotiff/rio-cogeo!267</a>)</li>
+<li>update <code>pydantic</code> requirement to <code>~=2.0</code> (author @mentaljam, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/267" title="GitHub Pull Request: cogeotiff/rio-cogeo #267">cogeotiff/rio-cogeo!267</a>)</li>
+<li>fix <code>pydantic</code> deprecation warnings (author @mentaljam, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/267" title="GitHub Pull Request: cogeotiff/rio-cogeo #267">cogeotiff/rio-cogeo!267</a>)</li>
+<li>replace <code>BaseModel.json</code> with <code>BaseModel.model_dump_json</code></li>
+<li>replace <code>BaseModel.dict</code> with <code>BaseModel.model_dump</code></li>
+<li>replace <code>class Config</code> with <code>model_config</code> class variables</li>
+</ul>
+<h2 id="401-2023-07-11">4.0.1 (2023-07-11)<a class="headerlink" href="#401-2023-07-11" title="Permanent link">&para;</a></h2>
+<ul>
+<li>limit pydantic requirement to `~=1.0``</li>
+</ul>
+<h2 id="400-2023-05-31">4.0.0 (2023-05-31)<a class="headerlink" href="#400-2023-05-31" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update morecantile requirement to <code>&gt;=4.0.0</code></li>
+<li>native support for all TileMatrixSet (with respect of the TMS spec 2.0)</li>
+<li>add <code>--tms</code> option to specify a path to a TileMatrixSet JSON file</li>
+<li>switch resampling enums to python Literal</li>
+</ul>
+<p><strong>breaking change</strong></p>
+<ul>
+<li>
+<p>Web optimization is now done in rio-cogeo instead of GDAL, when using <code>--web-optimized</code> and <code>--use-cog-driver</code> options</p>
+</li>
+<li>
+<p>switch from using <code>TILING_SCHEME</code> namespaced tags to simple <code>TILING_SCHEME_</code> prefixed metadata</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cog_web.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">(</span><span class="n">ns</span><span class="o">=</span><span class="s2">&quot;TILING_SCHEME&quot;</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span>
+    <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;WebMercatorQuad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ZOOM_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;18&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># now</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cog_web.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">tags</span><span class="p">())</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span>
+    <span class="s2">&quot;TILING_SCHEME_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;WebMercatorQuad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TILING_SCHEME_ZOOM_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;18&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="352-2023-05-22">3.5.2 (2023-05-22)<a class="headerlink" href="#352-2023-05-22" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Flag GeoTIFFs with invalidated optimizations as invalid COGs (author @mplough-kobold, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/260" title="GitHub Pull Request: cogeotiff/rio-cogeo #260">cogeotiff/rio-cogeo!260</a>)</li>
+</ul>
+<h2 id="351-2023-04-06">3.5.1 (2023-04-06)<a class="headerlink" href="#351-2023-04-06" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Use Case-insensitive check for external overviews (author @mplough-kobold, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/252" title="GitHub Pull Request: cogeotiff/rio-cogeo #252">cogeotiff/rio-cogeo!252</a>)</li>
+<li>Use destination directory for the temporary file</li>
+</ul>
+<h2 id="350-2022-10-26">3.5.0 (2022-10-26)<a class="headerlink" href="#350-2022-10-26" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add python 3.11 support</li>
+</ul>
+<p><strong>Breaking Changes</strong></p>
+<ul>
+<li>remove python 3.7 support</li>
+<li>require rasterio &gt;= 1.3.3 (ref: <a class="magiclink magiclink-github magiclink-discussion" href="https://github.com/cogeotiff/rio-cogeo/discussions/248" title="GitHub Discussion: cogeotiff/rio-cogeo #248">cogeotiff/rio-cogeo?248</a>)</li>
+<li>COG can be have blocksize (bigger than their <code>height</code> or <code>width</code>) and be <strong>tiled</strong> even if they are smaller than 512x512</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+rio<span class="w"> </span>cogeo<span class="w"> </span>create<span class="w"> </span>image_51x51.tif<span class="w"> </span>cog.tif
+rio<span class="w"> </span>cogeo<span class="w"> </span>info<span class="w"> </span>cog.tif<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.IFD&#39;</span>
+&gt;&gt;&gt;<span class="w"> </span><span class="o">[</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span><span class="s2">&quot;Level&quot;</span>:<span class="w"> </span><span class="m">0</span>,
+<span class="w">    </span><span class="s2">&quot;Width&quot;</span>:<span class="w"> </span><span class="m">51</span>,
+<span class="w">    </span><span class="s2">&quot;Height&quot;</span>:<span class="w"> </span><span class="m">51</span>,
+<span class="w">    </span><span class="s2">&quot;Blocksize&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">      </span><span class="m">51</span>,
+<span class="w">      </span><span class="m">51</span>
+<span class="w">    </span><span class="o">]</span>,
+<span class="w">    </span><span class="s2">&quot;Decimation&quot;</span>:<span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="o">}</span>
+<span class="o">]</span>
+rio<span class="w"> </span>cogeo<span class="w"> </span>info<span class="w"> </span>cog.tif<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.Profile.Tiled&#39;</span>
+&gt;&gt;&gt;<span class="w"> </span><span class="nb">false</span>
+
+<span class="c1"># now</span>
+rio<span class="w"> </span>cogeo<span class="w"> </span>create<span class="w"> </span>image_51x51.tif<span class="w"> </span>cog.tif
+rio<span class="w"> </span>cogeo<span class="w"> </span>info<span class="w"> </span>cog.tif<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.IFD&#39;</span>
+&gt;&gt;&gt;<span class="w"> </span><span class="o">[</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span><span class="s2">&quot;Level&quot;</span>:<span class="w"> </span><span class="m">0</span>,
+<span class="w">    </span><span class="s2">&quot;Width&quot;</span>:<span class="w"> </span><span class="m">51</span>,
+<span class="w">    </span><span class="s2">&quot;Height&quot;</span>:<span class="w"> </span><span class="m">51</span>,
+<span class="w">    </span><span class="s2">&quot;Blocksize&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">      </span><span class="m">512</span>,
+<span class="w">      </span><span class="m">512</span>
+<span class="w">    </span><span class="o">]</span>,
+<span class="w">    </span><span class="s2">&quot;Decimation&quot;</span>:<span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="o">}</span>
+<span class="o">]</span>
+rio<span class="w"> </span>cogeo<span class="w"> </span>info<span class="w"> </span>cog.tif<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.Profile.Tiled&#39;</span>
+&gt;&gt;&gt;<span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<h2 id="341-2022-09-14">3.4.1 (2022-09-14)<a class="headerlink" href="#341-2022-09-14" title="Permanent link">&para;</a></h2>
+<ul>
+<li>avoid breaking change for <code>cog_info()</code> when previously passing <code>*kwargs</code> to <code>cog_validate</code></li>
+</ul>
+<h2 id="340-2022-09-05">3.4.0 (2022-09-05)<a class="headerlink" href="#340-2022-09-05" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add python 3.10 support</li>
+<li>allow forwarding namespaced metadata to output dataset</li>
+<li>set GDAL config for all <code>info</code> methods (previously GDAL's configs were only use in the COG validation step)</li>
+</ul>
+<h2 id="330-2022-06-24">3.3.0 (2022-06-24)<a class="headerlink" href="#330-2022-06-24" title="Permanent link">&para;</a></h2>
+<ul>
+<li>allow <strong>non-GeoTIFF</strong> in <code>cog_validate</code></li>
+<li>allow <code>config</code> option in <code>rio cogeo info</code> CLI</li>
+</ul>
+<h2 id="320-2022-04-05">3.2.0 (2022-04-05)<a class="headerlink" href="#320-2022-04-05" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Switch to <code>pyproject.toml</code> (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/232" title="GitHub Pull Request: cogeotiff/rio-cogeo #232">cogeotiff/rio-cogeo!232</a>)</li>
+<li>add <code>--zoom-level</code> option to define dataset coarsest zoom level, when creating <code>web optimized</code> COG.</li>
+</ul>
+<h2 id="310-2022-02-18">3.1.0 (2022-02-18)<a class="headerlink" href="#310-2022-02-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix equivalence for rio-cogeo and GDAL definition of <code>aligned_levels</code></li>
+</ul>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li>update morecantile requirement to <code>&gt;=3.1,&lt;4.0</code>. WebOptimized COGs will is now aligned with GDAL and Mercantile TMS definition.</li>
+</ul>
+<h2 id="303-2021-02-14">3.0.3 (2021-02-14)<a class="headerlink" href="#303-2021-02-14" title="Permanent link">&para;</a></h2>
+<ul>
+<li>use <code>rasterio.vrt.WarpedVRT</code> in <code>utils.get_web_optimized_params</code> to better handle dataset with GEOS projection (crossing dateline).</li>
+</ul>
+<h2 id="302-2021-12-16">3.0.2 (2021-12-16)<a class="headerlink" href="#302-2021-12-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove usage of (soon to be deprecated) <code>rasterio.path</code> (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/222" title="GitHub Pull Request: cogeotiff/rio-cogeo #222">cogeotiff/rio-cogeo!222</a>)</li>
+<li>add band metadata in <code>cog_info</code> output and update <code>rio_cogeo.models.Info</code> (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/223" title="GitHub Pull Request: cogeotiff/rio-cogeo #223">cogeotiff/rio-cogeo!223</a>)</li>
+</ul>
+<h2 id="301-2021-10-27">3.0.1 (2021-10-27)<a class="headerlink" href="#301-2021-10-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update <code>test</code> and <code>dev</code> dependencies to <code>rio-tiler&gt;=3.0.0a0</code></li>
+</ul>
+<h2 id="300-2021-09-30">3.0.0 (2021-09-30)<a class="headerlink" href="#300-2021-09-30" title="Permanent link">&para;</a></h2>
+<ul>
+<li>no changes since 3.0.0a0</li>
+</ul>
+<h2 id="300a0-2021-09-23">3.0.0a0 (2021-09-23)<a class="headerlink" href="#300a0-2021-09-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update to <code>morecantile&gt;=3.0</code></li>
+<li>raise warning when using incompatible options for GDAL COG driver (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/212" title="GitHub Pull Request: cogeotiff/rio-cogeo #212">cogeotiff/rio-cogeo!212</a>)</li>
+</ul>
+<h2 id="231-2021-07-06">2.3.1 (2021-07-06)<a class="headerlink" href="#231-2021-07-06" title="Permanent link">&para;</a></h2>
+<ul>
+<li>update <code>click</code> version requirement to <code>&gt;=7.0</code> to make sure <code>click.Choice</code> supports the <code>case_sensitive</code> option.</li>
+</ul>
+<h2 id="230-2021-06-25">2.3.0 (2021-06-25)<a class="headerlink" href="#230-2021-06-25" title="Permanent link">&para;</a></h2>
+<ul>
+<li>allow external configuration (GDAL Env) for <code>cog_validate</code> (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/206" title="GitHub Pull Request: cogeotiff/rio-cogeo #206">cogeotiff/rio-cogeo!206</a>)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">rio_cogeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">cog_validate</span>
+
+<span class="k">assert</span> <span class="n">cog_validate</span><span class="p">(</span><span class="s2">&quot;cog.tif&quot;</span><span class="p">,</span> <span class="n">congig</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;GDAL_DISABLE_READDIR_ON_OPEN&quot;</span><span class="p">:</span> <span class="s2">&quot;EMPTY_DIR&quot;</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+<p>In previous version we were forcing <code>GDAL_DISABLE_READDIR_ON_OPEN=FALSE</code> in <code>cog_validate</code> function to check for external overviews.</p>
+<p>Starting with version 2.3, it's up to the user to set the wanted GDAL configuration (e.g <code>EMPTY_DIR</code>: no external file check, <code>FALSE</code>: check for external files)</p>
+<h2 id="223-2021-06-18">2.2.3 (2021-06-18)<a class="headerlink" href="#223-2021-06-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>use opened file for click progressbar (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/204" title="GitHub Pull Request: cogeotiff/rio-cogeo #204">cogeotiff/rio-cogeo!204</a>)</li>
+</ul>
+<h2 id="222-2021-06-01">2.2.2 (2021-06-01)<a class="headerlink" href="#222-2021-06-01" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Add dictionary access to <code>Info</code> model (author @geospatial-jeff, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/201" title="GitHub Pull Request: cogeotiff/rio-cogeo #201">cogeotiff/rio-cogeo!201</a>)</li>
+<li>remove unsupported resampling method for Warping in CLI options (author @drnextgis, <a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/202" title="GitHub Pull Request: cogeotiff/rio-cogeo #202">cogeotiff/rio-cogeo!202</a>)</li>
+</ul>
+<h2 id="221-2021-05-19">2.2.1 (2021-05-19)<a class="headerlink" href="#221-2021-05-19" title="Permanent link">&para;</a></h2>
+<ul>
+<li>replace missing rio-tiler dependencies with a custom BBox type definition (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/198" title="GitHub Pull Request: cogeotiff/rio-cogeo #198">cogeotiff/rio-cogeo!198</a>)</li>
+</ul>
+<h2 id="220-2021-05-18">2.2.0 (2021-05-18)<a class="headerlink" href="#220-2021-05-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add pydantic models for <code>info</code> output (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/191" title="GitHub Issue: cogeotiff/rio-cogeo #191">cogeotiff/rio-cogeo#191</a>)</li>
+<li>add <code>use_cog_driver</code> option to create COG using new GDAL COG Driver (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/194" title="GitHub Pull Request: cogeotiff/rio-cogeo #194">cogeotiff/rio-cogeo!194</a>)</li>
+</ul>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li><code>rio_cogeo.cogeo.cog_info</code> now returns a pydantic model</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">rio_cogeo.cogeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">cog_info</span>
+
+<span class="c1"># before</span>
+<span class="n">info</span> <span class="o">=</span> <span class="n">cog_info</span><span class="p">(</span><span class="s2">&quot;my.tif&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;GEO&quot;</span><span class="p">][</span><span class="s2">&quot;CRS&quot;</span><span class="p">]</span>
+
+<span class="c1"># now</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">rio_cogeo</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Info</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">info</span><span class="o">.</span><span class="n">GEO</span><span class="o">.</span><span class="n">CRS</span>
+</code></pre></div>
+<ul>
+<li>add <code>TILING SCHEME</code> in dataset namespaced metadata when creating WebOptimized COG (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/193" title="GitHub Pull Request: cogeotiff/rio-cogeo #193">cogeotiff/rio-cogeo!193</a>)</li>
+<li>add more info in rio cogeo info <code>Tags</code> (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/193" title="GitHub Pull Request: cogeotiff/rio-cogeo #193">cogeotiff/rio-cogeo!193</a>)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+<span class="err">$</span> <span class="n">rio</span> <span class="n">cogeo</span> <span class="n">create</span> <span class="ow">in</span><span class="o">.</span><span class="n">tif</span> <span class="n">out</span><span class="o">.</span><span class="n">tif</span> <span class="o">-</span><span class="n">w</span>
+<span class="err">$</span> <span class="n">rio</span> <span class="n">cogeo</span> <span class="n">info</span> <span class="n">out</span><span class="o">.</span><span class="n">tif</span> <span class="o">|</span> <span class="n">jq</span> <span class="o">.</span><span class="n">Tags</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span>
+  <span class="s2">&quot;AREA_OR_POINT&quot;</span><span class="p">:</span> <span class="s2">&quot;Area&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;OVR_RESAMPLING_ALG&quot;</span><span class="p">:</span> <span class="s2">&quot;NEAREST&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># now</span>
+<span class="err">$</span> <span class="n">rio</span> <span class="n">cogeo</span> <span class="n">create</span> <span class="ow">in</span><span class="o">.</span><span class="n">tif</span> <span class="n">out</span><span class="o">.</span><span class="n">tif</span> <span class="o">-</span><span class="n">w</span>
+<span class="err">$</span> <span class="n">rio</span> <span class="n">cogeo</span> <span class="n">info</span> <span class="n">out</span><span class="o">.</span><span class="n">tif</span> <span class="o">|</span> <span class="n">jq</span> <span class="o">.</span><span class="n">Tags</span>
+<span class="o">&gt;&gt;</span> <span class="p">{</span>
+  <span class="s2">&quot;Image Metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;AREA_OR_POINT&quot;</span><span class="p">:</span> <span class="s2">&quot;Area&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DataType&quot;</span><span class="p">:</span> <span class="s2">&quot;Generic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OVR_RESAMPLING_ALG&quot;</span><span class="p">:</span> <span class="s2">&quot;NEAREST&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;Image Structure&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;COMPRESSION&quot;</span><span class="p">:</span> <span class="s2">&quot;DEFLATE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;INTERLEAVE&quot;</span><span class="p">:</span> <span class="s2">&quot;BAND&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LAYOUT&quot;</span><span class="p">:</span> <span class="s2">&quot;COG&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;Tiling Scheme&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;WEBMERCATORQUAD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ZOOM_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;17&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>update <code>Web-Optimized</code> configuration to match GDAL COG Driver (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/193" title="GitHub Pull Request: cogeotiff/rio-cogeo #193">cogeotiff/rio-cogeo!193</a>)</li>
+</ul>
+<p>By default only the <code>raw</code> data will be aligned to the grid. To align overviews, the <code>aligned_levels</code> option can be used (wasn't really working in previous version).</p>
+<ul>
+<li>
+<p><code>rio_cogeo.utils.get_web_optimized_params</code> has been refactored (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/193" title="GitHub Pull Request: cogeotiff/rio-cogeo #193">cogeotiff/rio-cogeo!193</a>)</p>
+</li>
+<li>
+<p><code>cog_translate</code> will now materialize <strong>Nodata or Alpha band</strong> to an internal <strong>mask</strong> automatically for JPEG compresssed output (<a class="magiclink magiclink-github magiclink-pull" href="https://github.com/cogeotiff/rio-cogeo/pull/196" title="GitHub Pull Request: cogeotiff/rio-cogeo #196">cogeotiff/rio-cogeo!196</a>)</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+<span class="n">cog_translate</span><span class="p">(</span><span class="n">raster_path_rgba</span><span class="p">,</span> <span class="s2">&quot;cogeo.tif&quot;</span><span class="p">,</span> <span class="n">jpeg_profile</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cogeo.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">src</span><span class="o">.</span><span class="n">compression</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;JPEG&quot;</span>
+    <span class="k">assert</span> <span class="n">has_alpha_band</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">has_mask_band</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+
+<span class="c1"># now</span>
+<span class="n">cog_translate</span><span class="p">(</span><span class="n">raster_path_rgba</span><span class="p">,</span> <span class="s2">&quot;cogeo.tif&quot;</span><span class="p">,</span> <span class="n">jpeg_profile</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cogeo.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="k">assert</span> <span class="n">src</span><span class="o">.</span><span class="n">compression</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;JPEG&quot;</span>
+    <span class="k">assert</span> <span class="n">has_mask_band</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="214-2021-03-31">2.1.4 (2021-03-31)<a class="headerlink" href="#214-2021-03-31" title="Permanent link">&para;</a></h2>
+<ul>
+<li>fix issue in validation when BLOCK_OFFSET_0 is None (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/182" title="GitHub Issue: cogeotiff/rio-cogeo #182">cogeotiff/rio-cogeo#182</a>)</li>
+</ul>
+<h2 id="213-2021-03-03">2.1.3 (2021-03-03)<a class="headerlink" href="#213-2021-03-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <strong>colormap</strong> options in <code>cog_translate</code> to allow a user to set or update a colormap</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">cmap</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">255</span><span class="p">)}</span>
+<span class="n">cog_translate</span><span class="p">(</span><span class="s2">&quot;boring.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;cogeo.tif&quot;</span><span class="p">,</span> <span class="n">deflate_profile</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cogeo.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cog</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cog</span><span class="o">.</span><span class="n">colormap</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>add <strong>additional_cog_metadata</strong> options in <code>cog_translate</code> to allow the user to add more dataset metadatas</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">cog_translate</span><span class="p">(</span><span class="s2">&quot;boring.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;cogeo.tif&quot;</span><span class="p">,</span> <span class="n">deflate_profile</span><span class="p">,</span> <span class="n">additional_cog_metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;comments&quot;</span><span class="p">:</span> <span class="s2">&quot;I made this tiff with rio-cogeo&quot;</span><span class="p">})</span>
+
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;cogeo.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cog</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cog</span><span class="o">.</span><span class="n">tags</span><span class="p">()[</span><span class="s2">&quot;comment&quot;</span><span class="p">])</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s2">&quot;I made this tiff with rio-cogeo&quot;</span>
+</code></pre></div>
+<h2 id="212-2021-02-10">2.1.2 (2021-02-10)<a class="headerlink" href="#212-2021-02-10" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove useless path translation to pathlib and avoid side effect when using a URL (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/178" title="GitHub Issue: cogeotiff/rio-cogeo #178">cogeotiff/rio-cogeo#178</a>)</li>
+</ul>
+<h2 id="211-2021-01-27">2.1.1 (2021-01-27)<a class="headerlink" href="#211-2021-01-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>drop support for Python 3.5 (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/173" title="GitHub Issue: cogeotiff/rio-cogeo #173">cogeotiff/rio-cogeo#173</a>)</li>
+<li>allow pathlib.PurePath object as input and output (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/173" title="GitHub Issue: cogeotiff/rio-cogeo #173">cogeotiff/rio-cogeo#173</a>)</li>
+<li>add top-level exports (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/169" title="GitHub Issue: cogeotiff/rio-cogeo #169">cogeotiff/rio-cogeo#169</a>)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># before</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rio_cogeo.cogeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">cog_translate</span><span class="p">,</span> <span class="n">cog_validate</span><span class="p">,</span> <span class="n">cog_info</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rio_cogeo.profiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">cog_profiles</span>
+
+<span class="c1"># now</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rio_cogeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">cog_translate</span><span class="p">,</span> <span class="n">cog_validate</span><span class="p">,</span> <span class="n">cog_info</span><span class="p">,</span> <span class="n">cog_profiles</span>
+</code></pre></div>
+<h2 id="210-2020-12-18">2.1.0 (2020-12-18)<a class="headerlink" href="#210-2020-12-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>switch to <code>morecantile</code> and update the web-optimized creation method to better match GDAL 3.2.</li>
+<li>add <code>zoom_level_strategy</code> options to match GDAL 3.2 COG driver.</li>
+<li>add <code>aligned_levels</code> (cli and api) to select the level of overview to align with the TMS grid.</li>
+</ul>
+<p><strong>Breaking Changes:</strong>
+* removed <code>--latitude-adjustment/--global-maxzoom</code> option in the CLI
+* removed <code>latitude_adjustment</code> option in <code>rio_cogeo.cogeo.cog_translate</code>
+* updated <strong>overview blocksize</strong> to match the blocksize of the high resolution data (instead of default to 128)
+* for web-optimized COG, the highest overview level will be aligned with the TMS grid.</p>
+<h2 id="201-2020-10-07">2.0.1 (2020-10-07)<a class="headerlink" href="#201-2020-10-07" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove <code>pkg_resources</code> (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/pypa/setuptools/issues/510" title="GitHub Issue: pypa/setuptools #510">pypa/setuptools#510</a>)</li>
+</ul>
+<h2 id="200-2020-10-05">2.0.0 (2020-10-05)<a class="headerlink" href="#200-2020-10-05" title="Permanent link">&para;</a></h2>
+<p>There have been no changes since 2.0a9</p>
+<h2 id="20a9-2020-10-03">2.0a9 (2020-10-03)<a class="headerlink" href="#20a9-2020-10-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Update max IFD offset to 300 bytes (<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/cogeotiff/rio-cogeo/issues/158" title="GitHub Issue: cogeotiff/rio-cogeo #158">cogeotiff/rio-cogeo#158</a>)</li>
+</ul>
+<h2 id="20a8-2020-09-28">2.0a8 (2020-09-28)<a class="headerlink" href="#20a8-2020-09-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Make sure Alpha band isn't considered as an internal mask by <code>utils.has_mask_band</code> (#156)</li>
+</ul>
+<h2 id="20a7post1-2020-09-23">2.0a7.post1 (2020-09-23)<a class="headerlink" href="#20a7post1-2020-09-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix wrong min-zoom calculation in <code>rio_cogeo.cogeo.cog_info</code></li>
+</ul>
+<h2 id="20a7-2020-09-23">2.0a7 (2020-09-23)<a class="headerlink" href="#20a7-2020-09-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove duplicate <code>count</code> information in rio_cogeo.cogeo.cog_info output (#150)</li>
+<li>allow COG with IFD offset up to 200 bytes to accomodate with GDAL 3.1 changes (#151)</li>
+<li>fix zoom level calculation in <code>rio_cogeo.cogeo.cog_info</code></li>
+</ul>
+<h2 id="20a6-2020-08-18">2.0a6 (2020-08-18)<a class="headerlink" href="#20a6-2020-08-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>fix bug in cogeo.info when CRS in not set.</li>
+<li>add minzoom/maxzoom in cogeo.info output.</li>
+</ul>
+<p><strong>Breaking Changes:</strong>
+* rio_cogeo.utils.get_max_zoom renamed rio_cogeo.utils.get_zooms and now return min/max zoom.</p>
+<h2 id="20a5-2020-07-31">2.0a5 (2020-07-31)<a class="headerlink" href="#20a5-2020-07-31" title="Permanent link">&para;</a></h2>
+<ul>
+<li>move most of the cogeo info code in rio_cogeo.cogeo.cog_info api</li>
+<li>add cog_validation info in cogeo info result</li>
+<li>cog_validate returns a tuple (is_valid, errors, warnings) (#142, co-author with @geospatial-jeff)</li>
+<li>add scale, offset, image tags and band color interpretation in cog_info (#145, #146 and #147)</li>
+</ul>
+<h2 id="20a4-2020-06-15">2.0a4 (2020-06-15)<a class="headerlink" href="#20a4-2020-06-15" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Force output width and height (#140)</li>
+</ul>
+<h2 id="20a3-2020-06-15">2.0a3 (2020-06-15)<a class="headerlink" href="#20a3-2020-06-15" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>info</code> CLI (#134)</li>
+<li>use <code>Deflate</code> as default temporary compression (#137)</li>
+</ul>
+<h2 id="20a2-2020-05-20">2.0a2 (2020-05-20)<a class="headerlink" href="#20a2-2020-05-20" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>--config</code> CLI option to pass additional GDAL Configuration options (#135)</li>
+</ul>
+<h2 id="20a1-2020-05-07">2.0a1 (2020-05-07)<a class="headerlink" href="#20a1-2020-05-07" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Dropping python 2</strong> (#128)</li>
+<li>use new mercantile xy_bounds for better web-optimized file (#126)</li>
+<li>Allow temporary file on disk when using MemoryFile output</li>
+<li>add <code>--blocksize</code> option in CLI (#131)</li>
+<li>depreciate <code>rio_cogeo.utils.get_maximum_overview_level</code> and use rasterio.rio.overview.get_maximum_overview_level (#132)</li>
+</ul>
+<h2 id="1110-2020-02-21">1.1.10 (2020-02-21)<a class="headerlink" href="#1110-2020-02-21" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Transfer colormap (#121)</li>
+</ul>
+<h2 id="119-2020-02-06">1.1.9 (2020-02-06)<a class="headerlink" href="#119-2020-02-06" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Transfer scale and offset values to output COG (#118)</li>
+</ul>
+<h2 id="118-2020-01-08">1.1.8 (2020-01-08)<a class="headerlink" href="#118-2020-01-08" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Transfer color interpretation value to output COG (#113) * Thanks @pierotofy</li>
+<li>Cast <code>dataset_mask</code> returned by rasterio to uint8 to overcome a bug in rasterio 1.1.2 (#115)</li>
+</ul>
+<h2 id="117-2019-12-02">1.1.7 (2019-12-02)<a class="headerlink" href="#117-2019-12-02" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>strict</code> option to cog_validate to treat warnings as error (#109) * Thanks @pierotofy</li>
+<li>add documentation examples using MemoryFiles (#108 #107)</li>
+<li>Switch to <code>PHOTOMETRIC=MINISBLACK</code> when PHOTOMETRIC is set to YCBCR for 1 band dataset (#41)</li>
+</ul>
+<h2 id="116-2019-11-13">1.1.6 (2019-11-13)<a class="headerlink" href="#116-2019-11-13" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>-forward-band-tags</code> options (#115)</li>
+</ul>
+<h2 id="115-2019-10-04">1.1.5 (2019-10-04)<a class="headerlink" href="#115-2019-10-04" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>--allow-intermediate-compression</code> option to reduce the memory/disk footprint (#103)</li>
+</ul>
+<h2 id="114-2019-10-03">1.1.4 (2019-10-03)<a class="headerlink" href="#114-2019-10-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix support for optimizing open datasets, memfiles, and VRTs (#100 from j08lue)</li>
+</ul>
+<h2 id="113-2019-09-16">1.1.3 (2019-09-16)<a class="headerlink" href="#113-2019-09-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Add lzma/lerc/lerc_deflate/lerc_zstd profiles (#97)</li>
+<li>Add warnings and notes for <code>non-standard</code> compression (#97)</li>
+<li>fix THREADS definition for GDAL config</li>
+</ul>
+<h2 id="112-2019-09-12">1.1.2 (2019-09-12)<a class="headerlink" href="#112-2019-09-12" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix incorrect context behavior closing input Dataset (#94)</li>
+</ul>
+<h2 id="111-2019-09-10">1.1.1 (2019-09-10)<a class="headerlink" href="#111-2019-09-10" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add safeguard to keep datatype from input to output files (#85)</li>
+</ul>
+<p><strong>CLI Changes:</strong>
+* add <code>-t, --dtype</code> datatype option.</p>
+<p><strong>API Changes:</strong>
+* add datatype option
+* update for rasterio&gt;=1.0.28
+* allow rasterio.io.DatasetReader input (#89)</p>
+<p>Note: This release was deleted in PyPi.</p>
+<h2 id="110-2019-07-16">1.1.0 (2019-07-16)<a class="headerlink" href="#110-2019-07-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>check internal blocksize and adapt if raster is too small (#80)</li>
+</ul>
+<h2 id="100-2019-04-19">1.0.0 (2019-04-19)<a class="headerlink" href="#100-2019-04-19" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add <code>--web-optimized</code> option to create a web optimized COG (#10)</li>
+<li>add <code>--latitude-adjustment/--global-maxzoom</code> option to adjust MAX_ZOOM for global datasets</li>
+<li>Web-optimized tests needs python3.6 (cogdumper)</li>
+<li>add <code>--resampling</code> option to select the resampling algorithm when using <code>--web-optimized</code></li>
+<li>add <code>--in-memory/--no-in-memory</code> options to use temporyNamedd file instead of in-memory temp file.</li>
+</ul>
+<h2 id="10b3-2019-03-30">1.0b3 (2019-03-30)<a class="headerlink" href="#10b3-2019-03-30" title="Permanent link">&para;</a></h2>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li>remove deprecated YCBCR profile</li>
+<li>512x512 dataset without internal tiling are valid</li>
+</ul>
+<h2 id="10b2-2019-03-27">1.0b2 (2019-03-27)<a class="headerlink" href="#10b2-2019-03-27" title="Permanent link">&para;</a></h2>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li>Switch from JPEG to DEFLATE as default profile in CLI (#66)</li>
+</ul>
+<h2 id="10b1-2019-03-25">1.0b1 (2019-03-25)<a class="headerlink" href="#10b1-2019-03-25" title="Permanent link">&para;</a></h2>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li>refactor utils.get_maximum_overview_level to get rasterio dataset
+as input and reduce the number of dataset opennings (#61)</li>
+</ul>
+<h2 id="10b0-2019-03-15">1.0b0 (2019-03-15)<a class="headerlink" href="#10b0-2019-03-15" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add more logging and <code>--quiet</code> option (#46)</li>
+<li>add <code>--overview-blocksize</code> to set overview's internal tile size (#60)</li>
+</ul>
+<p><strong>Bug fixes:</strong></p>
+<ul>
+<li>copy tags and description from input to output (#19)</li>
+<li>copy input mask band to output mask</li>
+</ul>
+<p><strong>Breaking Changes:</strong></p>
+<ul>
+<li>rio cogeo now has subcommands: 'create' and 'validate' (#6).</li>
+<li>internal mask creation is now optional (--add-mask).</li>
+<li>internal nodata or alpha channel can be forwarded to the output dataset.</li>
+<li>removed default overview blocksize to be equal to the raw data blocksize (#60)</li>
+</ul>
+<h2 id="10dev10-2019-02-12">1.0dev10 (2019-02-12)<a class="headerlink" href="#10dev10-2019-02-12" title="Permanent link">&para;</a></h2>
+<ul>
+<li>allow non integer nodata value (#51)</li>
+<li>fix GDAL blocksize options casting for overview calculation (#50)</li>
+</ul>
+<h2 id="10dev9-2019-02-11">1.0dev9 (2019-02-11)<a class="headerlink" href="#10dev9-2019-02-11" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Renamed "ycbcr" profile's name to "jpeg" to reflect the compression name.
+  "ycbcr" profile will raise a "DeprecationWarning" (#44)</li>
+<li>"webp" profile has been added to COG profiles. Exploitation of this new
+  compression mode will require GDAL 2.4 (#27)</li>
+<li>Rio-cogeo can calculate the overview level based on the internal tile size
+  and the dataset width/height (#37)</li>
+</ul>
+<h2 id="10dev8-2018-10-02">1.0dev8 (2018-10-02)<a class="headerlink" href="#10dev8-2018-10-02" title="Permanent link">&para;</a></h2>
+<ul>
+<li>write tags in output file (#31)</li>
+<li>add bilinear, cubic spline, lanczos resampling modes for overviews</li>
+</ul>
+<h2 id="10dev7-2018-09-12">1.0dev7 (2018-09-12)<a class="headerlink" href="#10dev7-2018-09-12" title="Permanent link">&para;</a></h2>
+<ul>
+<li>add resampling option for overviews (#28)</li>
+</ul>
+<h2 id="10dev6-2018-08-23">1.0dev6 (2018-08-23)<a class="headerlink" href="#10dev6-2018-08-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Remove unnecessary compression for in-memory step (reduce runtime and memory usage) (#25)</li>
+</ul>
+<h2 id="10dev4-2018-07-16">1.0dev4 (2018-07-16)<a class="headerlink" href="#10dev4-2018-07-16" title="Permanent link">&para;</a></h2>
+<ul>
+<li>rasterio 1.0</li>
+</ul>
+<h2 id="10dev3-2018-07-05">1.0dev3 (2018-07-05)<a class="headerlink" href="#10dev3-2018-07-05" title="Permanent link">&para;</a></h2>
+<ul>
+<li>remove default bidx in cli (#17)</li>
+</ul>
+<h2 id="10dev2-2018-06-28">1.0dev2 (2018-06-28)<a class="headerlink" href="#10dev2-2018-06-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Add ZSTD compressed COG profile (#14)</li>
+<li>Fix warnings for useless boundless=True option (#13)</li>
+<li>add BIGTIFF=IF_SAFER to COG profile (if BIGTIFF not set otherwise in the env)</li>
+</ul>
+<p><strong>Breaking Changes:</strong>
+* replace "BAND" by "PIXEL" interleave in PACKBITS profile (#16)</p>
+<h2 id="10dev12018-16-13">1.0dev1(2018-16-13)<a class="headerlink" href="#10dev12018-16-13" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Initial release. Requires Rasterio &gt;= 1.0b1.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/cogeotiff" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/cogeotiff" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.cogeo.org/" target="_blank" rel="noopener" title="www.cogeo.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>

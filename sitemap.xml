@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/API/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/Advanced/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/CLI/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/Is_it_a_COG/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/contributing/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/profile/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cogeotiff.github.io/rio-cogeo/release-notes/</loc>
+         <lastmod>2025-11-21</lastmod>
+    </url>
+</urlset>
