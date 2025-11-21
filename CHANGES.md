@@ -1,5 +1,11 @@
 # Release Notes
 
+## 7.0.0 (2025-11-21)
+
+* switch to UV for development
+* remove python 3.10 support **breaking change**
+* update morecantile requirement to `>=5.0,<8.0` 
+
 ## 6.0.0 (2025-11-05)
 
 * allow `interleave=BAND` when using GDAL COG driver (require `GDAL>=3.11`) (https://github.com/cogeotiff/rio-cogeo/issues/306)
