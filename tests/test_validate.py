@@ -32,6 +32,10 @@ raster_known_incompatible = os.path.join(
     fixture_dir, "validate", "image_known_incompatible_ghost_headers.tif"
 )
 
+raster_big_width = os.path.join(fixture_dir, "validate", "image_2000x128.tif")
+# Tiled 2000x128 with non tiled 1000x64 overview
+raster_ovr_non_tiled = os.path.join(fixture_dir, "validate", "image_ovr_non_tiled.tif")
+
 jpeg_profile = cog_profiles.get("jpeg")
 jpeg_profile.update({"blockxsize": 256, "blockysize": 256})
 
@@ -46,6 +50,16 @@ def test_cog_validate_valid(monkeypatch):
     # not tiled, no overview
     assert not cog_validate(raster_big, quiet=True, config=config)[0]
 
+    assert (
+        "The file is greater than 512xH or 512xW, but is not tiled"
+        in cog_validate(raster_big_width, quiet=True, config=config)[1]
+    )
+
+    # tiled, non tiled overview
+    assert (
+        "Overview of index 0 is not tiled"
+        in cog_validate(raster_ovr_non_tiled, quiet=True, config=config)[1]
+    )
     # external overview
     assert not cog_validate(raster_external, config=config)[0]
 
