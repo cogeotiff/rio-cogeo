@@ -7,6 +7,7 @@ e.g:
 ```python
 from rio_cogeo.cogeo import cog_translate
 
+
 def _translate(src_path, dst_path, profile="webp", profile_options={}, **options):
     """Convert image to COG."""
     # Format creation option (see gdalwarp `-co` option)
@@ -50,7 +51,7 @@ from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
 # Create GeoTIFF profile
-bounds = mercantile.bounds(mercantile.Tile(0,0,0))
+bounds = mercantile.bounds(mercantile.Tile(0, 0, 0))
 
 # Rasterio uses numpy array of shape of `(bands, height, width)`
 width = 1024
@@ -126,7 +127,6 @@ config = {
 
 
 with open("logfile.txt", "w+") as buffer:
-
     # Progress output buffer must be interactive
     buffer.isatty = lambda: True
 
@@ -148,7 +148,8 @@ translation is using the text buffer.
 ```python
 import re
 
-def getPercentage(buffer:str) -> float:
+
+def getPercentage(buffer: str) -> float:
     return int(re.findall("\d*%", buffer)[-1].replace("%", "")) / 100
 ```
 

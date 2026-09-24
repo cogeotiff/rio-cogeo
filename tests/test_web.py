@@ -82,7 +82,6 @@ def test_cog_translate_web():
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -171,7 +170,6 @@ def test_cog_translate_Internal():
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -249,7 +247,6 @@ def test_cog_translate_web_align():
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         web_profile = cog_profiles.get("raw")
         web_profile.update({"blockxsize": 256, "blockysize": 256})
         config = {"GDAL_TIFF_OVR_BLOCKSIZE": "256"}
@@ -332,9 +329,10 @@ def test_cog_translate_web_geos():
             use_cog_driver=True,
             config=config,
         )
-        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
-            "cogeo_gdal.tif"
-        ) as cog_gdal:
+        with (
+            rasterio.open("cogeo.tif") as cog_dst,
+            rasterio.open("cogeo_gdal.tif") as cog_gdal,
+        ):
             assert cog_dst.shape == cog_gdal.shape
             for i in range(0, 4):
                 assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
@@ -345,7 +343,6 @@ def test_web_align_cogeo_gdal():
     """Test Web-Optimized COG conformance with GDAL."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         web_tms = morecantile.tms.get("WebMercatorQuad")
 
         web_profile = cog_profiles.get("raw")
@@ -369,9 +366,10 @@ def test_web_align_cogeo_gdal():
             config=config,
             use_cog_driver=True,
         )
-        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
-            "cogeo_gdal.tif"
-        ) as cog_gdal:
+        with (
+            rasterio.open("cogeo.tif") as cog_dst,
+            rasterio.open("cogeo_gdal.tif") as cog_gdal,
+        ):
             assert cog_dst.shape == cog_gdal.shape
             for i in range(0, 4):
                 assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)
@@ -397,9 +395,10 @@ def test_web_align_cogeo_gdal():
             use_cog_driver=True,
         )
 
-        with rasterio.open("cogeo.tif") as cog_dst, rasterio.open(
-            "cogeo_gdal.tif"
-        ) as cog_gdal:
+        with (
+            rasterio.open("cogeo.tif") as cog_dst,
+            rasterio.open("cogeo_gdal.tif") as cog_gdal,
+        ):
             assert cog_dst.shape == cog_gdal.shape
             for i in range(0, 4):
                 assert round(cog_dst.bounds[i], 5) == round(cog_gdal.bounds[i], 5)

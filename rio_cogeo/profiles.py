@@ -181,7 +181,8 @@ class COGProfiles(dict):
         if key in ["zstd", "webp", "lerc", "lerc_deflate", "lerc_zstd"]:
             warnings.warn(
                 "Non-standard compression schema: {}. The output COG might not be fully"
-                " supported by software not build against latest libtiff.".format(key)
+                " supported by software not build against latest libtiff.".format(key),
+                stacklevel=2,
             )
 
         return self[key].copy()

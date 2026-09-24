@@ -190,6 +190,7 @@ def cog_translate(  # noqa: C901
         warnings.warn(
             "'web_optomized' option is deprecated and will be removed in 6.0. Please use the `tms` option",
             DeprecationWarning,
+            stacklevel=2,
         )
         tms = tms or morecantile.tms.get("WebMercatorQuad")
 
@@ -226,6 +227,7 @@ def cog_translate(  # noqa: C901
                 warnings.warn(
                     "Input dataset has both a nodata value and internal alpha/mask band. Nodata value will be prioritized.",
                     NodataAlphaMaskWarning,
+                    stacklevel=2,
                 )
 
             if colormap and len(indexes) > 1:
@@ -246,6 +248,7 @@ def cog_translate(  # noqa: C901
             ):
                 warnings.warn(
                     "Nodata/Alpha band will be translated to an internal mask band.",
+                    stacklevel=2,
                 )
                 add_mask = True
                 indexes = (
@@ -311,7 +314,8 @@ def cog_translate(  # noqa: C901
                 ):
                     warnings.warn(
                         "PHOTOMETRIC=YCBCR not supported on a 1-band raster"
-                        " and has been set to 'MINISBLACK'"
+                        " and has been set to 'MINISBLACK'",
+                        stacklevel=2,
                     )
                     dst_kwargs["photometric"] = "MINISBLACK"
 
@@ -346,7 +350,8 @@ def cog_translate(  # noqa: C901
                     if tmp_dst.colorinterp[0] is not ColorInterp.palette:
                         tmp_dst.colorinterp = [ColorInterp.palette]
                         warnings.warn(
-                            "Dataset color interpretation was set to `Palette`"
+                            "Dataset color interpretation was set to `Palette`",
+                            stacklevel=2,
                         )
                     tmp_dst.write_colormap(1, colormap)
 
@@ -356,7 +361,8 @@ def cog_translate(  # noqa: C901
                     except ValueError:
                         warnings.warn(
                             "Dataset has `Palette` color interpretation"
-                            " but is missing colormap information"
+                            " but is missing colormap information",
+                            stacklevel=2,
                         )
 
                 wind = list(tmp_dst.block_windows(1))
@@ -449,7 +455,8 @@ def cog_translate(  # noqa: C901
 
                     if add_mask and dst_kwargs.get("compress", "") != "JPEG":
                         warnings.warn(
-                            "With GDAL COG driver, mask band will be translated to an alpha band."
+                            "With GDAL COG driver, mask band will be translated to an alpha band.",
+                            stacklevel=2,
                         )
                     if overview_level == 0:
                         dst_kwargs["overviews"] = "NONE"
@@ -574,7 +581,6 @@ def cog_validate(  # noqa: C901
                 errors.append("Overviews should be sorted")
 
             for ix, dec in enumerate(overviews):
-
                 # NOTE: Size check is handled in rasterio `src.overviews` methods
                 # https://github.com/mapbox/rasterio/blob/4ebdaa08cdcc65b141ed3fe95cf8bbdd9117bc0b/rasterio/_base.pyx
                 # We just need to make sure the decimation level is > 1
@@ -631,7 +637,6 @@ def cog_validate(  # noqa: C901
                 break
 
             for ix, _dec in enumerate(overviews):
-
                 # Get the width and height of the overview
                 overview_width = src.width // (_dec)
                 overview_height = src.height // (_dec)
@@ -646,9 +651,9 @@ def cog_validate(  # noqa: C901
                         if data_offset > 0:
                             data_offset = int(data_offset) if data_offset else 0
                             data_offsets.append(data_offset)
-                            details["data_offsets"][
-                                "overview_{}".format(ix)
-                            ] = data_offset
+                            details["data_offsets"]["overview_{}".format(ix)] = (
+                                data_offset
+                            )
                             break
                     else:
                         continue

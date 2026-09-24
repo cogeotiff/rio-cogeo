@@ -382,16 +382,14 @@ def info(input, to_json, config):  # noqa: C901
     if to_json:
         click.echo(metadata.model_dump_json(exclude_none=True, by_alias=True))
     else:
-
         sep = 25
-        click.echo(
-            f"""{click.style('Driver:', bold=True)} {metadata.Driver}
-{click.style('File:', bold=True)} {metadata.Path}
-{click.style('COG:', bold=True)} {metadata.COG}
-{click.style('Compression:', bold=True)} {metadata.Compression}
-{click.style('ColorSpace:', bold=True)} {metadata.ColorSpace}
+        click.echo(f"""{click.style("Driver:", bold=True)} {metadata.Driver}
+{click.style("File:", bold=True)} {metadata.Path}
+{click.style("COG:", bold=True)} {metadata.COG}
+{click.style("Compression:", bold=True)} {metadata.Compression}
+{click.style("ColorSpace:", bold=True)} {metadata.ColorSpace}
 
-{click.style('Profile', bold=True)}
+{click.style("Profile", bold=True)}
     {click.style("Width:", bold=True):<{sep}} {metadata.Profile.Width}
     {click.style("Height:", bold=True):<{sep}} {metadata.Profile.Height}
     {click.style("Bands:", bold=True):<{sep}} {metadata.Profile.Bands}
@@ -404,35 +402,28 @@ def info(input, to_json, config):  # noqa: C901
     {click.style("ColorMap:", bold=True):<{sep}} {metadata.Profile.ColorMap}
     {click.style("ColorInterp:", bold=True):<{sep}} {metadata.Profile.ColorInterp}
     {click.style("Scales:", bold=True):<{sep}} {metadata.Profile.Scales}
-    {click.style("Offsets:", bold=True):<{sep}} {metadata.Profile.Offsets}"""
-        )
+    {click.style("Offsets:", bold=True):<{sep}} {metadata.Profile.Offsets}""")
 
-        click.echo(
-            f"""
-{click.style('Geo', bold=True)}
+        click.echo(f"""
+{click.style("Geo", bold=True)}
     {click.style("Crs:", bold=True):<{sep}} {metadata.GEO.CRS}
     {click.style("Origin:", bold=True):<{sep}} {metadata.GEO.Origin}
     {click.style("Resolution:", bold=True):<{sep}} {metadata.GEO.Resolution}
     {click.style("BoundingBox:", bold=True):<{sep}} {metadata.GEO.BoundingBox}
     {click.style("MinZoom:", bold=True):<{sep}} {metadata.GEO.MinZoom}
-    {click.style("MaxZoom:", bold=True):<{sep}} {metadata.GEO.MaxZoom}"""
-        )
+    {click.style("MaxZoom:", bold=True):<{sep}} {metadata.GEO.MaxZoom}""")
 
         for ns, values in metadata.Tags.items():
-            click.echo(
-                f"""
-{click.style(ns, bold=True)}"""
-            )
+            click.echo(f"""
+{click.style(ns, bold=True)}""")
             for key, val in values.items():
                 click.echo(
                     f"""    {click.style(key, underline=True, bold=True)}: {val}"""
                 )
 
         for ns, meta in metadata.Band_Metadata.items():
-            click.echo(
-                f"""
-{click.style(ns, bold=True)}"""
-            )
+            click.echo(f"""
+{click.style(ns, bold=True)}""")
 
             if meta.Description:
                 click.echo(
@@ -460,8 +451,8 @@ def info(input, to_json, config):  # noqa: C901
 
         click.echo(
             f"""
-{click.style('IFD', bold=True)}
-    {click.style('Id', underline=True, bold=True):<20}{click.style('Size', underline=True, bold=True):<27}{click.style('BlockSize', underline=True, bold=True):<26}{click.style('Decimation', underline=True, bold=True)}"""
+{click.style("IFD", bold=True)}
+    {click.style("Id", underline=True, bold=True):<20}{click.style("Size", underline=True, bold=True):<27}{click.style("BlockSize", underline=True, bold=True):<26}{click.style("Decimation", underline=True, bold=True)}"""
         )
 
         for ifd in metadata.IFD:
@@ -470,10 +461,8 @@ def info(input, to_json, config):  # noqa: C901
             click.echo(f"""    {ifd.Level:<8}{wh:<15}{bl:<14}{ifd.Decimation}""")
 
         if metadata.COG_errors or metadata.COG_warnings:
-            click.echo(
-                f"""
-{click.style('COG Validation info', bold=True)}"""
-            )
+            click.echo(f"""
+{click.style("COG Validation info", bold=True)}""")
             for error in metadata.COG_errors or []:
                 click.secho(f"""    - {error} (error)""", fg="red")
             for warning in metadata.COG_warnings or []:

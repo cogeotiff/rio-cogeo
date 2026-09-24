@@ -75,22 +75,11 @@
     output_profile = cog_profiles.get(profile)
 
     tms = morecantile.tms.get("WGS1984Quad")
-    cog_translate(
-        "in.tif",
-        "out.tif",
-        output_profile,
-        web_optimzed=True,
-        tms=tms
-    )
+    cog_translate("in.tif", "out.tif", output_profile, web_optimzed=True, tms=tms)
 
     # now
     tms = morecantile.tms.get("WGS1984Quad")
-    cog_translate(
-        "in.tif",
-        "out.tif",
-        output_profile,
-        tms=tms
-    )
+    cog_translate("in.tif", "out.tif", output_profile, tms=tms)
     ```
 
 * fix COG validation for SPARSE dataset (author @mpadillaruiz, https://github.com/cogeotiff/rio-cogeo/issues/281)

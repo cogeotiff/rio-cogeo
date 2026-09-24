@@ -36,7 +36,7 @@ power of two:
 
 ```python
 overview_level = 3
-overviews = [2 ** j for j in range(1, overview_level + 1)]
+overviews = [2**j for j in range(1, overview_level + 1)]
 print(overviews)
 [2, 4, 8]
 ```
@@ -48,7 +48,7 @@ As described above, a decimation base of 2 is used by default. However you can p
 ```python
 overview_level = 3
 decimation_base = 3
-overviews = [decimation_base ** j for j in range(1, overview_level + 1)]
+overviews = [decimation_base**j for j in range(1, overview_level + 1)]
 print(overviews)
 [3, 9, 27]
 ```

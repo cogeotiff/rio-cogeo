@@ -83,7 +83,7 @@ default_section = "THIRDPARTY"
 no_strict_optional = "True"
 ignore_missing_imports = "True"
 
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     "D1",  # pydocstyle errors
     "E",  # pycodestyle errors

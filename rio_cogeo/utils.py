@@ -14,7 +14,7 @@ from rasterio.warp import calculate_default_transform
 def has_alpha_band(src_dst: Union[DatasetReader, DatasetWriter, WarpedVRT]):
     """Check for alpha band or mask in source."""
     if (
-        any([MaskFlags.alpha in flags for flags in src_dst.mask_flag_enums])
+        any(MaskFlags.alpha in flags for flags in src_dst.mask_flag_enums)
         or ColorInterp.alpha in src_dst.colorinterp
     ):
         return True
@@ -24,10 +24,8 @@ def has_alpha_band(src_dst: Union[DatasetReader, DatasetWriter, WarpedVRT]):
 def has_mask_band(src_dst):
     """Check for mask band in source."""
     if any(
-        [
-            (MaskFlags.per_dataset in flags and MaskFlags.alpha not in flags)
-            for flags in src_dst.mask_flag_enums
-        ]
+        (MaskFlags.per_dataset in flags and MaskFlags.alpha not in flags)
+        for flags in src_dst.mask_flag_enums
     ):
         return True
     return False

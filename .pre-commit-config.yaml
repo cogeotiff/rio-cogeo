@@ -1,29 +1,24 @@
 repos:
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.24
+    rev: '0.26'
     hooks:
       - id: validate-pyproject
 
-  - repo: https://github.com/psf/black
-    rev: 22.12.0
-    hooks:
-      - id: black
-        language_version: python
-
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 9.0.1
     hooks:
       - id: isort
         language_version: python
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.238
+    rev: v0.16.8
     hooks:
       - id: ruff
         args: ["--fix"]
+      - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v2.3.1
     hooks:
       - id: mypy
         language_version: python

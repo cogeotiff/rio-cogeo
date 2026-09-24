@@ -47,7 +47,7 @@ def test_cogeo_valid(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
+            assert all((512, 512) == (h, w) for (h, w) in src.block_shapes)
             assert src.compression.value == "DEFLATE"
             assert not src.photometric
             assert src.interleaving.value == "PIXEL"
@@ -206,7 +206,7 @@ def test_cogeo_validOvrOption(runner):
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
+            assert all((512, 512) == (h, w) for (h, w) in src.block_shapes)
             assert src.overviews(1) == [2, 4]
 
 
@@ -251,7 +251,7 @@ def test_cogeo_overviewTilesize(monkeypatch, runner):
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert all([(128, 128) == (h, w) for (h, w) in src.block_shapes])
+            assert all((128, 128) == (h, w) for (h, w) in src.block_shapes)
             assert src.overviews(1)
 
         with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
@@ -265,7 +265,7 @@ def test_cogeo_overviewTilesize(monkeypatch, runner):
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert all([(128, 128) == (h, w) for (h, w) in src.block_shapes])
+            assert all((128, 128) == (h, w) for (h, w) in src.block_shapes)
             assert src.overviews(1)
 
         with rasterio.open("output.tif", OVERVIEW_LEVEL=1) as src:
@@ -355,7 +355,7 @@ def test_cogeo_validgdalBlockOption(runner):
         assert not result.exception
         assert result.exit_code == 0
         with rasterio.open("output.tif") as src:
-            assert all([(128, 128) == (h, w) for (h, w) in src.block_shapes])
+            assert all((128, 128) == (h, w) for (h, w) in src.block_shapes)
             assert src.overviews(1) == [2, 4]
 
 

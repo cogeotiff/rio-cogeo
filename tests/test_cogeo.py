@@ -63,7 +63,7 @@ def _validate_translated_rgb_jpeg(src):
     assert src.height == 512
     assert src.width == 512
     assert src.meta["dtype"] == "uint8"
-    assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
+    assert all((64, 64) == (h, w) for (h, w) in src.block_shapes)
     assert src.profile["blockxsize"] == 64
     assert src.profile["blockysize"] == 64
     assert src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
@@ -132,7 +132,7 @@ def test_cog_translate_validRaw(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 512
             assert src.width == 512
-            assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
+            assert all((64, 64) == (h, w) for (h, w) in src.block_shapes)
             assert not src.compression
             assert src.interleaving.value == "PIXEL"
 
@@ -166,7 +166,7 @@ def test_cog_translate_validAlpha(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert all([(64, 64) == (h, w) for (h, w) in src.block_shapes])
+            assert all((64, 64) == (h, w) for (h, w) in src.block_shapes)
             assert src.compression.value == "WEBP"
             assert has_alpha_band(src)
 
@@ -209,9 +209,10 @@ def test_cog_translate_validAlpha(runner):
             cog_profiles.get("deflate"),
             quiet=True,
         )
-        with rasterio.open("cogeo.tif") as cog, rasterio.open(
-            raster_path_rgba
-        ) as source:
+        with (
+            rasterio.open("cogeo.tif") as cog,
+            rasterio.open(raster_path_rgba) as source,
+        ):
             assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
             assert cog.count == source.count
             assert cog.colorinterp == source.colorinterp
@@ -223,9 +224,10 @@ def test_cog_translate_validAlpha(runner):
             quiet=True,
             add_mask=True,
         )
-        with rasterio.open("cogeo.tif") as cog, rasterio.open(
-            raster_path_rgba
-        ) as source:
+        with (
+            rasterio.open("cogeo.tif") as cog,
+            rasterio.open(raster_path_rgba) as source,
+        ):
             assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
             assert cog.count <= source.count
             assert cog.colorinterp != source.colorinterp
@@ -297,7 +299,7 @@ def test_cog_translate_validCustom(runner):
             assert src.height == 512
             assert src.width == 512
             assert src.meta["dtype"] == "uint8"
-            assert all([(256, 256) == (h, w) for (h, w) in src.block_shapes])
+            assert all((256, 256) == (h, w) for (h, w) in src.block_shapes)
             assert src.compression == "YCbCr JPEG" or src.compression.value == "JPEG"
             assert src.profile["blockxsize"] == 256
             assert src.profile["blockysize"] == 256
@@ -310,9 +312,10 @@ def test_cog_translate_mask(runner):
     """Should work as expected (copy mask from input)."""
     with runner.isolated_filesystem():
         cog_translate(raster_path_mask, "cogeo.tif", jpeg_profile, quiet=True)
-        with rasterio.open("cogeo.tif") as cog, rasterio.open(
-            raster_path_mask
-        ) as source:
+        with (
+            rasterio.open("cogeo.tif") as cog,
+            rasterio.open(raster_path_mask) as source,
+        ):
             assert cog.read(1, masked=True).max() == source.read(1, masked=True).max()
             assert cog.count == source.count
             assert cog.colorinterp == source.colorinterp
@@ -366,7 +369,7 @@ def test_cog_translate_valid_blocksize(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 171
             assert src.width == 171
-            all([(128, 128) == (h, w) for (h, w) in src.block_shapes])
+            assert all((128, 128) == (h, w) for (h, w) in src.block_shapes)
             assert src.profile["blockxsize"] == 128
             assert src.profile["blockysize"] == 128
             assert src.overviews(1) == [2]
@@ -376,7 +379,7 @@ def test_cog_translate_valid_blocksize(runner):
         with rasterio.open("cogeo.tif") as src:
             assert src.height == 51
             assert src.width == 51
-            assert all([(512, 512) == (h, w) for (h, w) in src.block_shapes])
+            assert all((512, 512) == (h, w) for (h, w) in src.block_shapes)
             assert src.profile.get("blockxsize") == 512
             assert src.profile.get("blockysize") == 512
             assert not src.overviews(1)
@@ -674,9 +677,11 @@ def test_gdal_cog_compare(runner):
             quiet=True,
         )
 
-        with rasterio.open("riocogeo.tif") as riocogeo, rasterio.open(
-            "gdalcogeo.tif"
-        ) as gdalcogeo, rasterio.open("cog.tif") as cog:
+        with (
+            rasterio.open("riocogeo.tif") as riocogeo,
+            rasterio.open("gdalcogeo.tif") as gdalcogeo,
+            rasterio.open("cog.tif") as cog,
+        ):
             assert cog.profile == gdalcogeo.profile == riocogeo.profile
             assert cog.overviews(1) == gdalcogeo.overviews(1) == riocogeo.overviews(1)
 
@@ -712,9 +717,10 @@ def test_gdal_cog_compareWeb(runner):
             TILING_SCHEME_ALIGNED_LEVELS="2",
         )
 
-        with rasterio.open("gdalcogeo.tif") as gdalcogeo, rasterio.open(
-            "cog.tif"
-        ) as cog:
+        with (
+            rasterio.open("gdalcogeo.tif") as gdalcogeo,
+            rasterio.open("cog.tif") as cog,
+        ):
             cog_meta = cog.meta
             _ = cog_meta.pop("transform")
 
@@ -820,7 +826,6 @@ def test_cog_translate_forward_ns_metadata(runner):
 def test_cog_translate_decimation_base(runner):
     """Should create proper overviews when using custom decimation base."""
     with runner.isolated_filesystem():
-
         base_level_pairs = [(3, 6), (4, 5), (5, 4)]
 
         for decimation_base, overview_level in base_level_pairs:
@@ -847,9 +852,10 @@ def test_cog_translate_gcps(runner):
             quiet=True,
         )
 
-        with rasterio.open("cogeo.tif") as cog, rasterio.open(
-            raster_path_gcps
-        ) as source:
+        with (
+            rasterio.open("cogeo.tif") as cog,
+            rasterio.open(raster_path_gcps) as source,
+        ):
             assert cog.read(1).max() == source.read(1).max()
             assert not cog.count == source.count
 
@@ -870,9 +876,10 @@ def test_cog_translate_gcps(runner):
             quiet=True,
         )
 
-        with rasterio.open("cogeo.tif") as cog, rasterio.open(
-            raster_path_gcps
-        ) as source:
+        with (
+            rasterio.open("cogeo.tif") as cog,
+            rasterio.open(raster_path_gcps) as source,
+        ):
             assert cog.read(1).max() == source.read(1).max()
             assert cog.count == source.count
             assert cog.count == 1
