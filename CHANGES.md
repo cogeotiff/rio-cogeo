@@ -1,5 +1,9 @@
 # Release Notes
 
+## 7.0.3 (2026-09-24)
+
+* fix: tiling check for datasets exceeding 512px in a single dimension (author @m3zn, https://github.com/cogeotiff/rio-cogeo/pull/332)
+
 ## 7.0.2 (2026-03-27)
 
 * fix: add data_offsets initialization in cog_validate function (author @benboothby, https://github.com/cogeotiff/rio-cogeo/pull/318)
