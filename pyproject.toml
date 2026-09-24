@@ -32,7 +32,6 @@ dev = [
     "pytest",
     "pytest-cov",    
     "pre-commit",
-    "bump-my-version",
 ]
 docs = [
     "mkdocs",
