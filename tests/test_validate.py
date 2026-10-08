@@ -2,9 +2,12 @@
 
 import os
 
+import numpy
 import pytest
+import rasterio
 from click.testing import CliRunner
 from rasterio.errors import NotGeoreferencedWarning
+from rasterio.transform import from_origin
 
 from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_cogeo.profiles import cog_profiles
@@ -156,3 +159,34 @@ def test_cog_validate_config(monkeypatch):
             raster_external, config={"GDAL_DISABLE_READDIR_ON_OPEN": "FALSE"}
         )[1][0]
     )
+
+
+def test_cog_validate_sparse_empty(tmp_path):
+    """Should validate a sparse COG filled entirely with nodata."""
+    src_path = str(tmp_path / "empty.tif")
+    with rasterio.open(
+        src_path,
+        "w",
+        driver="GTiff",
+        width=1024,
+        height=1024,
+        count=1,
+        dtype="uint8",
+        nodata=0,
+        crs="EPSG:3857",
+        transform=from_origin(0, 0, 1, 1),
+    ) as dst:
+        dst.write(numpy.zeros((1, 1024, 1024), dtype="uint8"))
+
+    profile = cog_profiles.get("deflate")
+    profile.update(sparse_ok=True, blockxsize=256, blockysize=256)
+    cog_path = str(tmp_path / "empty_cog.tif")
+    cog_translate(src_path, cog_path, profile, overview_level=2, quiet=True)
+
+    with rasterio.open(cog_path) as src:
+        assert src.get_tag_item("BLOCK_OFFSET_0_0", "TIFF", bidx=1) is None
+
+    is_valid, errors, warnings = cog_validate(cog_path, quiet=True)
+    assert is_valid
+    assert not errors
+    assert not warnings
