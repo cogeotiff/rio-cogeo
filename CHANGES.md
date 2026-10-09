@@ -1,5 +1,9 @@
 # Release Notes
 
+## 7.0.4 (2026-10-09)
+
+* fix: avoid index error on COGs with no data (author @benboothby, https://github.com/cogeotiff/rio-cogeo/pull/338)
+
 ## 7.0.3 (2026-09-24)
 
 * fix: tiling check for datasets exceeding 512px in a single dimension (author @m3zn, https://github.com/cogeotiff/rio-cogeo/pull/332)
