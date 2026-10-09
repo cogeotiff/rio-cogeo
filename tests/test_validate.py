@@ -20,6 +20,8 @@ raster_jpeg = os.path.join(fixture_dir, "validate", "nontiff.jpg")
 raster_big = os.path.join(fixture_dir, "image_2000px.tif")
 raster_zero_offset = os.path.join(fixture_dir, "validate", "cog_no_offest.tif")
 raster_sparse = os.path.join(fixture_dir, "validate", "sparse.tif")
+# Sparse COG filled entirely with nodata (no block has a data offset)
+raster_sparse_empty = os.path.join(fixture_dir, "validate", "sparse_empty.tif")
 
 # COG created with rio-cogeo but using gdal 3.1
 raster_rioCOGgdal31 = os.path.join(fixture_dir, "validate", "image_rioCOG_gdal3.1.tif")
@@ -88,6 +90,12 @@ def test_cog_validate_valid(monkeypatch):
 
     # Sparse COG with some overviews that contain zeros
     assert cog_validate(raster_sparse, config=config)[0]
+
+    # Sparse COG filled entirely with nodata
+    is_valid, errors, warnings = cog_validate(raster_sparse_empty, config=config)
+    assert is_valid
+    assert not errors
+    assert not warnings
 
 
 def test_cog_validate_return():

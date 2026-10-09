@@ -659,7 +659,7 @@ def cog_validate(  # noqa: C901
                         continue
                     break
 
-            if data_offsets[-1] != 0 and data_offsets[-1] < ifd_offsets[-1]:
+            if data_offsets and data_offsets[-1] < ifd_offsets[-1]:
                 if len(overviews) > 0:
                     errors.append(
                         "The offset of the first block of the smallest overview "
